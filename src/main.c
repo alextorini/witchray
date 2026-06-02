@@ -8,12 +8,9 @@ const int VIRTUAL_HEIGHT = 360;
 
 int main() {
     SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
-
-    // SetTargetFPS(60);
+    SetTargetFPS(60);
     InitWindow(1920, 1080, "WitchRay");
-
     InitAudioDevice();
-
     SearchAndSetResourceDir("resources");
 
     init();
@@ -37,7 +34,6 @@ int main() {
     unload();
 
     CloseAudioDevice();
-
     CloseWindow();
 
     return 0;

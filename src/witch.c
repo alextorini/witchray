@@ -89,7 +89,7 @@ void update_and_draw() {
         entity_render = (Render *)ecs_pointers.components.render->data + i;
 
         if (ep->comp_mask &
-            (ecs_pointers.components.position->mask_bit || ecs_pointers.components.velocity->mask_bit)) {
+            (ecs_pointers.components.position->mask_bit | ecs_pointers.components.velocity->mask_bit)) {
             *entity_position = Vector2Add(*entity_position, Vector2Scale(*entity_velocity, GetFrameTime()));
 
             if ((ep->comp_mask & ecs_pointers.components.paralax->mask_bit) &&

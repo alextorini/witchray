@@ -18,7 +18,7 @@ typedef struct {
 typedef struct {
     int id;
     int version;
-    uint32_t comp_mask;
+    uint64_t comp_mask;
 } EcsEntity;
 
 typedef struct {

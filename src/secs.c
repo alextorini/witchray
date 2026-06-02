@@ -38,7 +38,7 @@ EcsComponent *ecs_register_component(EcsSpace *space, const char *name, size_t d
     strncpy(component->name, name, MAX_COMPONENT_NAME_LENGTH - 1);
     component->name[MAX_COMPONENT_NAME_LENGTH - 1] = '\0';
 
-    component->mask_bit = (1 << space->current_component_id);
+    component->mask_bit = (1ULL << space->current_component_id);
 
     component->data = calloc(space->current_entities_capacity, data_struct_size);
     if (!component->data) {

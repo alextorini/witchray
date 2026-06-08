@@ -3,6 +3,7 @@
 #include "raymath.h"
 #include "render.h"
 #include "secs.h"
+#include "misc.h"
 
 
 static Font fnt;
@@ -83,7 +84,7 @@ void update_and_draw() {
     Position *e_pos;
     Velocity *e_vel;
     IsParalax *e_is_prlx;
-    IsPlayer *e_is_plr;
+    // IsPlayer *e_is_plr;
     EcsEntity *e_ptr;
     for (int i = 0; i < spc->current_entity_id; i++) {
         e_ptr = (EcsEntity *)spc->entities + i;

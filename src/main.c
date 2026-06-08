@@ -2,6 +2,7 @@
 #include "resource_dir.h"
 
 #include "witch.h"
+#include "misc.h"
 
 const int VIRTUAL_WIDTH = 640;
 const int VIRTUAL_HEIGHT = 360;

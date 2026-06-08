@@ -6,7 +6,7 @@
 typedef Vector2 Position;
 typedef Vector2 Velocity;
 typedef bool IsParalax;
-typedef bool IsPlayer;
+// typedef bool IsPlayer;
 
 typedef struct {
     Texture *spritesheet;

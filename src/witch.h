@@ -6,6 +6,7 @@
 typedef Vector2 Position;
 typedef Vector2 Velocity;
 typedef bool IsParalax;
+typedef bool IsPlayer;
 
 typedef struct {
     Texture *spritesheet;
@@ -18,24 +19,25 @@ typedef struct {
 } Background;
 
 typedef struct {
-    EcsComponent *position;
-    EcsComponent *velocity;
-    EcsComponent *render;
-    EcsComponent *paralax;
+    EcsComponent *pos;
+    EcsComponent *vel;
+    EcsComponent *rndr;
+    EcsComponent *is_prlx;
+    // EcsComponent *is_plr;
 } EcsComponentPointers;
 
 typedef struct {
-    EcsEntity *player;
+    EcsEntity *plr;
     EcsEntity *background_layers[2][2];
     EcsEntity **enemies;
 } EcsEntityPointers;
 
 typedef struct {
-    EcsComponentPointers components;
-    EcsEntityPointers entities;
+    EcsComponentPointers cmpnts;
+    EcsEntityPointers entts;
 } EcsPointers;
 
-extern EcsPointers ecs_pointers;
+extern EcsPointers ecs_ptrs;
 
 void init();
 

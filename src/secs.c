@@ -1,5 +1,6 @@
 #include "secs.h"
 #include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -11,10 +12,10 @@ EcsSpace *ecs_create_space() {
 
     space->current_entities_capacity = INITIAL_ENTITIES_CAPACITY;
     space->current_components_capacity = INITIAL_COMPONENTS_CAPACITY;
-    space->current_entity_id = 0;
+    space->current_entity_id = 1;
     space->current_component_id = 0;
 
-    space->entities = (EcsEntity *)malloc(sizeof(EcsEntity) * INITIAL_ENTITIES_CAPACITY);
+    space->entities = (EcsEntity *)malloc(sizeof(EcsEntity) * space->current_components_capacity);
     if (!space->entities) {
         free(space);
         return NULL;
@@ -30,45 +31,82 @@ EcsSpace *ecs_create_space() {
     return space;
 }
 
-EcsComponent *ecs_register_component(EcsSpace *space, const char *name, size_t data_struct_size) {
-    EcsComponent *component = &space->components[space->current_component_id];
+EcsComponent *ecs_register_component(EcsSpace *space, const char *name, size_t data_size) {
+    EcsComponent *cmp = &space->components[space->current_component_id];
 
-    component->data_struct_size = data_struct_size;
+    cmp->data_size = data_size;
 
-    strncpy(component->name, name, MAX_COMPONENT_NAME_LENGTH - 1);
-    component->name[MAX_COMPONENT_NAME_LENGTH - 1] = '\0';
+    strncpy(cmp->name, name, MAX_COMPONENT_NAME_LENGTH - 1);
+    cmp->name[MAX_COMPONENT_NAME_LENGTH - 1] = '\0';
 
-    component->mask_bit = (1ULL << space->current_component_id);
+    cmp->mask_bit = (1ULL << space->current_component_id);
 
-    component->data = calloc(space->current_entities_capacity, data_struct_size);
-    if (!component->data) {
+    cmp->sparse_cap = INITIAL_ENTITIES_CAPACITY;
+    cmp->cap = INITIAL_ENTITIES_CAPACITY;
+
+    cmp->count = 1;
+
+    cmp->sparse_ids = (uint32_t *)calloc(cmp->sparse_cap, sizeof(uint32_t));
+    if (!cmp->sparse_ids) {
         return NULL;
     }
 
+    cmp->dense_ids = (uint32_t *)malloc(sizeof(uint32_t) * cmp->cap);
+    if (!cmp->dense_ids) {
+        free(cmp->sparse_ids);
+
+        return NULL;
+    }
+
+    cmp->data = malloc(data_size * cmp->cap);
+    if (!cmp->data) {
+        free(cmp->sparse_ids);
+        free(cmp->dense_ids);
+
+        return NULL;
+    }
+
+    memset(cmp->data, 0, data_size);
+
     space->current_component_id++;
 
-    return component;
+    return cmp;
 }
 
 EcsEntity *ecs_create_entity(EcsSpace *space) {
     EcsEntity *entity = &space->entities[space->current_entity_id];
     entity->id = space->current_entity_id++;
     entity->version = 0;
+    // entity->comp_mask = 0;
 
     return entity;
 }
 
-int ecs_add_component(EcsEntity *entity, EcsComponent *component, void *component_data) {
-    memcpy((char *)component->data + (entity->id * component->data_struct_size), component_data,
-           component->data_struct_size);
+int ecs_add_component(EcsEntity *ent, EcsComponent *cmp, void *cmp_data) {
+    cmp->sparse_ids[ent->id] = cmp->count;
+    cmp->dense_ids[cmp->count] = ent->id;
 
-    entity->comp_mask = entity->comp_mask | component->mask_bit;
+    memcpy((char *)cmp->data + (cmp->count * cmp->data_size), cmp_data,
+           cmp->data_size);
+
+    // ent->comp_mask = ent->comp_mask | cmp->mask_bit;
+
+    cmp->count++;
 
     return 0;
 }
 
-void *ecs_get_entity_component(EcsComponent *component, EcsEntity *entity) {
-    return (char *)component->data + component->data_struct_size * entity->id;
+void *ecs_get_entity_component(EcsComponent *cmp, EcsEntity *ent) {
+    if (ent->id >= cmp->sparse_cap) {
+        return NULL;
+    }
+
+    uint32_t dense_id = cmp->sparse_ids[ent->id];
+    if (!dense_id) {
+        return NULL;
+    }
+
+    return (char *)cmp->data + cmp->data_size * dense_id;
 }
 
 int ecs_destroy_space(EcsSpace *space) {

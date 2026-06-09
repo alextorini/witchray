@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "raylib.h"
 #include "secs.h"
 #include "witch.h"
@@ -9,7 +10,7 @@ Texture load_pixel_texture(const char *path) {
     return texture;
 }
 
-void create_layer_instance(EcsSpace *space, Texture *texture, Position position, Velocity velocity) {
+EcsEntity *create_layer_instance(EcsSpace *space, Texture *texture, Position position, Velocity velocity) {
     EcsEntity *layer = ecs_create_entity(space);
 
     ecs_add_component(layer, ecs_ptrs.cmpnts.pos, &position);
@@ -18,16 +19,22 @@ void create_layer_instance(EcsSpace *space, Texture *texture, Position position,
     Render render = {texture, {0.0f, 0.0f, 1.0f * texture->width, 1.0f * texture->height}};
     ecs_add_component(layer, ecs_ptrs.cmpnts.rndr, &render);
 
-    IsParalax is_parallax = true;
+    IsParallax is_parallax = true;
     ecs_add_component(layer, ecs_ptrs.cmpnts.is_prlx, &is_parallax);
+
+    return layer;
 }
 
-void add_parallax_background_layer(EcsSpace *space, Texture *texture, float speed) {
+EcsEntity **add_parallax_background_layer(EcsSpace *space, Texture *texture, float speed) {
     Position position = {0, 0};
     Velocity velocity = {-speed, 0};
 
-    create_layer_instance(space, texture, position, velocity);
+    EcsEntity **layers = malloc(sizeof(EcsEntity) * 2);
+
+    layers[0] = create_layer_instance(space, texture, position, velocity);
 
     position.x = texture->width;
-    create_layer_instance(space, texture, position, velocity);
+    layers[1] = create_layer_instance(space, texture, position, velocity);
+
+    return layers;
 }

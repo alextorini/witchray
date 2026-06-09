@@ -60,11 +60,16 @@ void init() {
     ecs_ptrs.cmpnts.pos = ecs_register_component(spc, (char *)"Position", sizeof(Position));
     ecs_ptrs.cmpnts.vel = ecs_register_component(spc, (char *)"Velocity", sizeof(Velocity));
     ecs_ptrs.cmpnts.rndr = ecs_register_component(spc, (char *)"Render", sizeof(Render));
-    ecs_ptrs.cmpnts.is_prlx = ecs_register_component(spc, (char *)"Paralax", sizeof(IsParalax));
+    ecs_ptrs.cmpnts.is_prlx = ecs_register_component(spc, (char *)"Parallax", sizeof(IsParallax));
     // ecs_ptrs.cmpnts.is_plr = ecs_register_component(spc, (char *)"Player", sizeof(IsPlayer));
 
-    add_parallax_background_layer(spc, &bckgrnd.layer_1, BG_LAYER_1_SPEED);
-    add_parallax_background_layer(spc, &bckgrnd.layer_2, BG_LAYER_2_SPEED);
+    EcsEntity **layer_copies;
+    layer_copies = add_parallax_background_layer(spc, &bckgrnd.layer_1, BG_LAYER_1_SPEED);
+    ecs_ptrs.entts.background_layers[0][0] = layer_copies[0];
+    ecs_ptrs.entts.background_layers[0][1] = layer_copies[1];
+    layer_copies = add_parallax_background_layer(spc, &bckgrnd.layer_2, BG_LAYER_2_SPEED);
+    ecs_ptrs.entts.background_layers[1][0] = layer_copies[0];
+    ecs_ptrs.entts.background_layers[1][1] = layer_copies[1];
 
     ecs_ptrs.entts.plr = ecs_create_entity(spc);
     Position temp_position = {50, 50};
@@ -72,7 +77,76 @@ void init() {
     Render temp_render = {&sprtshts.player, {0.0f, 0.0f, 41.0f, 27.0f}};
     ecs_add_component(ecs_ptrs.entts.plr, ecs_ptrs.cmpnts.rndr, &temp_render);
     /* IsPlayer temp_player = true;
-    ecs_add_component(ecs_ptrs.entts.plr, ecs_ptrs.cmpnts.is_plr, &temp_player); */
+       ecs_add_component(ecs_ptrs.entts.plr, ecs_ptrs.cmpnts.is_plr, &temp_player); */
+}
+
+void move_entities() {
+    Render *e_rndr;
+    Position *e_pos;
+    Velocity *e_vel;
+    IsParallax *e_is_prlx;
+    for (int i = 1; i < spc->current_entity_id; i++) {
+        e_pos = (Position *)ecs_ptrs.cmpnts.pos->data + ecs_ptrs.cmpnts.pos->sparse_ids[i];
+        if (!e_pos) {
+            continue;
+        }
+
+        e_vel = (Velocity *)ecs_ptrs.cmpnts.vel->data + ecs_ptrs.cmpnts.vel->sparse_ids[i];
+        if (!e_vel) {
+            continue;
+        }
+
+        *e_pos = Vector2Add(*e_pos, Vector2Scale(*e_vel, GetFrameTime()));
+    }
+}
+
+void move_parallax() {
+    Render *e_rndr;
+    Position *e_pos;
+    Velocity *e_vel;
+    IsParallax *e_is_prlx;
+    for (int i = 1; i < spc->current_entity_id; i++) {
+        e_pos = (Position *)ecs_ptrs.cmpnts.pos->data + ecs_ptrs.cmpnts.pos->sparse_ids[i];
+        if (!e_pos) {
+            continue;
+        }
+
+        e_rndr = (Render *)ecs_ptrs.cmpnts.rndr->data + ecs_ptrs.cmpnts.rndr->sparse_ids[i];
+        if (!e_rndr) {
+            continue;
+        }
+
+        e_is_prlx = (IsParallax *)ecs_ptrs.cmpnts.is_prlx->data + ecs_ptrs.cmpnts.is_prlx->sparse_ids[i];
+        if (!e_is_prlx) {
+            continue;
+        }
+
+        if (e_pos->x + e_rndr->frame.width < 0) {
+            e_pos->x += e_rndr->frame.width * 2.0f;
+        }
+    }
+}
+
+void render_entities() {
+    Render *e_rndr;
+    Position *e_pos;
+
+    Position draw_pos;
+    for (int i = 1; i < spc->current_entity_id; i++) {
+        e_pos = (Position *)ecs_ptrs.cmpnts.pos->data + ecs_ptrs.cmpnts.pos->sparse_ids[i];
+        if (!e_pos) {
+            continue;
+        }
+
+        e_rndr = (Render *)ecs_ptrs.cmpnts.rndr->data + ecs_ptrs.cmpnts.rndr->sparse_ids[i];
+        if (!e_rndr) {
+            continue;
+        }
+
+        draw_pos.x = (float)(int)floorf(e_pos->x);
+        draw_pos.y = (float)(int)floorf(e_pos->y);
+        DrawTextureRec(*e_rndr->spritesheet, e_rndr->frame, draw_pos, WHITE);
+    }
 }
 
 void update_and_draw() {
@@ -83,48 +157,17 @@ void update_and_draw() {
     Render *e_rndr;
     Position *e_pos;
     Velocity *e_vel;
-    IsParalax *e_is_prlx;
+    IsParallax *e_is_prlx;
     // IsPlayer *e_is_plr;
     EcsEntity *e_ptr;
-    for (int i = 0; i < spc->current_entity_id; i++) {
-        e_ptr = (EcsEntity *)spc->entities + i;
-        e_pos = (Position *)ecs_ptrs.cmpnts.pos->data + i;
-        e_vel = (Velocity *)ecs_ptrs.cmpnts.vel->data + i;
-        e_rndr = (Render *)ecs_ptrs.cmpnts.rndr->data + i;
-        e_is_prlx = (IsParalax *)ecs_ptrs.cmpnts.is_prlx->data + i;
-        // e_is_plr = (IsPlayer *)ecs_ptrs.cmpnts.is_plr->data + i;
 
-        if (e_ptr->comp_mask & (ecs_ptrs.cmpnts.pos->mask_bit | ecs_ptrs.cmpnts.vel->mask_bit)) {
-            *e_pos = Vector2Add(*e_pos, Vector2Scale(*e_vel, GetFrameTime()));
-
-            if ((e_ptr->comp_mask & ecs_ptrs.cmpnts.is_prlx->mask_bit) && *e_is_prlx == 1 &&
-                (e_pos->x + e_rndr->frame.width < 0)) {
-                e_pos->x += e_rndr->frame.width * 2.0f;
-            }
-        }
-
-        /* if ((e_ptr->comp_mask & ecs_ptrs.cmpnts.is_plr->mask_bit) && *e_is_plr == 1) {
-            if (IsKeyDown(KEY_RIGHT)) e_pos->x += 2.0f;
-            if (IsKeyDown(KEY_LEFT)) e_pos->x -= 2.0f;
-            if (IsKeyDown(KEY_UP)) e_pos->y -= 2.0f;
-            if (IsKeyDown(KEY_DOWN)) e_pos->y += 2.0f;
-        } */
-    }
-
-    Position draw_pos;
-    for (int i = 0; i < spc->current_entity_id; i++) {
-        e_ptr = (EcsEntity *)spc->entities + i;
-        e_pos = (Position *)ecs_ptrs.cmpnts.pos->data + i;
-        e_rndr = (Render *)ecs_ptrs.cmpnts.rndr->data + i;
-        if (e_ptr->comp_mask & (ecs_ptrs.cmpnts.pos->mask_bit | ecs_ptrs.cmpnts.rndr->mask_bit)) {
-            draw_pos.x = (float)(int)floorf(e_pos->x);
-            draw_pos.y = (float)(int)floorf(e_pos->y);
-            DrawTextureRec(*e_rndr->spritesheet, e_rndr->frame, draw_pos, WHITE);
-        }
-    }
+    move_entities();
+    render_entities();
+    move_parallax();
 
     DrawTextEx(fnt, TextFormat("%d", GetFPS()), CLITERAL(Position){3, 3}, 9, 1, DARKGREEN);
 }
+
 
 void unload() {
     UnloadTexture(sprtshts.player);

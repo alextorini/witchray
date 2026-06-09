@@ -5,7 +5,7 @@
 
 typedef Vector2 Position;
 typedef Vector2 Velocity;
-typedef bool IsParalax;
+typedef bool IsParallax;
 // typedef bool IsPlayer;
 
 typedef struct {

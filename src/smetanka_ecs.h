@@ -2,37 +2,39 @@
 
 #include <stdint.h>
 #include <stddef.h>
-#include <stdint.h>
 
 #define INITIAL_ENTITIES_CAPACITY 100
 #define INITIAL_COMPONENTS_CAPACITY 10
 #define MAX_COMPONENT_NAME_LENGTH 32
 
 typedef struct {
-    uint64_t mask_bit;
-    size_t data_struct_size;
+    uint32_t *sparse_ids;
+    uint32_t *dense_ids;
+    uint32_t count;
+    uint32_t sparse_cap;
+    uint32_t cap;
+    size_t data_size;
     void *data;
     char name[MAX_COMPONENT_NAME_LENGTH];
 } EcsComponent;
 
 typedef struct {
-    int id;
-    int version;
-    uint32_t comp_mask;
+    uint32_t id;
+    uint32_t version;
 } EcsEntity;
 
 typedef struct {
-    int current_entity_id;
-    int current_entities_capacity;
-    int current_components_capacity;
-    int current_component_id;
+    uint32_t current_entity_id;
+    uint32_t current_entities_capacity;
+    uint32_t current_components_capacity;
+    uint32_t current_component_id;
     EcsEntity *entities;
     EcsComponent *components;
 } EcsSpace;
 
 EcsSpace *ecs_create_space();
 
-EcsComponent *ecs_register_component(EcsSpace *space, const char *name, size_t data_struct_size);
+EcsComponent *ecs_register_component(EcsSpace *space, const char *name, size_t data_size);
 
 EcsEntity *ecs_create_entity(EcsSpace *space);
 

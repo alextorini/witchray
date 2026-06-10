@@ -1,7 +1,7 @@
 #include <stdlib.h>
-#include "raylib.h"
-#include "secs.h"
-#include "witch.h"
+
+#include "witch_render.h"
+#include "witch_core.h"
 
 Texture load_pixel_texture(const char *path) {
     Texture texture = LoadTexture(path);
@@ -10,7 +10,7 @@ Texture load_pixel_texture(const char *path) {
     return texture;
 }
 
-EcsEntity *create_layer_instance(EcsSpace *space, Texture *texture, Position position, Velocity velocity) {
+static EcsEntity *create_layer_instance(EcsSpace *space, Texture *texture, Position position, Velocity velocity) {
     EcsEntity *layer = ecs_create_entity(space);
 
     ecs_add_component(layer, ecs_ptrs.cmpnts.pos, &position);

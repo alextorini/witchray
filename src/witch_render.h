@@ -1,7 +1,8 @@
 #pragma once
 
-#include "raylib.h"
-#include "secs.h"
+#include "ext/raylib.h"
+
+#include "smetanka_ecs.h"
 
 Texture load_pixel_texture(const char *path);
 

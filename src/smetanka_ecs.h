@@ -2,7 +2,6 @@
 
 #include <stdint.h>
 #include <stddef.h>
-#include <stdint.h>
 
 #define INITIAL_ENTITIES_CAPACITY 100
 #define INITIAL_COMPONENTS_CAPACITY 10
@@ -14,7 +13,6 @@ typedef struct {
     uint32_t count;
     uint32_t sparse_cap;
     uint32_t cap;
-    uint64_t mask_bit;
     size_t data_size;
     void *data;
     char name[MAX_COMPONENT_NAME_LENGTH];
@@ -23,7 +21,6 @@ typedef struct {
 typedef struct {
     uint32_t id;
     uint32_t version;
-    // uint64_t comp_mask;
 } EcsEntity;
 
 typedef struct {

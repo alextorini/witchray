@@ -1,8 +1,7 @@
-#include "secs.h"
-#include <stddef.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "smetanka_ecs.h"
 
 EcsSpace *ecs_create_space() {
     EcsSpace *space = (EcsSpace *)malloc(sizeof(EcsSpace));
@@ -38,8 +37,6 @@ EcsComponent *ecs_register_component(EcsSpace *space, const char *name, size_t d
 
     strncpy(cmp->name, name, MAX_COMPONENT_NAME_LENGTH - 1);
     cmp->name[MAX_COMPONENT_NAME_LENGTH - 1] = '\0';
-
-    cmp->mask_bit = (1ULL << space->current_component_id);
 
     cmp->sparse_cap = INITIAL_ENTITIES_CAPACITY;
     cmp->cap = INITIAL_ENTITIES_CAPACITY;
@@ -77,7 +74,6 @@ EcsEntity *ecs_create_entity(EcsSpace *space) {
     EcsEntity *entity = &space->entities[space->current_entity_id];
     entity->id = space->current_entity_id++;
     entity->version = 0;
-    // entity->comp_mask = 0;
 
     return entity;
 }
@@ -88,8 +84,6 @@ int ecs_add_component(EcsEntity *ent, EcsComponent *cmp, void *cmp_data) {
 
     memcpy((char *)cmp->data + (cmp->count * cmp->data_size), cmp_data,
            cmp->data_size);
-
-    // ent->comp_mask = ent->comp_mask | cmp->mask_bit;
 
     cmp->count++;
 

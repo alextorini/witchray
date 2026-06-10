@@ -1,12 +1,12 @@
 #pragma once
 
-#include "secs.h"
-#include "raylib.h"
+#include "ext/raylib.h"
+
+#include "smetanka_ecs.h"
 
 typedef Vector2 Position;
 typedef Vector2 Velocity;
 typedef bool IsParallax;
-// typedef bool IsPlayer;
 
 typedef struct {
     Texture *spritesheet;
@@ -38,6 +38,7 @@ typedef struct {
 } EcsPointers;
 
 extern EcsPointers ecs_ptrs;
+extern EcsSpace *spc;
 
 void init();
 

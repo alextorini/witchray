@@ -1,10 +1,18 @@
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "smetanka_ecs.h"
 
+#define ECS_MALLOC malloc
+#define ECS_MALLOC_TYPE(type) ((type *)malloc(sizeof(type)))
+#define ECS_MALLOC_ARR(type, count) ((type *)malloc(sizeof(type) * (count)))
+#define ECS_CALLOC calloc
+#define ECS_CALLOC_TYPE(type, count) ((type *)calloc(sizeof(type), (count)))
+#define ECS_FREE free
+
 EcsSpace *ecs_create_space() {
-    EcsSpace *space = (EcsSpace *)malloc(sizeof(EcsSpace));
+    EcsSpace *space = ECS_MALLOC_TYPE(EcsSpace);
     if (!space) {
         return NULL;
     }
@@ -14,16 +22,16 @@ EcsSpace *ecs_create_space() {
     space->current_entity_id = 1;
     space->current_component_id = 0;
 
-    space->entities = (EcsEntity *)malloc(sizeof(EcsEntity) * space->current_components_capacity);
+    space->entities = ECS_MALLOC_ARR(EcsEntity, space->current_entities_capacity);
     if (!space->entities) {
-        free(space);
+        ECS_FREE(space);
         return NULL;
     }
 
-    space->components = (EcsComponent *)malloc(sizeof(EcsComponent) * INITIAL_COMPONENTS_CAPACITY);
+    space->components = ECS_MALLOC_ARR(EcsComponent, space->current_components_capacity);
     if (!space->components) {
-        free(space->entities);
-        free(space);
+        ECS_FREE(space->entities);
+        ECS_FREE(space);
         return NULL;
     }
 
@@ -43,22 +51,22 @@ EcsComponent *ecs_register_component(EcsSpace *space, const char *name, size_t d
 
     cmp->count = 1;
 
-    cmp->sparse_ids = (uint32_t *)calloc(cmp->sparse_cap, sizeof(uint32_t));
+    cmp->sparse_ids = ECS_CALLOC_TYPE(uint32_t, cmp->sparse_cap);
     if (!cmp->sparse_ids) {
         return NULL;
     }
 
-    cmp->dense_ids = (uint32_t *)malloc(sizeof(uint32_t) * cmp->cap);
+    cmp->dense_ids = ECS_MALLOC_ARR(uint32_t, cmp->cap);
     if (!cmp->dense_ids) {
-        free(cmp->sparse_ids);
+        ECS_FREE(cmp->sparse_ids);
 
         return NULL;
     }
 
-    cmp->data = malloc(data_size * cmp->cap);
+    cmp->data = ECS_MALLOC(data_size * cmp->cap);
     if (!cmp->data) {
-        free(cmp->sparse_ids);
-        free(cmp->dense_ids);
+        ECS_FREE(cmp->sparse_ids);
+        ECS_FREE(cmp->dense_ids);
 
         return NULL;
     }
@@ -109,15 +117,15 @@ int ecs_destroy_space(EcsSpace *space) {
     }
 
     if (space->entities) {
-        free(space->entities);
+        ECS_FREE(space->entities);
     }
 
     for (int i = 0; i < space->current_component_id; i++) {
-        free(space->components[i].data);
+        ECS_FREE(space->components[i].data);
     }
 
-    free(space->components);
-    free(space);
+    ECS_FREE(space->components);
+    ECS_FREE(space);
 
     return 0;
 }

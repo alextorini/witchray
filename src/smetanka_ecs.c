@@ -98,12 +98,12 @@ int ecs_add_component(EcsEntity *ent, EcsComponent *cmp, void *cmp_data) {
     return 0;
 }
 
-void *ecs_get_entity_component(EcsComponent *cmp, EcsEntity *ent) {
-    if (ent->id >= cmp->sparse_cap) {
+void *ecs_get_entity_component(EcsComponent *cmp, uint32_t ent_id) {
+    if (ent_id >= cmp->sparse_cap) {
         return NULL;
     }
 
-    uint32_t dense_id = cmp->sparse_ids[ent->id];
+    uint32_t dense_id = cmp->sparse_ids[ent_id];
     if (!dense_id) {
         return NULL;
     }

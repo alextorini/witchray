@@ -11,7 +11,7 @@ static Music music;
 #define SKY_COLOR CLITERAL(Color){255, 128, 156, 255}
 
 #define BG_LAYER_1_SPEED 50.0f
-#define BG_LAYER_2_SPEED 100.0f
+#define BG_LAYER_2_SPEED 150.0f
 
 static Background bckgrnd;
 

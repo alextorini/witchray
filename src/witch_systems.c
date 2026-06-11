@@ -7,23 +7,20 @@
 #include "witch_systems.h"
 
 void system_move_entities() {
-    Position *ent_pos;
-    Velocity *ent_vel;
-
     EcsComponent *pos_cmp = ecs_ptrs.cmpnts.pos;
     EcsComponent *vel_cmp = ecs_ptrs.cmpnts.vel;
 
     EcsComponent *least_used_cmp = (pos_cmp->count < vel_cmp->count) ? pos_cmp : vel_cmp;
 
     for (uint32_t i = 1; i < least_used_cmp->count; i++) {
-        uint32_t id = least_used_cmp->dense_ids[i];
+        uint32_t ent_id = least_used_cmp->dense_ids[i];
 
-        ent_pos = (Position *)pos_cmp->data + pos_cmp->sparse_ids[id];
+        Position *ent_pos = (Position *)ecs_get_entity_component(pos_cmp, ent_id);
         if (!ent_pos) {
             continue;
         }
 
-        ent_vel = (Velocity *)vel_cmp->data + vel_cmp->sparse_ids[id];
+        Velocity *ent_vel = (Velocity *)ecs_get_entity_component(vel_cmp, ent_id);
         if (!ent_vel) {
             continue;
         }
@@ -33,13 +30,9 @@ void system_move_entities() {
 }
 
 void system_move_parallax() {
-    IsParallax *ent_prlx;
-    Position *ent_pos;
-    Render *ent_rndr;
-
-    EcsComponent *prlx_cmp = ecs_ptrs.cmpnts.prlx;
     EcsComponent *pos_cmp = ecs_ptrs.cmpnts.pos;
     EcsComponent *rndr_cmp = ecs_ptrs.cmpnts.rndr;
+    EcsComponent *prlx_cmp = ecs_ptrs.cmpnts.prlx;
 
     EcsComponent *least_used_cmp =
         (prlx_cmp->count < pos_cmp->count)
@@ -47,19 +40,19 @@ void system_move_parallax() {
         : ((pos_cmp->count < rndr_cmp->count) ? pos_cmp : rndr_cmp);
 
     for (uint32_t i = 1; i < least_used_cmp->count; i++) {
-        uint32_t id = least_used_cmp->dense_ids[i];
+        uint32_t ent_id = least_used_cmp->dense_ids[i];
 
-        ent_pos = (Position *)pos_cmp->data + pos_cmp->sparse_ids[id];
+        Position *ent_pos = (Position *)ecs_get_entity_component(pos_cmp, ent_id);
         if (!ent_pos) {
             continue;
         }
 
-        ent_rndr = (Render *)rndr_cmp->data + rndr_cmp->sparse_ids[id];
+        Render *ent_rndr = (Render *)ecs_get_entity_component(rndr_cmp,  ent_id);
         if (!ent_rndr) {
             continue;
         }
 
-        ent_prlx = (IsParallax *)prlx_cmp->data + prlx_cmp->sparse_ids[id];
+        IsParallax *ent_prlx = (IsParallax *)ecs_get_entity_component(prlx_cmp, ent_id);
         if (!ent_prlx) {
             continue;
         }
@@ -71,9 +64,6 @@ void system_move_parallax() {
 }
 
 void system_render_entities() {
-    Render *ent_rndr;
-    Position *ent_pos;
-
     EcsComponent *pos_cmp = ecs_ptrs.cmpnts.pos;
     EcsComponent *rndr_cmp = ecs_ptrs.cmpnts.rndr;
 
@@ -81,14 +71,14 @@ void system_render_entities() {
 
     Position draw_pos;
     for (int i = 1; i < least_used_cmp->count; i++) {
-        uint32_t id = least_used_cmp->dense_ids[i];
+        uint32_t ent_id = least_used_cmp->dense_ids[i];
 
-        ent_pos = (Position *)pos_cmp->data + pos_cmp->sparse_ids[id];
+        Position *ent_pos = (Position *)ecs_get_entity_component(pos_cmp, ent_id);
         if (!ent_pos) {
             continue;
         }
 
-        ent_rndr = (Render *)rndr_cmp->data + rndr_cmp->sparse_ids[id];
+        Render *ent_rndr = (Render *)ecs_get_entity_component(rndr_cmp,  ent_id);
         if (!ent_rndr) {
             continue;
         }

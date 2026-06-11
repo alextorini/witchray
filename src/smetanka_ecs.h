@@ -40,6 +40,6 @@ EcsEntity *ecs_create_entity(EcsSpace *space);
 
 int ecs_add_component(EcsEntity *entity, EcsComponent *component, void *component_data);
 
-void *ecs_get_entity_component(EcsComponent *component, EcsEntity *entity);
+void *ecs_get_entity_component(EcsComponent *component, uint32_t entity_id);
 
 int ecs_destroy_space(EcsSpace *space);

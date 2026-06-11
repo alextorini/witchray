@@ -20,7 +20,7 @@ static EcsEntity *create_layer_instance(EcsSpace *space, Texture *texture, Posit
     ecs_add_component(layer, ecs_ptrs.cmpnts.rndr, &render);
 
     IsParallax is_parallax = true;
-    ecs_add_component(layer, ecs_ptrs.cmpnts.is_prlx, &is_parallax);
+    ecs_add_component(layer, ecs_ptrs.cmpnts.prlx, &is_parallax);
 
     return layer;
 }
@@ -29,7 +29,7 @@ EcsEntity **add_parallax_background_layer(EcsSpace *space, Texture *texture, flo
     Position position = {0, 0};
     Velocity velocity = {-speed, 0};
 
-    EcsEntity **layers = malloc(sizeof(EcsEntity) * 2);
+    EcsEntity **layers = (EcsEntity **)malloc(sizeof(EcsEntity) * 2);
 
     layers[0] = create_layer_instance(space, texture, position, velocity);
 

@@ -59,7 +59,7 @@ void init() {
     ecs_ptrs.cmpnts.pos = ecs_register_component(spc, (char *)"Position", sizeof(Position));
     ecs_ptrs.cmpnts.vel = ecs_register_component(spc, (char *)"Velocity", sizeof(Velocity));
     ecs_ptrs.cmpnts.rndr = ecs_register_component(spc, (char *)"Render", sizeof(Render));
-    ecs_ptrs.cmpnts.is_prlx = ecs_register_component(spc, (char *)"Parallax", sizeof(IsParallax));
+    ecs_ptrs.cmpnts.prlx = ecs_register_component(spc, (char *)"Parallax", sizeof(IsParallax));
 
     EcsEntity **layer_copies;
     layer_copies = add_parallax_background_layer(spc, &bckgrnd.layer_1, BG_LAYER_1_SPEED);

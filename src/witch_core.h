@@ -22,8 +22,7 @@ typedef struct {
     EcsComponent *pos;
     EcsComponent *vel;
     EcsComponent *rndr;
-    EcsComponent *is_prlx;
-    // EcsComponent *is_plr;
+    EcsComponent *prlx;
 } EcsComponentPointers;
 
 typedef struct {

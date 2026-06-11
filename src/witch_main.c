@@ -11,7 +11,7 @@ int main() {
     SetTargetFPS(60);
     InitWindow(1280, 720, "WitchRay");
     InitAudioDevice();
-    SearchAndSetResourceDir("resources");
+    SearchAndSetResourceDir("res");
 
     init();
 

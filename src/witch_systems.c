@@ -63,6 +63,43 @@ void system_move_parallax() {
     }
 }
 
+void system_animate_entities() {
+    EcsComponent * anim_cmp = ecs_ptrs.cmpnts.anim;
+    EcsComponent *rndr_cmp = ecs_ptrs.cmpnts.rndr;
+
+    EcsComponent *least_used_cmp = (anim_cmp->count < rndr_cmp->count) ? anim_cmp : rndr_cmp;
+
+    for (int i = 1; i < least_used_cmp->count; i++) {
+        uint32_t ent_id = least_used_cmp->dense_ids[i];
+
+        Animation *ent_anim = (Animation *)ecs_get_entity_component(anim_cmp, ent_id);
+        if (!ent_anim) {
+            continue;
+        }
+
+        Render *ent_rndr = (Render *)ecs_get_entity_component(rndr_cmp,  ent_id);
+        if (!ent_rndr) {
+            continue;
+        }
+
+        AnimationClip *cur_clp = &ent_anim->set->clips[ent_anim->current_clip];
+        ent_anim->timer += GetFrameTime();
+
+        if (cur_clp->frame_time <= 0.00001f) return;
+
+        while (ent_anim->timer >= cur_clp->frame_time) {
+            ent_anim->current_frame++;
+            if (ent_anim->current_frame > cur_clp->end_frame) {
+                ent_anim->current_frame = cur_clp->start_frame;
+            }
+
+            ent_anim->timer -= cur_clp->frame_time;
+        }
+
+        ent_rndr->frame.x = ent_rndr->frame.width * ent_anim->current_frame;
+    }
+}
+
 void system_render_entities() {
     EcsComponent *pos_cmp = ecs_ptrs.cmpnts.pos;
     EcsComponent *rndr_cmp = ecs_ptrs.cmpnts.rndr;

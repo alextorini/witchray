@@ -5,3 +5,4 @@
 #else
     #define CLITERAL(type)      (type)
 #endif
+

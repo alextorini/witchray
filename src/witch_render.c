@@ -10,31 +10,31 @@ Texture load_pixel_texture(const char *path) {
     return texture;
 }
 
-static EcsEntity *create_layer_instance(EcsSpace *space, Texture *texture, Position position, Velocity velocity) {
-    EcsEntity *layer = ecs_create_entity(space);
+static EcsEntityId create_layer_instance(Texture *texture, Position position, Velocity velocity) {
+    EcsEntityId layer_id = ecs_create_entity();
 
-    ecs_add_component(layer, ecs_ptrs.cmpnts.pos, &position);
-    ecs_add_component(layer, ecs_ptrs.cmpnts.vel, &velocity);
+    ecs_add_component(layer_id, ecs_hndls.cmpnts.pos, &position);
+    ecs_add_component(layer_id, ecs_hndls.cmpnts.vel, &velocity);
 
     Render render = {texture, {0.0f, 0.0f, 1.0f * texture->width, 1.0f * texture->height}};
-    ecs_add_component(layer, ecs_ptrs.cmpnts.rndr, &render);
+    ecs_add_component(layer_id, ecs_hndls.cmpnts.rndr, &render);
 
     IsParallax is_parallax = true;
-    ecs_add_component(layer, ecs_ptrs.cmpnts.prlx, &is_parallax);
+    ecs_add_component(layer_id, ecs_hndls.cmpnts.prlx, &is_parallax);
 
-    return layer;
+    return layer_id;
 }
 
-EcsEntity **add_parallax_background_layer(EcsSpace *space, Texture *texture, float speed) {
+EcsEntityId *add_parallax_background_layer(Texture *texture, float speed) {
     Position position = {0, 0};
     Velocity velocity = {-speed, 0};
 
-    EcsEntity **layers = (EcsEntity **)malloc(sizeof(EcsEntity) * 2);
+    EcsEntityId *layers = (EcsEntityId *)malloc(sizeof(EcsEntityId) * 2);
 
-    layers[0] = create_layer_instance(space, texture, position, velocity);
+    layers[0] = create_layer_instance(texture, position, velocity);
 
     position.x = texture->width;
-    layers[1] = create_layer_instance(space, texture, position, velocity);
+    layers[1] = create_layer_instance(texture, position, velocity);
 
     return layers;
 }

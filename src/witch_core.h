@@ -38,26 +38,25 @@ typedef struct {
 } Background;
 
 typedef struct {
-    EcsComponent *pos;
-    EcsComponent *vel;
-    EcsComponent *rndr;
-    EcsComponent *anim;
-    EcsComponent *prlx;
-} EcsComponentPointers;
+    EcsComponentId pos;
+    EcsComponentId vel;
+    EcsComponentId rndr;
+    EcsComponentId anim;
+    EcsComponentId prlx;
+} EcsComponentHandles;
 
 typedef struct {
-    EcsEntity *plr;
-    EcsEntity *background_layers[2][2];
-    EcsEntity **enemies;
-} EcsEntityPointers;
+    EcsEntityId plr;
+    EcsEntityId background_layers[2][2];
+    EcsEntityId *enemies;
+} EcsEntityHandles;
 
 typedef struct {
-    EcsComponentPointers cmpnts;
-    EcsEntityPointers entts;
-} EcsPointers;
+    EcsComponentHandles cmpnts;
+    EcsEntityHandles entts;
+} EcsHandles;
 
-extern EcsPointers ecs_ptrs;
-extern EcsSpace *spc;
+extern EcsHandles ecs_hndls;
 
 void init();
 

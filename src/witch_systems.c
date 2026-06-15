@@ -1,26 +1,26 @@
+#include <stdint.h>
 #include "ext/raylib.h"
 #include "ext/raymath.h"
 
 #include "smetanka_ecs.h"
 #include "witch_core.h"
-#include <stdint.h>
 #include "witch_systems.h"
 
 void system_move_entities() {
-    EcsComponent *pos_cmp = ecs_ptrs.cmpnts.pos;
-    EcsComponent *vel_cmp = ecs_ptrs.cmpnts.vel;
+    EcsComponentId pos_cmp_id = ecs_hndls.cmpnts.pos;
+    EcsComponentId vel_cmp_id = ecs_hndls.cmpnts.vel;
 
-    EcsComponent *least_used_cmp = (pos_cmp->count < vel_cmp->count) ? pos_cmp : vel_cmp;
+    int32_t vel_cmp_count = ecs_get_component_count(vel_cmp_id);
 
-    for (uint32_t i = 1; i < least_used_cmp->count; i++) {
-        uint32_t ent_id = least_used_cmp->dense_ids[i];
+    for (uint32_t i = 1; i < vel_cmp_count; i++) {
+        uint32_t ent_id = ecs_get_component_dense(vel_cmp_id, i);
 
-        Position *ent_pos = (Position *)ecs_get_entity_component(pos_cmp, ent_id);
+        Position *ent_pos = (Position *)ecs_get_entity_component(pos_cmp_id, ent_id);
         if (!ent_pos) {
             continue;
         }
 
-        Velocity *ent_vel = (Velocity *)ecs_get_entity_component(vel_cmp, ent_id);
+        Velocity *ent_vel = (Velocity *)ecs_get_entity_component(vel_cmp_id, ent_id);
         if (!ent_vel) {
             continue;
         }
@@ -30,29 +30,26 @@ void system_move_entities() {
 }
 
 void system_move_parallax() {
-    EcsComponent *pos_cmp = ecs_ptrs.cmpnts.pos;
-    EcsComponent *rndr_cmp = ecs_ptrs.cmpnts.rndr;
-    EcsComponent *prlx_cmp = ecs_ptrs.cmpnts.prlx;
+    EcsComponentId pos_cmp = ecs_hndls.cmpnts.pos;
+    EcsComponentId rndr_cmp_id = ecs_hndls.cmpnts.rndr;
+    EcsComponentId prlx_cmp_id = ecs_hndls.cmpnts.prlx;
 
-    EcsComponent *least_used_cmp =
-        (prlx_cmp->count < pos_cmp->count)
-        ? ((prlx_cmp->count < rndr_cmp->count) ? prlx_cmp : rndr_cmp)
-        : ((pos_cmp->count < rndr_cmp->count) ? pos_cmp : rndr_cmp);
+    int32_t prlx_cmp_count = ecs_get_component_count(prlx_cmp_id);
 
-    for (uint32_t i = 1; i < least_used_cmp->count; i++) {
-        uint32_t ent_id = least_used_cmp->dense_ids[i];
+    for (uint32_t i = 1; i < prlx_cmp_count; i++) {
+        uint32_t ent_id = ecs_get_component_dense(prlx_cmp_id, i);
 
         Position *ent_pos = (Position *)ecs_get_entity_component(pos_cmp, ent_id);
         if (!ent_pos) {
             continue;
         }
 
-        Render *ent_rndr = (Render *)ecs_get_entity_component(rndr_cmp,  ent_id);
+        Render *ent_rndr = (Render *)ecs_get_entity_component(rndr_cmp_id,  ent_id);
         if (!ent_rndr) {
             continue;
         }
 
-        IsParallax *ent_prlx = (IsParallax *)ecs_get_entity_component(prlx_cmp, ent_id);
+        IsParallax *ent_prlx = (IsParallax *)ecs_get_entity_component(prlx_cmp_id, ent_id);
         if (!ent_prlx) {
             continue;
         }
@@ -64,20 +61,20 @@ void system_move_parallax() {
 }
 
 void system_animate_entities() {
-    EcsComponent * anim_cmp = ecs_ptrs.cmpnts.anim;
-    EcsComponent *rndr_cmp = ecs_ptrs.cmpnts.rndr;
+    EcsComponentId anim_cmp_id = ecs_hndls.cmpnts.anim;
+    EcsComponentId rndr_cmp_id = ecs_hndls.cmpnts.rndr;
 
-    EcsComponent *least_used_cmp = (anim_cmp->count < rndr_cmp->count) ? anim_cmp : rndr_cmp;
+    int32_t anim_cmp_count = ecs_get_component_count(anim_cmp_id);
 
-    for (int i = 1; i < least_used_cmp->count; i++) {
-        uint32_t ent_id = least_used_cmp->dense_ids[i];
+    for (int i = 1; i < anim_cmp_count; i++) {
+        uint32_t ent_id = ecs_get_component_dense(anim_cmp_id, i);
 
-        Animation *ent_anim = (Animation *)ecs_get_entity_component(anim_cmp, ent_id);
+        Animation *ent_anim = (Animation *)ecs_get_entity_component(anim_cmp_id, ent_id);
         if (!ent_anim) {
             continue;
         }
 
-        Render *ent_rndr = (Render *)ecs_get_entity_component(rndr_cmp,  ent_id);
+        Render *ent_rndr = (Render *)ecs_get_entity_component(rndr_cmp_id,  ent_id);
         if (!ent_rndr) {
             continue;
         }
@@ -101,21 +98,21 @@ void system_animate_entities() {
 }
 
 void system_render_entities() {
-    EcsComponent *pos_cmp = ecs_ptrs.cmpnts.pos;
-    EcsComponent *rndr_cmp = ecs_ptrs.cmpnts.rndr;
+    EcsComponentId pos_cmp_id = ecs_hndls.cmpnts.pos;
+    EcsComponentId rndr_cmp_id = ecs_hndls.cmpnts.rndr;
 
-    EcsComponent *least_used_cmp = (pos_cmp->count < rndr_cmp->count) ? pos_cmp : rndr_cmp;
+    int32_t rndr_cmp_count = ecs_get_component_count(rndr_cmp_id);
 
     Position draw_pos;
-    for (int i = 1; i < least_used_cmp->count; i++) {
-        uint32_t ent_id = least_used_cmp->dense_ids[i];
+    for (int i = 1; i < rndr_cmp_count; i++) {
+        uint32_t ent_id = ecs_get_component_dense(rndr_cmp_id, i);
 
-        Position *ent_pos = (Position *)ecs_get_entity_component(pos_cmp, ent_id);
+        Position *ent_pos = (Position *)ecs_get_entity_component(pos_cmp_id, ent_id);
         if (!ent_pos) {
             continue;
         }
 
-        Render *ent_rndr = (Render *)ecs_get_entity_component(rndr_cmp,  ent_id);
+        Render *ent_rndr = (Render *)ecs_get_entity_component(rndr_cmp_id,  ent_id);
         if (!ent_rndr) {
             continue;
         }

@@ -41,9 +41,7 @@ typedef struct {
 
 static Sounds snds;
 
-EcsSpace *spc;
-
-EcsPointers ecs_ptrs;
+EcsHandles ecs_hndls;
 
 void init() {
     int codepoints[512] = {0};
@@ -66,27 +64,27 @@ void init() {
 
     PlayMusicStream(music);
 
-    spc = ecs_create_space();
+    ecs_create_space();
 
-    ecs_ptrs.cmpnts.pos = ecs_register_component(spc, (char *)"Position", sizeof(Position));
-    ecs_ptrs.cmpnts.vel = ecs_register_component(spc, (char *)"Velocity", sizeof(Velocity));
-    ecs_ptrs.cmpnts.rndr = ecs_register_component(spc, (char *)"Render", sizeof(Render));
-    ecs_ptrs.cmpnts.anim = ecs_register_component(spc, (char *)"Animation", sizeof(Animation));
-    ecs_ptrs.cmpnts.prlx = ecs_register_component(spc, (char *)"Parallax", sizeof(IsParallax));
+    ecs_hndls.cmpnts.pos = ecs_register_component((char *)"Position", sizeof(Position));
+    ecs_hndls.cmpnts.vel = ecs_register_component((char *)"Velocity", sizeof(Velocity));
+    ecs_hndls.cmpnts.rndr = ecs_register_component((char *)"Render", sizeof(Render));
+    ecs_hndls.cmpnts.anim = ecs_register_component((char *)"Animation", sizeof(Animation));
+    ecs_hndls.cmpnts.prlx = ecs_register_component((char *)"Parallax", sizeof(IsParallax));
 
-    EcsEntity **layer_copies;
-    layer_copies = add_parallax_background_layer(spc, &bckgrnd.layer_1, BG_LAYER_1_SPEED);
-    ecs_ptrs.entts.background_layers[0][0] = layer_copies[0];
-    ecs_ptrs.entts.background_layers[0][1] = layer_copies[1];
-    layer_copies = add_parallax_background_layer(spc, &bckgrnd.layer_2, BG_LAYER_2_SPEED);
-    ecs_ptrs.entts.background_layers[1][0] = layer_copies[0];
-    ecs_ptrs.entts.background_layers[1][1] = layer_copies[1];
+    EcsEntityId *layer_copies;
+    layer_copies = add_parallax_background_layer(&bckgrnd.layer_1, BG_LAYER_1_SPEED);
+    ecs_hndls.entts.background_layers[0][0] = layer_copies[0];
+    ecs_hndls.entts.background_layers[0][1] = layer_copies[1];
+    layer_copies = add_parallax_background_layer(&bckgrnd.layer_2, BG_LAYER_2_SPEED);
+    ecs_hndls.entts.background_layers[1][0] = layer_copies[0];
+    ecs_hndls.entts.background_layers[1][1] = layer_copies[1];
 
-    ecs_ptrs.entts.plr = ecs_create_entity(spc);
+    ecs_hndls.entts.plr = ecs_create_entity();
     Position temp_position = {50, 50};
-    ecs_add_component(ecs_ptrs.entts.plr, ecs_ptrs.cmpnts.pos, &temp_position);
+    ecs_add_component(ecs_hndls.entts.plr, ecs_hndls.cmpnts.pos, &temp_position);
     Render temp_render = {&sprtshts.player, {0.0f, 0.0f, 41.0f, 27.0f}};
-    ecs_add_component(ecs_ptrs.entts.plr, ecs_ptrs.cmpnts.rndr, &temp_render);
+    ecs_add_component(ecs_hndls.entts.plr, ecs_hndls.cmpnts.rndr, &temp_render);
 
     plr_idle.start_frame = 0;
     plr_idle.end_frame = 1;
@@ -102,7 +100,7 @@ void init() {
     plr_anim.current_clip = 0;
     plr_anim.current_frame = 0;
     plr_anim.timer = 0.0;
-    ecs_add_component(ecs_ptrs.entts.plr, ecs_ptrs.cmpnts.anim, &plr_anim);
+    ecs_add_component(ecs_hndls.entts.plr, ecs_hndls.cmpnts.anim, &plr_anim);
 }
 
 void update_and_draw() {
@@ -131,5 +129,5 @@ void unload() {
     StopMusicStream(music);
     UnloadMusicStream(music);
 
-    ecs_destroy_space(spc);
+    ecs_destroy_space();
 }

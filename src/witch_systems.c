@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdint.h>
 #include "ext/raylib.h"
 #include "ext/raymath.h"
@@ -14,6 +15,9 @@ void system_move_entities() {
 
     for (uint32_t i = 1; i < vel_cmp_count; i++) {
         uint32_t ent_id = ecs_get_component_dense(vel_cmp_id, i);
+        if (ent_id == INVALID_ID) {
+            abort();
+        }
 
         Position *ent_pos = (Position *)ecs_get_entity_component(pos_cmp_id, ent_id);
         if (!ent_pos) {
@@ -38,6 +42,9 @@ void system_move_parallax() {
 
     for (uint32_t i = 1; i < prlx_cmp_count; i++) {
         uint32_t ent_id = ecs_get_component_dense(prlx_cmp_id, i);
+        if (ent_id == INVALID_ID) {
+            abort();
+        }
 
         Position *ent_pos = (Position *)ecs_get_entity_component(pos_cmp, ent_id);
         if (!ent_pos) {
@@ -68,6 +75,9 @@ void system_animate_entities() {
 
     for (int i = 1; i < anim_cmp_count; i++) {
         uint32_t ent_id = ecs_get_component_dense(anim_cmp_id, i);
+        if (ent_id == INVALID_ID) {
+            abort();
+        }
 
         Animation *ent_anim = (Animation *)ecs_get_entity_component(anim_cmp_id, ent_id);
         if (!ent_anim) {
@@ -106,6 +116,9 @@ void system_render_entities() {
     Position draw_pos;
     for (int i = 1; i < rndr_cmp_count; i++) {
         uint32_t ent_id = ecs_get_component_dense(rndr_cmp_id, i);
+        if (ent_id == INVALID_ID) {
+            abort();
+        }
 
         Position *ent_pos = (Position *)ecs_get_entity_component(pos_cmp_id, ent_id);
         if (!ent_pos) {

@@ -81,10 +81,10 @@ void init() {
     ecs_hndls.entts.background_layers[1][1] = layer_copies[1];
 
     ecs_hndls.entts.plr = ecs_create_entity();
-    Position temp_position = {50, 50};
-    ecs_add_component(ecs_hndls.entts.plr, ecs_hndls.cmpnts.pos, &temp_position);
-    Render temp_render = {&sprtshts.player, {0.0f, 0.0f, 41.0f, 27.0f}};
-    ecs_add_component(ecs_hndls.entts.plr, ecs_hndls.cmpnts.rndr, &temp_render);
+    Position plr_pos = {50, 50};
+    ecs_add_component(ecs_hndls.entts.plr, ecs_hndls.cmpnts.pos, &plr_pos);
+    Render plr_rndr = {&sprtshts.player, {0.0f, 0.0f, 41.0f, 27.0f}};
+    ecs_add_component(ecs_hndls.entts.plr, ecs_hndls.cmpnts.rndr, &plr_rndr);
 
     plr_idle.start_frame = 0;
     plr_idle.end_frame = 1;
@@ -108,6 +108,7 @@ void update_and_draw() {
 
     ClearBackground(SKY_COLOR);
 
+    system_process_input();
     system_move_entities();
     system_animate_entities();
     system_render_entities();

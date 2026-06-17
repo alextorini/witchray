@@ -7,6 +7,45 @@
 #include "witch_core.h"
 #include "witch_systems.h"
 
+#define PLAYER_SPEED 3.0f
+
+void system_process_input() {
+    EcsEntityId plr_id = ecs_hndls.entts.plr;
+    Position *plr_pos = (Position *)ecs_get_entity_component(ecs_hndls.cmpnts.pos, plr_id);
+
+    float dx = 0.0;
+    float dy = 0.0;
+    if (IsKeyDown(KEY_LEFT)) dx--;
+    if (IsKeyDown(KEY_RIGHT)) dx++;
+    if (IsKeyDown(KEY_UP)) dy--;
+    if (IsKeyDown(KEY_DOWN)) dy++;
+
+    if (IsGamepadAvailable(0)) {
+        dx += GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X);
+        dy += GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_Y);
+
+        if (dx <= 0.1 && dx > -0.1) dx = 0;
+        if (dy <= 0.1 && dy > -0.1) dy = 0;
+    }
+
+    if (dx > 1.0) dx = 1.0;
+    if (dx < -1.0) dx = -1.0;
+    if (dy > 1.0) dy = 1.0;
+    if (dy < -1.0) dy = -1.0;
+
+    if (dx != 0 && dy != 0) {
+        float len = sqrt(dx * dx + dy * dy);
+        dx = dx / len;
+        dy = dy / len;
+    }
+
+    plr_pos->x += dx * PLAYER_SPEED;
+    plr_pos->y += dy * PLAYER_SPEED;
+    if (plr_pos->x < 1) plr_pos->x = 1;
+    if (plr_pos->x > 640 - 41 - 1) plr_pos->x = 640 - 41 - 1;
+    if (plr_pos->y < 1) plr_pos->y = 1;
+    if (plr_pos->y > 360 - 27 - 1) plr_pos->y = 360 - 27 - 1;
+}
 void system_move_entities() {
     EcsComponentId pos_cmp_id = ecs_hndls.cmpnts.pos;
     EcsComponentId vel_cmp_id = ecs_hndls.cmpnts.vel;
@@ -130,8 +169,8 @@ void system_render_entities() {
             continue;
         }
 
-        draw_pos.x = (float)(int)floorf(ent_pos->x);
-        draw_pos.y = (float)(int)floorf(ent_pos->y);
+        draw_pos.x = /* (float)(int)floorf */(ent_pos->x);
+        draw_pos.y = /* (float)(int)floorf */(ent_pos->y);
         DrawTextureRec(*ent_rndr->spritesheet, ent_rndr->frame, draw_pos, WHITE);
     }
 }

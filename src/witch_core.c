@@ -2,10 +2,11 @@
 
 #include "ext/raylib.h"
 
-#include "witch_render.h"
 #include "witch_core.h"
+#include "witch_parallax.h"
 #include "witch_systems.h"
 #include "smetanka_misc.h"
+#include "smetanka_render.h"
 
 #define WR_MALLOC malloc
 #define WR_MALLOC_TYPE(type) ((type *)malloc(sizeof(type)))

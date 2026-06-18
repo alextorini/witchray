@@ -1,14 +1,6 @@
 #include <stdlib.h>
 
-#include "witch_render.h"
 #include "witch_core.h"
-
-Texture load_pixel_texture(const char *path) {
-    Texture texture = LoadTexture(path);
-    SetTextureFilter(texture, TEXTURE_FILTER_POINT);
-
-    return texture;
-}
 
 static EcsEntityId create_layer_instance(Texture *texture, Position position, Velocity velocity) {
     EcsEntityId layer_id = ecs_create_entity();

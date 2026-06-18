@@ -8,7 +8,7 @@
 #define ECS_MALLOC_TYPE(type) ((type *)malloc(sizeof(type)))
 #define ECS_MALLOC_ARR(type, count) ((type *)malloc(sizeof(type) * (count)))
 #define ECS_CALLOC calloc
-#define ECS_CALLOC_TYPE(type, count) ((type *)calloc(sizeof(type), (count)))
+#define ECS_CALLOC_TYPE(type, count) ((type *)calloc((count), sizeof(type)))
 #define ECS_REALLOC realloc
 #define ECS_REALLOC_ARR(ptr, type, count) ((type *)realloc((ptr), (sizeof(type) * (count))))
 #define ECS_FREE free
@@ -21,7 +21,7 @@ typedef struct {
 typedef struct {
     uint32_t *sparse_ids;
     EcsEntityId *dense_ids;
-    int32_t count;
+    uint32_t count;
     uint32_t sparse_cap;
     uint32_t cap;
     size_t data_size;
@@ -110,11 +110,15 @@ EcsComponentId ecs_register_component(const char *name, size_t data_size) {
     cmp->sparse_cap = INITIAL_ENTITIES_CAPACITY;
     cmp->cap = INITIAL_ENTITIES_CAPACITY;
 
-    cmp->count = 1;
+    cmp->count = 0;
 
-    cmp->sparse_ids = ECS_CALLOC_TYPE(uint32_t, cmp->sparse_cap);
+    cmp->sparse_ids = ECS_MALLOC_ARR(uint32_t, cmp->sparse_cap);
     if (!cmp->sparse_ids) {
         abort();
+    }
+
+    for (uint32_t i = 0; i < cmp->sparse_cap; i++) {
+        cmp->sparse_ids[i] = INVALID_ID;
     }
 
     cmp->dense_ids = ECS_MALLOC_ARR(uint32_t, cmp->cap);
@@ -140,7 +144,7 @@ EcsComponentId ecs_register_component(const char *name, size_t data_size) {
 }
 
 EcsEntityId ecs_create_entity() {
-    if (space->current_entity_id >= space->current_entities_capacity) {
+    while (space->current_entity_id >= space->current_entities_capacity) {
         space->current_entities_capacity *= 2;
         EcsEntity *entts = ECS_REALLOC_ARR(space->entities, EcsEntity, space->current_entities_capacity);
         if (!entts) {
@@ -161,10 +165,15 @@ void ecs_add_component(EcsEntityId ent_id, EcsComponentId cmp_id, void *cmp_data
     EcsComponent *cmp = &space->components[cmp_id];
 
     while (ent_id >= cmp->sparse_cap) {
+        uint32_t old_cap = cmp->sparse_cap;
         cmp->sparse_cap *= 2;
         uint32_t *sparse_ids = ECS_REALLOC_ARR(cmp->sparse_ids, uint32_t, cmp->sparse_cap);
         if (!sparse_ids) {
             abort();
+        }
+
+        for (uint32_t i = old_cap; i < cmp->sparse_cap; i++) {
+            sparse_ids[i] = INVALID_ID;
         }
 
         cmp->sparse_ids = sparse_ids;
@@ -178,14 +187,21 @@ void ecs_add_component(EcsEntityId ent_id, EcsComponentId cmp_id, void *cmp_data
         }
 
         cmp->dense_ids = dense_ids;
+
+        void *data = ECS_REALLOC(cmp->data, cmp->data_size * cmp->cap);
+
+        if (!data) {
+            abort();
+        }
+
+        cmp->data = data;
     }
 
 
     cmp->sparse_ids[ent_id] = cmp->count;
     cmp->dense_ids[cmp->count] = ent_id;
 
-    memcpy((char *)cmp->data + (cmp->count * cmp->data_size), cmp_data,
-           cmp->data_size);
+    memcpy((char *)cmp->data + (cmp->count * cmp->data_size), cmp_data, cmp->data_size);
 
     cmp->count++;
 }
@@ -198,9 +214,15 @@ void *ecs_get_entity_component(EcsComponentId cmp_id, EcsEntityId ent_id) {
     }
 
     uint32_t dense_id = cmp->sparse_ids[ent_id];
-    if (!dense_id) {
+    if (dense_id == INVALID_ID) {
         return NULL;
     }
+
+    if (dense_id >= cmp->count)
+        abort();
+
+    if (cmp->dense_ids[dense_id] != ent_id)
+        abort();
 
     return (char *)cmp->data + cmp->data_size * dense_id;
 }
@@ -230,7 +252,7 @@ EcsEntityId ecs_get_component_dense(EcsComponentId cmp_id, uint32_t dense_id) {
         return INVALID_ID;
     }
 
-    if (dense_id > cmp->cap) {
+    if (dense_id >= cmp->cap) {
         return INVALID_ID;
     }
 

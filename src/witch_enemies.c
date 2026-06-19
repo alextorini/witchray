@@ -5,6 +5,8 @@
 #define SPAWN_COOLDOWN 0.1
 #define ENEMY_SPEED 50.0
 #define MAX_ENEMIES_COUNT 1000
+#define ENEMY_WIDTH 32
+#define ENEMY_HEIGHT 32
 
 static uint16_t enemies_count;
 static float spawn_cooldown;
@@ -18,7 +20,7 @@ EcsEntityId create_enemy(Position *pos) {
     EcsEntityId enemy_id = ecs_create_entity();
 
     ecs_add_component(enemy_id, ecs_hndls.cmpnts.pos, pos);
-    Render rndr = {&sprtshts.enemy, {0.0f, 0.0f, 32.0f, 32.0f}};
+    Render rndr = {&sprtshts.enemy, ENEMY_DEFAULT_FRAME};
     ecs_add_component(enemy_id, ecs_hndls.cmpnts.rndr, &rndr);
 
     Velocity vel = {-ENEMY_SPEED, 0};
@@ -42,7 +44,7 @@ void system_spawn_enemies(float dt) {
 
     Position pos;
     pos.x = VIRTUAL_WIDTH;
-    pos.y = rand() % (VIRTUAL_HEIGHT - 32 + 1);
+    pos.y = rand() % (VIRTUAL_HEIGHT - ENEMY_HEIGHT + 1);
 
     create_enemy(&pos);
 

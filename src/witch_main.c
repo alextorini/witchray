@@ -6,7 +6,7 @@
 int main() {
     SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
     SetTargetFPS(60);
-    InitWindow(1280, 720, "WitchRay");
+    InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "WitchRay");
     InitAudioDevice();
     SearchAndSetResourceDir("res");
 

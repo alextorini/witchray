@@ -24,8 +24,8 @@ void system_process_input() {
         dx += GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X);
         dy += GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_Y);
 
-        if (dx <= 0.1 && dx > -0.1) dx = 0;
-        if (dy <= 0.1 && dy > -0.1) dy = 0;
+        if (dx <= GAMEPAD_DEADZONE && dx > -GAMEPAD_DEADZONE) dx = 0;
+        if (dy <= GAMEPAD_DEADZONE && dy > -GAMEPAD_DEADZONE) dy = 0;
     }
 
     if (dx > 1.0) dx = 1.0;

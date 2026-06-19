@@ -37,12 +37,7 @@ Spritesheets sprtshts;
 EcsHandles ecs_hndls;
 
 void init() {
-    int codepoints[512] = {0};
-    for (int i = 0; i < 95; i++)
-        codepoints[i] = 32 + i;
-    for (int i = 0; i < 255; i++)
-        codepoints[96 + i] = 0x400 + i;
-    fnt = LoadFontEx("fonts/monocraft.otf", 18, codepoints, 350);
+    fnt = load_font("fonts/monocraft.otf");
 
     sprtshts.player = load_pixel_texture("images/player.png");
     sprtshts.enemy = load_pixel_texture("images/enemy.png");
@@ -74,14 +69,14 @@ void init() {
     ecs_hndls.entts.background_layers[1][1] = layer_copies[1];
 
     ecs_hndls.entts.plr = ecs_create_entity();
-    Position plr_pos = {50, 50};
+    Position plr_pos = PLAYER_START_POS;
     ecs_add_component(ecs_hndls.entts.plr, ecs_hndls.cmpnts.pos, &plr_pos);
-    Render plr_rndr = {&sprtshts.player, {0.0f, 0.0f, 41.0f, 27.0f}};
+    Render plr_rndr = {&sprtshts.player, PLAYER_DEFAULT_FRAME};
     ecs_add_component(ecs_hndls.entts.plr, ecs_hndls.cmpnts.rndr, &plr_rndr);
 
     plr_idle.start_frame = 0;
     plr_idle.end_frame = 1;
-    plr_idle.frame_time = 0.25;
+    plr_idle.frame_time = PLAYER_IDLE_ANIM_SPEED;
     plr_idle.loop = true;
 
     plr_anim_set.clips = WR_MALLOC_TYPE(AnimationClip);

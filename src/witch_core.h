@@ -7,12 +7,21 @@
 #define VIRTUAL_WIDTH 640
 #define VIRTUAL_HEIGHT 360
 
+#define WINDOW_WIDTH 1280
+#define WINDOW_HEIGHT 720
+
 #define SKY_COLOR CLITERAL(Color){255, 128, 156, 255}
 
 #define BG_LAYER_1_SPEED 50.0f
 #define BG_LAYER_2_SPEED 150.0f
 
+#define PLAYER_START_POS {50, 50}
+#define PLAYER_DEFAULT_FRAME {0.0f, 0.0f, 41.0f, 27.0f}
 #define PLAYER_SPEED 3.0f
+#define GAMEPAD_DEADZONE 0.1f
+#define PLAYER_IDLE_ANIM_SPEED 0.25f
+
+#define ENEMY_DEFAULT_FRAME {0.0f, 0.0f, 32.0f, 32.0f}
 
 typedef Vector2 Position;
 typedef Vector2 Velocity;

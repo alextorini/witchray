@@ -3,6 +3,7 @@
 #include "ext/raylib.h"
 
 #include "witch_core.h"
+#include "smetanka_ecs.h"
 #include "witch_parallax.h"
 #include "witch_systems.h"
 #include "smetanka_misc.h"
@@ -59,6 +60,7 @@ void init() {
     ecs_hndls.cmpnts.rndr = ecs_register_component((char *)"Render", sizeof(Render));
     ecs_hndls.cmpnts.anim = ecs_register_component((char *)"Animation", sizeof(Animation));
     ecs_hndls.cmpnts.prlx = ecs_register_component((char *)"Parallax", sizeof(IsParallax));
+    ecs_hndls.cmpnts.enmy = ecs_register_component((char *)"Enemy", sizeof(IsEnemy));
 
     EcsEntityId *layer_copies;
     layer_copies = add_parallax_background_layer(&bckgrnd.layer_1, BG_LAYER_1_SPEED);
@@ -98,12 +100,14 @@ void update_and_draw() {
 
     system_process_input();
     system_spawn_enemies(GetFrameTime());
+    system_clean_enemies();
     system_move_entities();
     system_animate_entities();
     system_render_entities();
     system_move_parallax();
 
     DrawTextEx(fnt, TextFormat("%d", GetFPS()), CLITERAL(Position){3, 3}, 9, 1, DARKGREEN);
+    DrawTextEx(fnt, TextFormat("%d", ecs_get_component_count(ecs_hndls.cmpnts.enmy)), CLITERAL(Position){3, 33}, 9, 1, DARKGREEN);
 }
 
 

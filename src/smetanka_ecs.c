@@ -115,16 +115,28 @@ EcsComponentId ecs_register_component(const char *name, size_t data_size) {
         abort();
     }
 
-    memset(cmp->data, 0, data_size);
-
     space->current_component_id++;
 
     return cmp_id;
 }
 
 EcsEntityId ecs_create_entity() {
+    if (space->current_entity_id > MAX_ENTITIES_CAPACITY) {
+        abort();
+    }
+
     while (space->current_entity_id >= space->current_entities_capacity) {
-        space->current_entities_capacity *= 2;
+        uint32_t new_cap = space->current_entities_capacity * 2;
+        if (new_cap > MAX_ENTITIES_CAPACITY) {
+            new_cap = MAX_ENTITIES_CAPACITY;
+        }
+
+        if (new_cap == space->current_entities_capacity) {
+            continue;
+        }
+
+        space->current_entities_capacity = new_cap;
+
         EcsEntity *entts = ECS_REALLOC_ARR(space->entities, EcsEntity, space->current_entities_capacity);
         if (!entts) {
             abort();
@@ -141,7 +153,20 @@ EcsEntityId ecs_create_entity() {
 }
 
 void ecs_add_component(EcsEntityId ent_id, EcsComponentId cmp_id, void *cmp_data) {
+    if (ent_id >= space->current_entity_id) {
+        abort();
+    }
+
+    if (cmp_id >= space->current_component_id) {
+        abort();
+    }
+
     EcsComponent *cmp = &space->components[cmp_id];
+
+    if (ent_id < cmp->sparse_cap && cmp->sparse_ids[ent_id] != INVALID_ID)
+    {
+        abort();
+    }
 
     while (ent_id >= cmp->sparse_cap) {
         uint32_t old_cap = cmp->sparse_cap;
@@ -160,7 +185,7 @@ void ecs_add_component(EcsEntityId ent_id, EcsComponentId cmp_id, void *cmp_data
 
     while (cmp->count >= cmp->cap) {
         cmp->cap *= 2;
-        EcsEntityId *dense_ids = ECS_REALLOC_ARR(cmp->dense_ids, uint32_t, cmp->cap);
+        EcsEntityId *dense_ids = ECS_REALLOC_ARR(cmp->dense_ids, EcsEntityId, cmp->cap);
         if (!dense_ids) {
             abort();
         }
@@ -168,7 +193,6 @@ void ecs_add_component(EcsEntityId ent_id, EcsComponentId cmp_id, void *cmp_data
         cmp->dense_ids = dense_ids;
 
         void *data = ECS_REALLOC(cmp->data, cmp->data_size * cmp->cap);
-
         if (!data) {
             abort();
         }
@@ -186,6 +210,10 @@ void ecs_add_component(EcsEntityId ent_id, EcsComponentId cmp_id, void *cmp_data
 }
 
 void *ecs_get_entity_component(EcsComponentId cmp_id, EcsEntityId ent_id) {
+    if (cmp_id >= space->current_component_id) {
+        return NULL;
+    }
+
     EcsComponent *cmp = &space->components[cmp_id];
 
     if (ent_id >= cmp->sparse_cap) {
@@ -208,14 +236,10 @@ void *ecs_get_entity_component(EcsComponentId cmp_id, EcsEntityId ent_id) {
 
 uint32_t ecs_get_component_count(EcsComponentId cmp_id) {
     if (cmp_id >= space->current_component_id) {
-        return INVALID_ID;
+        return 0;
     }
 
     EcsComponent *cmp = &space->components[cmp_id];
-
-    if (!cmp) {
-        return INVALID_ID;
-    }
 
     return cmp->count;
 }
@@ -231,12 +255,60 @@ EcsEntityId ecs_get_component_dense(EcsComponentId cmp_id, uint32_t dense_id) {
         return INVALID_ID;
     }
 
-    if (dense_id >= cmp->cap) {
+    if (dense_id >= cmp->count) {
         return INVALID_ID;
     }
 
     return cmp->dense_ids[dense_id];
 }
+
+static void ecs_remove_from_component(EcsComponent *cmp, EcsEntityId ent_id) {
+    if (ent_id >= cmp->sparse_cap) {
+        return;
+    }
+
+    uint32_t dense_id = cmp->sparse_ids[ent_id];
+    if (dense_id == INVALID_ID) {
+        return;
+    }
+
+    uint32_t last_index = cmp->count - 1;
+    EcsEntityId last_ent = cmp->dense_ids[last_index];
+
+    cmp->dense_ids[dense_id] = last_ent;
+    memcpy(
+        (char*)cmp->data + dense_id * cmp->data_size,
+        (char*)cmp->data + last_index * cmp->data_size,
+        cmp->data_size
+    );
+
+    cmp->sparse_ids[last_ent] = dense_id;
+
+    cmp->count--;
+
+    cmp->sparse_ids[ent_id] = INVALID_ID;
+}
+
+void ecs_destroy_entity(EcsEntityId ent_id) {
+    if (ent_id >= space->current_entity_id) {
+        return;
+    }
+
+    EcsEntity *entity = &space->entities[ent_id];
+
+    if (entity->id == INVALID_ID)
+        return;
+
+    for (uint32_t i = 0; i < space->current_component_id; i++)
+    {
+        ecs_remove_from_component(&space->components[i], ent_id);
+    }
+
+    entity->version++;
+
+    entity->id = INVALID_ID;
+}
+
 
 void ecs_destroy_space() {
     if (!space) {
@@ -247,12 +319,16 @@ void ecs_destroy_space() {
         ECS_FREE(space->entities);
     }
 
-    for (int i = 0; i < space->current_component_id; i++) {
+    for (uint32_t i = 0; i < space->current_component_id; i++) {
+        ECS_FREE(space->components[i].sparse_ids);
+        ECS_FREE(space->components[i].dense_ids);
         ECS_FREE(space->components[i].data);
     }
 
     ECS_FREE(space->components);
     ECS_FREE(space);
+
+    space = NULL;
 
     return;
 }

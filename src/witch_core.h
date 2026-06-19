@@ -26,6 +26,7 @@
 typedef Vector2 Position;
 typedef Vector2 Velocity;
 typedef bool IsParallax;
+typedef bool IsEnemy;
 
 typedef struct {
     Texture *spritesheet;
@@ -62,6 +63,7 @@ typedef struct {
     EcsComponentId rndr;
     EcsComponentId anim;
     EcsComponentId prlx;
+    EcsComponentId enmy;
 } EcsComponentHandles;
 
 typedef struct {

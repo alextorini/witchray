@@ -6,9 +6,9 @@
 #define INVALID_ID UINT32_MAX
 
 #define INITIAL_ENTITIES_CAPACITY 1
+#define MAX_ENTITIES_CAPACITY 1000000
 #define INITIAL_COMPONENTS_CAPACITY 1
 #define MAX_COMPONENT_NAME_LENGTH 32
-#define MAX_SYSTEM_NAME_LENGTH 32
 
 typedef uint32_t EcsEntityId;
 typedef uint32_t EcsComponentId;
@@ -26,5 +26,7 @@ void *ecs_get_entity_component(EcsComponentId component_id, EcsEntityId entity_i
 uint32_t ecs_get_component_count(EcsComponentId cmp_id);
 
 EcsEntityId ecs_get_component_dense(EcsComponentId cmp_id, uint32_t dense_id);
+
+void ecs_destroy_entity(EcsEntityId ent_id);
 
 void ecs_destroy_space();

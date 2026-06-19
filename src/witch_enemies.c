@@ -3,7 +3,7 @@
 #include "witch_core.h"
 
 #define SPAWN_COOLDOWN 0.1
-#define ENEMY_SPEED 50.0
+#define ENEMY_SPEED 150.0
 #define MAX_ENEMIES_COUNT 1000
 #define ENEMY_WIDTH 32
 #define ENEMY_HEIGHT 32
@@ -25,6 +25,9 @@ EcsEntityId create_enemy(Position *pos) {
 
     Velocity vel = {-ENEMY_SPEED, 0};
     ecs_add_component(enemy_id, ecs_hndls.cmpnts.vel, &vel);
+
+    IsEnemy enmy = true;
+    ecs_add_component(enemy_id, ecs_hndls.cmpnts.enmy, &enmy);
 
     enemies_count++;
 
@@ -51,3 +54,24 @@ void system_spawn_enemies(float dt) {
     spawn_cooldown = SPAWN_COOLDOWN;
 }
 
+void system_clean_enemies() {
+    EcsComponentId pos_cmp_id = ecs_hndls.cmpnts.pos;
+    EcsComponentId enmy_cmp_id = ecs_hndls.cmpnts.enmy;
+
+    uint32_t enemies_count = ecs_get_component_count(enmy_cmp_id);
+    for (uint32_t i = 0; i < enemies_count ; i++) {
+        uint32_t ent_id = ecs_get_component_dense(enmy_cmp_id, i);
+        if (ent_id == INVALID_ID) {
+            continue;
+        }
+
+        Position *ent_pos = (Position *)ecs_get_entity_component(pos_cmp_id, ent_id);
+        if (!ent_pos) {
+            continue;
+        }
+
+        if (ent_pos->x < -ENEMY_WIDTH) {
+            ecs_destroy_entity(ent_id);
+        }
+    }
+}

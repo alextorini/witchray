@@ -30,22 +30,12 @@ typedef struct {
 } EcsComponent;
 
 typedef struct {
-    EcsSystemCallback callback;
-    EcsComponentId *required_components;
-    int required_count;
-    char name[MAX_SYSTEM_NAME_LENGTH];
-} EcsSystem;
-
-typedef struct {
     EcsEntityId current_entity_id;
     uint32_t current_entities_capacity;
     EcsComponentId current_component_id;
     uint32_t current_components_capacity;
-    EcsSystemId current_system_id;
-    uint32_t current_systems_capacity;
     EcsEntity *entities;
     EcsComponent *components;
-    EcsSystem *systems;
 } EcsSpace;
 
 static EcsSpace *space;
@@ -58,10 +48,8 @@ void ecs_create_space() {
 
     space->current_entities_capacity = INITIAL_ENTITIES_CAPACITY;
     space->current_components_capacity = INITIAL_COMPONENTS_CAPACITY;
-    space->current_systems_capacity = INITIAL_SYSTEMS_CAPACITY;
     space->current_entity_id = 0;
     space->current_component_id = 0;
-    space->current_system_id = 0;
 
     space->entities = ECS_MALLOC_ARR(EcsEntity, space->current_entities_capacity);
     if (!space->entities) {
@@ -72,15 +60,6 @@ void ecs_create_space() {
 
     space->components = ECS_MALLOC_ARR(EcsComponent, space->current_components_capacity);
     if (!space->components) {
-        ECS_FREE(space->entities);
-        ECS_FREE(space);
-
-        abort();
-    }
-
-    space->systems = ECS_MALLOC_ARR(EcsSystem, space->current_components_capacity);
-    if (!space->systems) {
-        ECS_FREE(space->components);
         ECS_FREE(space->entities);
         ECS_FREE(space);
 
@@ -257,27 +236,6 @@ EcsEntityId ecs_get_component_dense(EcsComponentId cmp_id, uint32_t dense_id) {
     }
 
     return cmp->dense_ids[dense_id];
-}
-
-EcsSystemId ecs_register_system(
-    const char *name,
-    EcsSystemCallback callback,
-    uint32_t *req_cmpnts,
-    uint32_t cmpnts_count
-) {
-    EcsSystemId sys_id = space->current_system_id;
-    EcsSystem *sys = &space->systems[sys_id];
-
-    strncpy(sys->name, name, MAX_SYSTEM_NAME_LENGTH - 1);
-    sys->name[MAX_SYSTEM_NAME_LENGTH - 1] = '\0';
-
-    sys->callback = callback;
-    sys->required_components = req_cmpnts;
-    sys->required_count = cmpnts_count;
-
-    space->current_system_id++;
-
-    return sys_id;
 }
 
 void ecs_destroy_space() {

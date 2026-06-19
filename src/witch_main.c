@@ -3,9 +3,6 @@
 #include "witch_core.h"
 #include "smetanka_misc.h"
 
-const int VIRTUAL_WIDTH = 640;
-const int VIRTUAL_HEIGHT = 360;
-
 int main() {
     SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
     SetTargetFPS(60);

@@ -4,6 +4,16 @@
 
 #include "smetanka_ecs.h"
 
+#define VIRTUAL_WIDTH 640
+#define VIRTUAL_HEIGHT 360
+
+#define SKY_COLOR CLITERAL(Color){255, 128, 156, 255}
+
+#define BG_LAYER_1_SPEED 50.0f
+#define BG_LAYER_2_SPEED 150.0f
+
+#define PLAYER_SPEED 3.0f
+
 typedef Vector2 Position;
 typedef Vector2 Velocity;
 typedef bool IsParallax;
@@ -55,6 +65,13 @@ typedef struct {
     EcsComponentHandles cmpnts;
     EcsEntityHandles entts;
 } EcsHandles;
+
+typedef struct {
+    Texture player;
+    Texture enemy;
+} Spritesheets;
+
+extern Spritesheets sprtshts;
 
 extern EcsHandles ecs_hndls;
 

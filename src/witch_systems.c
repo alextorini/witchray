@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdint.h>
+
 #include "ext/raylib.h"
 #include "ext/raymath.h"
 
@@ -7,11 +8,10 @@
 #include "witch_core.h"
 #include "witch_systems.h"
 
-#define PLAYER_SPEED 3.0f
-
 void system_process_input() {
     EcsEntityId plr_id = ecs_hndls.entts.plr;
     Position *plr_pos = (Position *)ecs_get_entity_component(ecs_hndls.cmpnts.pos, plr_id);
+    Render *plr_rndr = (Render *)ecs_get_entity_component(ecs_hndls.cmpnts.rndr, plr_id);
 
     float dx = 0.0;
     float dy = 0.0;
@@ -41,11 +41,13 @@ void system_process_input() {
 
     plr_pos->x += dx * PLAYER_SPEED;
     plr_pos->y += dy * PLAYER_SPEED;
+
     if (plr_pos->x < 1) plr_pos->x = 1;
-    if (plr_pos->x > 640 - 41 - 1) plr_pos->x = 640 - 41 - 1;
+    if (plr_pos->x > VIRTUAL_WIDTH - plr_rndr->frame.width - 1) plr_pos->x = VIRTUAL_WIDTH - plr_rndr->frame.width - 1;
     if (plr_pos->y < 1) plr_pos->y = 1;
-    if (plr_pos->y > 360 - 27 - 1) plr_pos->y = 360 - 27 - 1;
+    if (plr_pos->y > VIRTUAL_WIDTH - plr_rndr->frame.height - 1) plr_pos->y = VIRTUAL_HEIGHT - plr_rndr->frame.height - 1;
 }
+
 void system_move_entities() {
     EcsComponentId pos_cmp_id = ecs_hndls.cmpnts.pos;
     EcsComponentId vel_cmp_id = ecs_hndls.cmpnts.vel;

@@ -7,6 +7,7 @@
 #include "witch_systems.h"
 #include "smetanka_misc.h"
 #include "smetanka_render.h"
+#include "witch_enemies.h"
 
 #define WR_MALLOC malloc
 #define WR_MALLOC_TYPE(type) ((type *)malloc(sizeof(type)))
@@ -18,19 +19,8 @@
 static Font fnt;
 static Music music;
 
-#define SKY_COLOR CLITERAL(Color){255, 128, 156, 255}
-
-#define BG_LAYER_1_SPEED 50.0f
-#define BG_LAYER_2_SPEED 150.0f
-
 static Background bckgrnd;
 
-typedef struct {
-    Texture player;
-    Texture enemy;
-} Spritesheets;
-
-static Spritesheets sprtshts;
 
 static AnimationClip plr_idle;
 static AnimationSet plr_anim_set;
@@ -41,6 +31,8 @@ typedef struct {
 } Sounds;
 
 static Sounds snds;
+
+Spritesheets sprtshts;
 
 EcsHandles ecs_hndls;
 
@@ -110,6 +102,7 @@ void update_and_draw() {
     ClearBackground(SKY_COLOR);
 
     system_process_input();
+    system_spawn_enemies(GetFrameTime());
     system_move_entities();
     system_animate_entities();
     system_render_entities();

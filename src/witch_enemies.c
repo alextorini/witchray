@@ -1,10 +1,11 @@
+#include <stdint.h>
 #include <stdlib.h>
 #include "smetanka_ecs.h"
 #include "witch_core.h"
 
-#define SPAWN_COOLDOWN 0.1
+#define SPAWN_COOLDOWN 0.01
 #define ENEMY_SPEED 150.0
-#define MAX_ENEMIES_COUNT 1000
+#define MAX_ENEMIES_COUNT 10000
 #define ENEMY_WIDTH 32
 #define ENEMY_HEIGHT 32
 
@@ -16,22 +17,22 @@ void init_enemy_factory() {
     spawn_cooldown = SPAWN_COOLDOWN;
 }
 
-EcsEntityId create_enemy(Position *pos) {
-    EcsEntityId enemy_id = ecs_create_entity();
+EcsEntityHandle create_enemy(Position *pos) {
+    EcsEntityHandle enemy_handle = ecs_create_entity();
 
-    ecs_add_component(enemy_id, ecs_hndls.cmpnts.pos, pos);
+    ecs_add_component(enemy_handle, ecs_hndls.cmpnts.pos, pos);
     Render rndr = {&sprtshts.enemy, ENEMY_DEFAULT_FRAME};
-    ecs_add_component(enemy_id, ecs_hndls.cmpnts.rndr, &rndr);
+    ecs_add_component(enemy_handle, ecs_hndls.cmpnts.rndr, &rndr);
 
     Velocity vel = {-ENEMY_SPEED, 0};
-    ecs_add_component(enemy_id, ecs_hndls.cmpnts.vel, &vel);
+    ecs_add_component(enemy_handle, ecs_hndls.cmpnts.vel, &vel);
 
     IsEnemy enmy = true;
-    ecs_add_component(enemy_id, ecs_hndls.cmpnts.enmy, &enmy);
+    ecs_add_component(enemy_handle, ecs_hndls.cmpnts.enmy, &enmy);
 
     enemies_count++;
 
-    return enemy_id;
+    return enemy_handle;
 }
 
 void system_spawn_enemies(float dt) {
@@ -60,7 +61,7 @@ void system_clean_enemies() {
 
     uint32_t enemies_count = ecs_get_component_count(enmy_cmp_id);
     for (uint32_t i = 0; i < enemies_count ; i++) {
-        uint32_t ent_id = ecs_get_component_dense(enmy_cmp_id, i);
+        EcsEntityHandle ent_id = ecs_get_component_dense(enmy_cmp_id, i);
         if (ent_id == INVALID_ID) {
             continue;
         }
@@ -70,7 +71,9 @@ void system_clean_enemies() {
             continue;
         }
 
-        if (ent_pos->x < -ENEMY_WIDTH) {
+        static uint8_t delete_enemies = 0;
+        if (IsKeyDown(KEY_SPACE)) delete_enemies = 1;
+        if (delete_enemies && ent_pos->x < -ENEMY_WIDTH) {
             ecs_destroy_entity(ent_id);
         }
     }

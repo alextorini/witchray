@@ -2,8 +2,8 @@
 
 #include "witch_core.h"
 
-static EcsEntityId create_layer_instance(Texture *texture, Position position, Velocity velocity) {
-    EcsEntityId layer_id = ecs_create_entity();
+static EcsEntityHandle create_layer_instance(Texture *texture, Position position, Velocity velocity) {
+    EcsEntityHandle layer_id = ecs_create_entity();
 
     ecs_add_component(layer_id, ecs_hndls.cmpnts.pos, &position);
     ecs_add_component(layer_id, ecs_hndls.cmpnts.vel, &velocity);
@@ -17,11 +17,11 @@ static EcsEntityId create_layer_instance(Texture *texture, Position position, Ve
     return layer_id;
 }
 
-EcsEntityId *add_parallax_background_layer(Texture *texture, float speed) {
+EcsEntityHandle *add_parallax_background_layer(Texture *texture, float speed) {
     Position position = {0, 0};
     Velocity velocity = {-speed, 0};
 
-    EcsEntityId *layers = (EcsEntityId *)malloc(sizeof(EcsEntityId) * 2);
+    EcsEntityHandle *layers = (EcsEntityHandle *)malloc(sizeof(EcsEntityHandle) * 2);
 
     layers[0] = create_layer_instance(texture, position, velocity);
 

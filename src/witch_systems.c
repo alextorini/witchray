@@ -9,7 +9,7 @@
 #include "witch_systems.h"
 
 void system_process_input() {
-    EcsEntityId plr_id = ecs_hndls.entts.plr;
+    EcsEntityHandle plr_id = ecs_hndls.entts.plr;
     Position *plr_pos = (Position *)ecs_get_entity_component(ecs_hndls.cmpnts.pos, plr_id);
     Render *plr_rndr = (Render *)ecs_get_entity_component(ecs_hndls.cmpnts.rndr, plr_id);
 
@@ -45,17 +45,17 @@ void system_process_input() {
     if (plr_pos->x < 1) plr_pos->x = 1;
     if (plr_pos->x > VIRTUAL_WIDTH - plr_rndr->frame.width - 1) plr_pos->x = VIRTUAL_WIDTH - plr_rndr->frame.width - 1;
     if (plr_pos->y < 1) plr_pos->y = 1;
-    if (plr_pos->y > VIRTUAL_WIDTH - plr_rndr->frame.height - 1) plr_pos->y = VIRTUAL_HEIGHT - plr_rndr->frame.height - 1;
+    if (plr_pos->y > VIRTUAL_HEIGHT - plr_rndr->frame.height - 1) plr_pos->y = VIRTUAL_HEIGHT - plr_rndr->frame.height - 1;
 }
 
 void system_move_entities() {
     EcsComponentId pos_cmp_id = ecs_hndls.cmpnts.pos;
     EcsComponentId vel_cmp_id = ecs_hndls.cmpnts.vel;
 
-    int32_t vel_cmp_count = ecs_get_component_count(vel_cmp_id);
+    uint32_t vel_cmp_count = ecs_get_component_count(vel_cmp_id);
 
     for (uint32_t i = 0; i < vel_cmp_count; i++) {
-        uint32_t ent_id = ecs_get_component_dense(vel_cmp_id, i);
+        EcsEntityHandle ent_id = ecs_get_component_dense(vel_cmp_id, i);
         if (ent_id == INVALID_ID) {
             abort();
         }
@@ -79,10 +79,10 @@ void system_move_parallax() {
     EcsComponentId rndr_cmp_id = ecs_hndls.cmpnts.rndr;
     EcsComponentId prlx_cmp_id = ecs_hndls.cmpnts.prlx;
 
-    int32_t prlx_cmp_count = ecs_get_component_count(prlx_cmp_id);
+    uint32_t prlx_cmp_count = ecs_get_component_count(prlx_cmp_id);
 
     for (uint32_t i = 0; i < prlx_cmp_count; i++) {
-        uint32_t ent_id = ecs_get_component_dense(prlx_cmp_id, i);
+        EcsEntityHandle ent_id = ecs_get_component_dense(prlx_cmp_id, i);
         if (ent_id == INVALID_ID) {
             abort();
         }
@@ -112,10 +112,10 @@ void system_animate_entities() {
     EcsComponentId anim_cmp_id = ecs_hndls.cmpnts.anim;
     EcsComponentId rndr_cmp_id = ecs_hndls.cmpnts.rndr;
 
-    int32_t anim_cmp_count = ecs_get_component_count(anim_cmp_id);
+    uint32_t anim_cmp_count = ecs_get_component_count(anim_cmp_id);
 
     for (int i = 0; i < anim_cmp_count; i++) {
-        uint32_t ent_id = ecs_get_component_dense(anim_cmp_id, i);
+        EcsEntityHandle ent_id = ecs_get_component_dense(anim_cmp_id, i);
         if (ent_id == INVALID_ID) {
             abort();
         }
@@ -152,11 +152,11 @@ void system_render_entities() {
     EcsComponentId pos_cmp_id = ecs_hndls.cmpnts.pos;
     EcsComponentId rndr_cmp_id = ecs_hndls.cmpnts.rndr;
 
-    int32_t rndr_cmp_count = ecs_get_component_count(rndr_cmp_id);
+    uint32_t rndr_cmp_count = ecs_get_component_count(rndr_cmp_id);
 
     Position draw_pos;
     for (int i = 0; i < rndr_cmp_count; i++) {
-        uint32_t ent_id = ecs_get_component_dense(rndr_cmp_id, i);
+        EcsEntityHandle ent_id = ecs_get_component_dense(rndr_cmp_id, i);
         if (ent_id == INVALID_ID) {
             abort();
         }

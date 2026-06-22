@@ -67,9 +67,9 @@ typedef struct {
 } EcsComponentHandles;
 
 typedef struct {
-    EcsEntityId plr;
-    EcsEntityId background_layers[2][2];
-    EcsEntityId *enemies;
+    EcsEntityHandle plr;
+    EcsEntityHandle background_layers[2][2];
+    EcsEntityHandle *enemies;
 } EcsEntityHandles;
 
 typedef struct {

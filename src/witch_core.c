@@ -62,7 +62,7 @@ void init() {
     ecs_hndls.cmpnts.prlx = ecs_register_component((char *)"Parallax", sizeof(IsParallax));
     ecs_hndls.cmpnts.enmy = ecs_register_component((char *)"Enemy", sizeof(IsEnemy));
 
-    EcsEntityId *layer_copies;
+    EcsEntityHandle *layer_copies;
     layer_copies = add_parallax_background_layer(&bckgrnd.layer_1, BG_LAYER_1_SPEED);
     ecs_hndls.entts.background_layers[0][0] = layer_copies[0];
     ecs_hndls.entts.background_layers[0][1] = layer_copies[1];

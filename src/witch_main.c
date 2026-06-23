@@ -5,9 +5,13 @@
 
 int main() {
     SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
+
     SetTargetFPS(60);
+
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "WitchRay");
+
     InitAudioDevice();
+
     SearchAndSetResourceDir("res");
 
     init();
@@ -24,13 +28,16 @@ int main() {
         EndTextureMode();
 
         BeginDrawing();
+
         DrawTexturePro(virtualScreen.texture, sourceRec, destRec, CLITERAL(Vector2){0, 0}, 0.0f, WHITE);
+
         EndDrawing();
     }
 
     unload();
 
     CloseAudioDevice();
+
     CloseWindow();
 
     return 0;

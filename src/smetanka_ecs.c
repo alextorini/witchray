@@ -15,7 +15,11 @@
 #define ECS_REALLOC_ARR(ptr, type, count) ((type *)realloc((ptr), (sizeof(type) * (count))))
 #define ECS_FREE free
 
-#define ABORT() printf("info: %s:%d: ", __FILE__, __LINE__); abort();
+#define ABORT() \
+    do { \
+        fprintf(stderr, "info: %s:%d\n", __FILE__, __LINE__); \
+        abort(); \
+    } while (0)
 
 typedef uint32_t EcsEntityId;
 typedef uint32_t EcsEntityGen;

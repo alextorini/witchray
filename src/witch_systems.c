@@ -8,47 +8,47 @@
 #include "witch_core.h"
 #include "witch_systems.h"
 
-void system_process_input() {
-    EcsEntityHandle plr_id = ecs_hndls.entts.plr;
-    Position *plr_pos = (Position *)ecs_get_entity_component(ecs_hndls.cmpnts.pos, plr_id);
-    Render *plr_rndr = (Render *)ecs_get_entity_component(ecs_hndls.cmpnts.rndr, plr_id);
+// void system_process_input() {
+//     EcsEntityHandle plr_id = ecs_hndls.entts.plr;
+//     Position *plr_pos = (Position *)ecs_get_entity_component(ecs_hndls.cmpnts.pos, plr_id);
+//     Render *plr_rndr = (Render *)ecs_get_entity_component(ecs_hndls.cmpnts.rndr, plr_id);
+//
+//     float dx = 0.0;
+//     float dy = 0.0;
+//     if (IsKeyDown(KEY_LEFT)) dx--;
+//     if (IsKeyDown(KEY_RIGHT)) dx++;
+//     if (IsKeyDown(KEY_UP)) dy--;
+//     if (IsKeyDown(KEY_DOWN)) dy++;
+//
+//     if (IsGamepadAvailable(0)) {
+//         dx += GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X);
+//         dy += GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_Y);
+//
+//         if (dx <= GAMEPAD_DEADZONE && dx > -GAMEPAD_DEADZONE) dx = 0;
+//         if (dy <= GAMEPAD_DEADZONE && dy > -GAMEPAD_DEADZONE) dy = 0;
+//     }
+//
+//     if (dx > 1.0) dx = 1.0;
+//     if (dx < -1.0) dx = -1.0;
+//     if (dy > 1.0) dy = 1.0;
+//     if (dy < -1.0) dy = -1.0;
+//
+//     if (dx != 0 && dy != 0) {
+//         float len = sqrt(dx * dx + dy * dy);
+//         dx = dx / len;
+//         dy = dy / len;
+//     }
+//
+//     plr_pos->x += dx * PLAYER_SPEED;
+//     plr_pos->y += dy * PLAYER_SPEED;
+//
+//     if (plr_pos->x < 1) plr_pos->x = 1;
+//     if (plr_pos->x > VIRTUAL_WIDTH - plr_rndr->frame.width - 1) plr_pos->x = VIRTUAL_WIDTH - plr_rndr->frame.width - 1;
+//     if (plr_pos->y < 1) plr_pos->y = 1;
+//     if (plr_pos->y > VIRTUAL_HEIGHT - plr_rndr->frame.height - 1) plr_pos->y = VIRTUAL_HEIGHT - plr_rndr->frame.height - 1;
+// }
 
-    float dx = 0.0;
-    float dy = 0.0;
-    if (IsKeyDown(KEY_LEFT)) dx--;
-    if (IsKeyDown(KEY_RIGHT)) dx++;
-    if (IsKeyDown(KEY_UP)) dy--;
-    if (IsKeyDown(KEY_DOWN)) dy++;
-
-    if (IsGamepadAvailable(0)) {
-        dx += GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X);
-        dy += GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_Y);
-
-        if (dx <= GAMEPAD_DEADZONE && dx > -GAMEPAD_DEADZONE) dx = 0;
-        if (dy <= GAMEPAD_DEADZONE && dy > -GAMEPAD_DEADZONE) dy = 0;
-    }
-
-    if (dx > 1.0) dx = 1.0;
-    if (dx < -1.0) dx = -1.0;
-    if (dy > 1.0) dy = 1.0;
-    if (dy < -1.0) dy = -1.0;
-
-    if (dx != 0 && dy != 0) {
-        float len = sqrt(dx * dx + dy * dy);
-        dx = dx / len;
-        dy = dy / len;
-    }
-
-    plr_pos->x += dx * PLAYER_SPEED;
-    plr_pos->y += dy * PLAYER_SPEED;
-
-    if (plr_pos->x < 1) plr_pos->x = 1;
-    if (plr_pos->x > VIRTUAL_WIDTH - plr_rndr->frame.width - 1) plr_pos->x = VIRTUAL_WIDTH - plr_rndr->frame.width - 1;
-    if (plr_pos->y < 1) plr_pos->y = 1;
-    if (plr_pos->y > VIRTUAL_HEIGHT - plr_rndr->frame.height - 1) plr_pos->y = VIRTUAL_HEIGHT - plr_rndr->frame.height - 1;
-}
-
-void system_move_entities() {
+void system_move_entities(float delta_time) {
     EcsComponentId pos_cmp_id = ecs_hndls.cmpnts.pos;
     EcsComponentId vel_cmp_id = ecs_hndls.cmpnts.vel;
 
@@ -70,7 +70,7 @@ void system_move_entities() {
             continue;
         }
 
-        *ent_pos = Vector2Add(*ent_pos, Vector2Scale(*ent_vel, GetFrameTime()));
+        *ent_pos = Vector2Add(*ent_pos, Vector2Scale(*ent_vel, delta_time));
     }
 }
 
@@ -108,7 +108,7 @@ void system_move_parallax() {
     }
 }
 
-void system_animate_entities() {
+void system_animate_entities(float delta_time) {
     EcsComponentId anim_cmp_id = ecs_hndls.cmpnts.anim;
     EcsComponentId rndr_cmp_id = ecs_hndls.cmpnts.rndr;
 
@@ -131,7 +131,7 @@ void system_animate_entities() {
         }
 
         AnimationClip *cur_clp = &ent_anim->set->clips[ent_anim->current_clip];
-        ent_anim->timer += GetFrameTime();
+        ent_anim->timer += delta_time;
 
         if (cur_clp->frame_time <= 0.00001f) return;
 

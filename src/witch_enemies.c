@@ -3,18 +3,31 @@
 #include "smetanka_ecs.h"
 #include "witch_core.h"
 
-#define SPAWN_COOLDOWN 0.01
-#define ENEMY_SPEED 150.0
+#define SPAWN_COOLDOWN 0.5
+#define ENEMY_SPEED 100.0
 #define MAX_ENEMIES_COUNT 10000
 #define ENEMY_WIDTH 32
 #define ENEMY_HEIGHT 32
 
+#define ENEMY_FRAME_TIME 0.5
+
 static uint16_t enemies_count;
 static float spawn_cooldown;
+
+static AnimationClip idle_animation;
+static AnimationSet animation_set;
 
 void init_enemy_factory() {
     enemies_count = 0;
     spawn_cooldown = SPAWN_COOLDOWN;
+
+    idle_animation.start_frame = 0;
+    idle_animation.end_frame = 1;
+    idle_animation.frame_time = ENEMY_FRAME_TIME;
+    idle_animation.loop = 1;
+    animation_set.clips = WR_MALLOC_TYPE(AnimationClip);
+    animation_set.count = 1;
+    animation_set.clips[0] = idle_animation;
 }
 
 EcsEntityHandle create_enemy(Position *pos) {
@@ -29,6 +42,13 @@ EcsEntityHandle create_enemy(Position *pos) {
 
     IsEnemy enmy = true;
     ecs_add_component(enemy_handle, ecs_hndls.cmpnts.enmy, &enmy);
+
+    Animation animation;
+    animation.set = &animation_set;
+    animation.current_clip = 0;
+    animation.current_frame = 0;
+    animation.timer = 0.0;
+    ecs_add_component(enemy_handle, ecs_hndls.cmpnts.anim, &animation);
 
     enemies_count++;
 
@@ -71,9 +91,7 @@ void system_clean_enemies() {
             continue;
         }
 
-        static uint8_t delete_enemies = 0;
-        if (IsKeyDown(KEY_SPACE)) delete_enemies = 1;
-        if (delete_enemies && ent_pos->x < -ENEMY_WIDTH) {
+        if (ent_pos->x < -ENEMY_WIDTH) {
             ecs_destroy_entity(ent_id);
         }
     }

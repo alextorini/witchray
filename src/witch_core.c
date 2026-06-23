@@ -1,5 +1,3 @@
-#include <stdlib.h>
-
 #include "ext/raylib.h"
 
 #include "witch_core.h"
@@ -9,19 +7,13 @@
 #include "smetanka_misc.h"
 #include "smetanka_render.h"
 #include "witch_enemies.h"
+#include "witch_player.h"
 
-#define WR_MALLOC malloc
-#define WR_MALLOC_TYPE(type) ((type *)malloc(sizeof(type)))
-#define WR_MALLOC_ARR(type, count) ((type *)malloc(sizeof(type) * (count)))
-#define WR_CALLOC calloc
-#define WR_CALLOC_TYPE(type, count) ((type *)calloc(sizeof(type), (count)))
-#define WR_FREE free
 
 static Font fnt;
 static Music music;
 
 static Background bckgrnd;
-
 
 static AnimationClip plr_idle;
 static AnimationSet plr_anim_set;
@@ -75,11 +67,13 @@ void init() {
     ecs_add_component(ecs_hndls.entts.plr, ecs_hndls.cmpnts.pos, &plr_pos);
     Render plr_rndr = {&sprtshts.player, PLAYER_DEFAULT_FRAME};
     ecs_add_component(ecs_hndls.entts.plr, ecs_hndls.cmpnts.rndr, &plr_rndr);
+    Velocity plr_vel = {0.0, 0.0};
+    ecs_add_component(ecs_hndls.entts.plr, ecs_hndls.cmpnts.vel, &plr_vel);
 
     plr_idle.start_frame = 0;
     plr_idle.end_frame = 1;
     plr_idle.frame_time = PLAYER_IDLE_ANIM_SPEED;
-    plr_idle.loop = true;
+    plr_idle.loop = 1;
 
     plr_anim_set.clips = WR_MALLOC_TYPE(AnimationClip);
     plr_anim_set.count = 1;
@@ -91,6 +85,8 @@ void init() {
     plr_anim.current_frame = 0;
     plr_anim.timer = 0.0;
     ecs_add_component(ecs_hndls.entts.plr, ecs_hndls.cmpnts.anim, &plr_anim);
+
+    init_enemy_factory();
 }
 
 void update_and_draw() {
@@ -98,11 +94,13 @@ void update_and_draw() {
 
     ClearBackground(SKY_COLOR);
 
-    system_process_input();
-    system_spawn_enemies(GetFrameTime());
+    float delta_time = GetFrameTime();
+
+    process_input(delta_time);
+    system_spawn_enemies(delta_time);
     system_clean_enemies();
-    system_move_entities();
-    system_animate_entities();
+    system_move_entities(delta_time);
+    system_animate_entities(delta_time);
     system_render_entities();
     system_move_parallax();
 

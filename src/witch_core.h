@@ -10,8 +10,8 @@
 #define VIRTUAL_WIDTH 640
 #define VIRTUAL_HEIGHT 360
 
-#define WINDOW_WIDTH 1920
-#define WINDOW_HEIGHT 1080
+#define WINDOW_WIDTH 1280
+#define WINDOW_HEIGHT 720
 
 #define SKY_COLOR CLITERAL(Color){255, 128, 156, 255}
 
@@ -41,6 +41,7 @@ typedef bool IsEnemy;
 typedef struct {
     Texture *spritesheet;
     Rectangle frame;
+    // int priority;
 } Render;
 
 typedef struct {

@@ -18,10 +18,10 @@ void process_input(float delta_time) {
 
     float dx = 0.0;
     float dy = 0.0;
-    if (IsKeyDown(KEY_LEFT)) dx--;
-    if (IsKeyDown(KEY_RIGHT)) dx++;
-    if (IsKeyDown(KEY_UP)) dy--;
-    if (IsKeyDown(KEY_DOWN)) dy++;
+    if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) dx--;
+    if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) dx++;
+    if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) dy--;
+    if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) dy++;
 
     if (IsGamepadAvailable(0)) {
         dx += GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X);

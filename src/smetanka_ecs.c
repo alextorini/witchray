@@ -330,6 +330,74 @@ EcsEntityHandle ecs_get_component_dense(EcsComponentId component_id, uint32_t de
     return space->entity_list[entity_id].handle;
 }
 
+EcsEntityIterator ecs_get_entity_iterator(EcsComponentId *component_id_list, uint16_t count)
+{
+    EcsEntityIterator iterator;
+
+    iterator.component_count = count;
+    iterator.index = 0;
+    iterator.base_component_id = INVALID_ID;
+
+    uint32_t min_entity_count = UINT32_MAX;
+    uint32_t secondary_component_index = 0;
+
+    for (uint32_t i = 0; i < count; i++) {
+        uint32_t component_entity_count = space->component_list[component_id_list[i]].count;
+        if (component_entity_count < min_entity_count) {
+            min_entity_count = component_entity_count;
+
+            if (iterator.base_component_id != INVALID_ID) {
+                iterator.secondary_component_id_list[secondary_component_index++] = iterator.base_component_id;
+            }
+
+            iterator.base_component_id = component_id_list[i];
+
+            continue;
+        }
+
+        iterator.secondary_component_id_list[secondary_component_index++] = component_id_list[i];
+    }
+
+    return iterator;
+}
+
+EcsEntityHandle ecs_get_next_entity(EcsEntityIterator *iterator) {
+    EcsEntityHandle entity_handle;
+
+    uint32_t base_component_count = ecs_get_component_count(iterator->base_component_id);
+    while (iterator->index < base_component_count) {
+        entity_handle = ecs_get_component_dense(iterator->base_component_id, iterator->index);
+
+        if (entity_handle == INVALID_ID) {
+            return INVALID_HANDLE;
+        }
+
+        if (iterator->component_count == 1) {
+            iterator->index++;
+
+            return entity_handle;
+        }
+
+        uint8_t isEntityValid = 1;
+        void *component_data;
+        for (uint32_t i = 0; i < iterator->component_count - 1; i++) {
+            component_data = ecs_get_entity_component(iterator->secondary_component_id_list[i], entity_handle);
+            if (!component_data) {
+                isEntityValid = 0;
+                break;
+            }
+        }
+
+        iterator->index++;
+
+        if (isEntityValid) {
+            return entity_handle;
+        }
+    }
+
+    return INVALID_HANDLE;
+}
+
 static void ecs_remove_from_component(EcsComponent *component, EcsEntityId entity_id) {
     if (entity_id >= component->sparse_capacity) {
         return;

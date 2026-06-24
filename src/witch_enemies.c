@@ -76,23 +76,15 @@ void system_spawn_enemies(float dt) {
 }
 
 void system_clean_enemies() {
-    EcsComponentId pos_cmp_id = ecs_hndls.cmpnts.pos;
-    EcsComponentId enmy_cmp_id = ecs_hndls.cmpnts.enmy;
+    EcsEntityIterator iterator =
+        ecs_get_entity_iterator(CLITERAL(EcsComponentId []){ecs_hndls.cmpnts.pos, ecs_hndls.cmpnts.enmy}, 2);
 
-    uint32_t enemies_count = ecs_get_component_count(enmy_cmp_id);
-    for (uint32_t i = 0; i < enemies_count ; i++) {
-        EcsEntityHandle ent_id = ecs_get_component_dense(enmy_cmp_id, i);
-        if (ent_id == INVALID_ID) {
-            continue;
-        }
+    EcsEntityHandle entity_handle;
+    while ((entity_handle = ecs_get_next_entity(&iterator)) != INVALID_HANDLE) {
+        Position *position = (Position *)ecs_get_entity_component(ecs_hndls.cmpnts.pos, entity_handle);
 
-        Position *ent_pos = (Position *)ecs_get_entity_component(pos_cmp_id, ent_id);
-        if (!ent_pos) {
-            continue;
-        }
-
-        if (ent_pos->x < -ENEMY_WIDTH) {
-            ecs_destroy_entity(ent_id);
+        if (position->x < -ENEMY_WIDTH) {
+            ecs_destroy_entity(entity_handle);
         }
     }
 }

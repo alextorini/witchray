@@ -1,10 +1,4 @@
-# BasedOnStyle: LLVM
-# IndentWidth: 4
-# ColumnLimit: 120
-
 BasedOnStyle: LLVM
 IndentWidth: 4
-AlignAfterOpenBracket: DontAlign
-BinPackArguments: false
-BinPackParameters: false
+ColumnLimit: 120
 

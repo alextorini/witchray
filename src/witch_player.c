@@ -11,10 +11,10 @@
 #define PLAYER_BRAKING  250.0
 
 void process_input(float delta_time) {
-    EcsEntityHandle plr_id = ecs_hndls.entts.plr;
-    Velocity *plr_vel = (Velocity *)ecs_get_entity_component(ecs_hndls.cmpnts.vel, plr_id);
-    Position *plr_pos = (Position *)ecs_get_entity_component(ecs_hndls.cmpnts.pos, plr_id);
-    Render *plr_rndr = (Render *)ecs_get_entity_component(ecs_hndls.cmpnts.rndr, plr_id);
+    EcsEntityHandle plr_id = ecs_handles.entts.plr;
+    Velocity *plr_vel = (Velocity *)ecs_get_entity_component(ecs_handles.cmpnts.vel, plr_id);
+    Position *plr_pos = (Position *)ecs_get_entity_component(ecs_handles.cmpnts.pos, plr_id);
+    Render *plr_rndr = (Render *)ecs_get_entity_component(ecs_handles.cmpnts.rndr, plr_id);
 
     float dx = 0.0;
     float dy = 0.0;

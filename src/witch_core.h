@@ -95,7 +95,7 @@ typedef struct {
 
 extern Spritesheets sprtshts;
 
-extern EcsHandles ecs_hndls;
+extern EcsHandles ecs_handles;
 
 void init();
 

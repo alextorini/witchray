@@ -5,14 +5,14 @@
 static EcsEntityHandle create_layer_instance(Texture *texture, Position position, Velocity velocity) {
     EcsEntityHandle layer_id = ecs_create_entity();
 
-    ecs_add_component(layer_id, ecs_hndls.cmpnts.pos, &position);
-    ecs_add_component(layer_id, ecs_hndls.cmpnts.vel, &velocity);
+    ecs_add_component(layer_id, ecs_handles.cmpnts.pos, &position);
+    ecs_add_component(layer_id, ecs_handles.cmpnts.vel, &velocity);
 
     Render render = {texture, {0.0f, 0.0f, 1.0f * texture->width, 1.0f * texture->height}};
-    ecs_add_component(layer_id, ecs_hndls.cmpnts.rndr, &render);
+    ecs_add_component(layer_id, ecs_handles.cmpnts.rndr, &render);
 
     IsParallax is_parallax = true;
-    ecs_add_component(layer_id, ecs_hndls.cmpnts.prlx, &is_parallax);
+    ecs_add_component(layer_id, ecs_handles.cmpnts.prlx, &is_parallax);
 
     return layer_id;
 }

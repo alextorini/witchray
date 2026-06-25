@@ -27,7 +27,7 @@ static Sounds snds;
 
 Spritesheets sprtshts;
 
-EcsHandles ecs_hndls;
+EcsHandles ecs_handles;
 
 void init() {
     fnt = load_font("fonts/monocraft.otf");
@@ -47,28 +47,28 @@ void init() {
 
     ecs_create_space();
 
-    ecs_hndls.cmpnts.pos = ecs_register_component((char *)"Position", sizeof(Position));
-    ecs_hndls.cmpnts.vel = ecs_register_component((char *)"Velocity", sizeof(Velocity));
-    ecs_hndls.cmpnts.rndr = ecs_register_component((char *)"Render", sizeof(Render));
-    ecs_hndls.cmpnts.anim = ecs_register_component((char *)"Animation", sizeof(Animation));
-    ecs_hndls.cmpnts.prlx = ecs_register_component((char *)"Parallax", sizeof(IsParallax));
-    ecs_hndls.cmpnts.enmy = ecs_register_component((char *)"Enemy", sizeof(IsEnemy));
+    ecs_handles.cmpnts.pos = ecs_register_component((char *)"Position", sizeof(Position));
+    ecs_handles.cmpnts.vel = ecs_register_component((char *)"Velocity", sizeof(Velocity));
+    ecs_handles.cmpnts.rndr = ecs_register_component((char *)"Render", sizeof(Render));
+    ecs_handles.cmpnts.anim = ecs_register_component((char *)"Animation", sizeof(Animation));
+    ecs_handles.cmpnts.prlx = ecs_register_component((char *)"Parallax", sizeof(IsParallax));
+    ecs_handles.cmpnts.enmy = ecs_register_component((char *)"Enemy", sizeof(IsEnemy));
 
     EcsEntityHandle *layer_copies;
     layer_copies = add_parallax_background_layer(&bckgrnd.layer_1, BG_LAYER_1_SPEED);
-    ecs_hndls.entts.background_layers[0][0] = layer_copies[0];
-    ecs_hndls.entts.background_layers[0][1] = layer_copies[1];
+    ecs_handles.entts.background_layers[0][0] = layer_copies[0];
+    ecs_handles.entts.background_layers[0][1] = layer_copies[1];
     layer_copies = add_parallax_background_layer(&bckgrnd.layer_2, BG_LAYER_2_SPEED);
-    ecs_hndls.entts.background_layers[1][0] = layer_copies[0];
-    ecs_hndls.entts.background_layers[1][1] = layer_copies[1];
+    ecs_handles.entts.background_layers[1][0] = layer_copies[0];
+    ecs_handles.entts.background_layers[1][1] = layer_copies[1];
 
-    ecs_hndls.entts.plr = ecs_create_entity();
+    ecs_handles.entts.plr = ecs_create_entity();
     Position plr_pos = PLAYER_START_POS;
-    ecs_add_component(ecs_hndls.entts.plr, ecs_hndls.cmpnts.pos, &plr_pos);
+    ecs_add_component(ecs_handles.entts.plr, ecs_handles.cmpnts.pos, &plr_pos);
     Render plr_rndr = {&sprtshts.player, PLAYER_DEFAULT_FRAME};
-    ecs_add_component(ecs_hndls.entts.plr, ecs_hndls.cmpnts.rndr, &plr_rndr);
+    ecs_add_component(ecs_handles.entts.plr, ecs_handles.cmpnts.rndr, &plr_rndr);
     Velocity plr_vel = {0.0, 0.0};
-    ecs_add_component(ecs_hndls.entts.plr, ecs_hndls.cmpnts.vel, &plr_vel);
+    ecs_add_component(ecs_handles.entts.plr, ecs_handles.cmpnts.vel, &plr_vel);
 
     plr_idle.start_frame = 0;
     plr_idle.end_frame = 1;
@@ -84,7 +84,7 @@ void init() {
     plr_anim.current_clip = 0;
     plr_anim.current_frame = 0;
     plr_anim.timer = 0.0;
-    ecs_add_component(ecs_hndls.entts.plr, ecs_hndls.cmpnts.anim, &plr_anim);
+    ecs_add_component(ecs_handles.entts.plr, ecs_handles.cmpnts.anim, &plr_anim);
 
     init_enemy_factory();
 }
@@ -98,14 +98,18 @@ void update_and_draw() {
 
     process_input(delta_time);
     system_spawn_enemies(delta_time);
-    system_clean_enemies();
-    system_move_entities(delta_time);
-    system_animate_entities(delta_time);
-    system_render_entities();
-    system_move_parallax();
+    system_clean_enemies(ecs_handles.cmpnts.enmy, ecs_handles.cmpnts.pos);
+    system_move_entities(ecs_handles.cmpnts.pos, ecs_handles.cmpnts.vel, delta_time);
+    system_animate_entities(ecs_handles.cmpnts.anim, ecs_handles.cmpnts.rndr,delta_time);
+    system_render_entities(ecs_handles.cmpnts.pos, ecs_handles.cmpnts.rndr);
+    system_move_parallax(ecs_handles.cmpnts.prlx, ecs_handles.cmpnts.pos, ecs_handles.cmpnts.rndr);
 
     DrawTextEx(fnt, TextFormat("%d", GetFPS()), CLITERAL(Position){3, 3}, 9, 1, DARKGREEN);
-    DrawTextEx(fnt, TextFormat("%d", ecs_get_component_count(ecs_hndls.cmpnts.enmy)), CLITERAL(Position){3, 33}, 9, 1, DARKGREEN);
+    DrawTextEx(
+        fnt,
+        TextFormat("%d", ecs_get_component_count(ecs_handles.cmpnts.enmy)),
+        CLITERAL(Position){3, 33}, 9, 1, DARKGREEN
+    );
 }
 
 

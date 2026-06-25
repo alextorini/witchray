@@ -33,22 +33,22 @@ void init_enemy_factory() {
 EcsEntityHandle create_enemy(Position *pos) {
     EcsEntityHandle enemy_handle = ecs_create_entity();
 
-    ecs_add_component(enemy_handle, ecs_hndls.cmpnts.pos, pos);
+    ecs_add_component(enemy_handle, ecs_handles.cmpnts.pos, pos);
     Render rndr = {&sprtshts.enemy, ENEMY_DEFAULT_FRAME};
-    ecs_add_component(enemy_handle, ecs_hndls.cmpnts.rndr, &rndr);
+    ecs_add_component(enemy_handle, ecs_handles.cmpnts.rndr, &rndr);
 
     Velocity vel = {-ENEMY_SPEED, 0};
-    ecs_add_component(enemy_handle, ecs_hndls.cmpnts.vel, &vel);
+    ecs_add_component(enemy_handle, ecs_handles.cmpnts.vel, &vel);
 
     IsEnemy enmy = true;
-    ecs_add_component(enemy_handle, ecs_hndls.cmpnts.enmy, &enmy);
+    ecs_add_component(enemy_handle, ecs_handles.cmpnts.enmy, &enmy);
 
     Animation animation;
     animation.set = &animation_set;
     animation.current_clip = 0;
     animation.current_frame = 0;
     animation.timer = 0.0;
-    ecs_add_component(enemy_handle, ecs_hndls.cmpnts.anim, &animation);
+    ecs_add_component(enemy_handle, ecs_handles.cmpnts.anim, &animation);
 
     enemies_count++;
 
@@ -75,13 +75,13 @@ void system_spawn_enemies(float dt) {
     spawn_cooldown = SPAWN_COOLDOWN;
 }
 
-void system_clean_enemies() {
+void system_clean_enemies(EcsComponentId enemy_id, EcsComponentId position_id) {
     EcsEntityIterator iterator =
-        ecs_get_entity_iterator(CLITERAL(EcsComponentId []){ecs_hndls.cmpnts.pos, ecs_hndls.cmpnts.enmy}, 2);
+        ecs_get_entity_iterator(CLITERAL(EcsComponentId []){enemy_id, position_id}, 2);
 
     EcsEntityHandle entity_handle;
     while ((entity_handle = ecs_get_next_entity(&iterator)) != INVALID_HANDLE) {
-        Position *position = (Position *)ecs_get_entity_component(ecs_hndls.cmpnts.pos, entity_handle);
+        Position *position = (Position *)ecs_get_entity_component(position_id, entity_handle);
 
         if (position->x < -ENEMY_WIDTH) {
             ecs_destroy_entity(entity_handle);

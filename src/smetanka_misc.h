@@ -23,3 +23,13 @@ static inline uint64_t pack_handle(uint32_t id, uint32_t gen) {
 static inline uint64_t increase_handle_gen(uint64_t handle) {
     return pack_handle(get_handle_id(handle), get_handle_gen(handle) + 1);
 }
+
+static inline uint8_t aabb_intersect(
+    float ax, float ay, float aw, float ah,
+    float bx, float by, float bw, float bh)
+{
+    return ax < bx + bw &&
+           ax + aw > bx &&
+           ay < by + bh &&
+           ay + ah > by;
+}

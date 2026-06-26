@@ -20,7 +20,7 @@ int main() {
     Rectangle sourceRec = {0.0f, 0.0f, (float)virtualScreen.texture.width, (float)-virtualScreen.texture.height};
     Rectangle destRec = {0.0f, 0.0f, (float)GetScreenWidth(), (float)GetScreenHeight()};
 
-    while (!WindowShouldClose()) {
+    while (!WindowShouldClose() && !should_close) {
         BeginTextureMode(virtualScreen);
 
         update_and_draw();

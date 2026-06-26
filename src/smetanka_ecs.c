@@ -46,7 +46,7 @@ typedef struct {
     uint32_t capacity;
 } EntityFreeSlotPool;
 
-typedef struct {
+struct EcsSpace {
     EcsEntityId next_entity_id;
     uint32_t current_entities_capacity;
     EcsComponentId current_component_id;
@@ -54,11 +54,11 @@ typedef struct {
     EcsEntity *entity_list;
     EcsComponent *component_list;
     EntityFreeSlotPool entity_free_slots_pool;
-} EcsSpace;
+};
 
 static EcsSpace *space;
 
-void ecs_create_space() {
+EcsSpace *ecs_create_space() {
     space = ECS_MALLOC_TYPE(EcsSpace);
     if (!space) {
         ABORT();
@@ -100,6 +100,8 @@ void ecs_create_space() {
     for (int i = 0; i < space->entity_free_slots_pool.capacity; i++) {
         space->entity_free_slots_pool.id_list[i] = INVALID_ID;
     }
+
+    return space;
 }
 
 EcsComponentId ecs_register_component(const char *name, size_t data_size) {
@@ -199,7 +201,7 @@ EcsEntityHandle ecs_create_entity() {
     return entity_pointer->handle;
 }
 
-void ecs_add_component(EcsEntityHandle entity_handle, EcsComponentId component_id, void *component_data) {
+void *ecs_add_component(EcsEntityHandle entity_handle, EcsComponentId component_id, void *component_data) {
     EcsEntityId entity_id = get_handle_id(entity_handle);
     if (entity_id >= space->next_entity_id) {
         ABORT();
@@ -259,9 +261,13 @@ void ecs_add_component(EcsEntityHandle entity_handle, EcsComponentId component_i
     cmp_ptr->sparse_id_list[entity_id] = cmp_ptr->count;
     cmp_ptr->dense_id_list[cmp_ptr->count] = entity_id;
 
-    memcpy((char *)cmp_ptr->data + (cmp_ptr->count * cmp_ptr->data_size), component_data, cmp_ptr->data_size);
+    void *new_data = (char *)cmp_ptr->data + (cmp_ptr->count * cmp_ptr->data_size);
+
+    memcpy(new_data, component_data, cmp_ptr->data_size);
 
     cmp_ptr->count++;
+
+    return new_data;
 }
 
 void *ecs_get_entity_component(EcsComponentId component_id, EcsEntityHandle entity_handle) {
@@ -470,6 +476,32 @@ void ecs_destroy_entity(EcsEntityHandle entity_handle) {
     space->entity_free_slots_pool.id_list[space->entity_free_slots_pool.count++] = entity_id;
 }
 
+void ecs_clear_space() {
+    for (uint32_t i = 0; i < space->current_component_id; i++) {
+        EcsComponent *cmp = &space->component_list[i];
+
+        for (uint32_t j = 0; j < cmp->count; j++) {
+            cmp->sparse_id_list[cmp->dense_id_list[j]] = INVALID_ID;
+        }
+
+        cmp->count = 0;
+    }
+
+    space->entity_free_slots_pool.count = 0;
+
+    for (EcsEntityId id = 0; id < space->next_entity_id; id++) {
+        EcsEntity *entity = &space->entity_list[id];
+
+        if (!entity->active) {
+            continue;
+        }
+
+        entity->active = 0;
+        entity->handle = increase_handle_gen(entity->handle);
+
+        space->entity_free_slots_pool.id_list[space->entity_free_slots_pool.count++] = id;
+    }
+}
 
 void ecs_destroy_space() {
     if (!space) {

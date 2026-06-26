@@ -1,129 +1,80 @@
 #include "ext/raylib.h"
 
-#include "witch_core.h"
 #include "smetanka_ecs.h"
+#include "smetanka_misc.h"
+#include "witch_core.h"
 #include "witch_parallax.h"
 #include "witch_systems.h"
-#include "smetanka_misc.h"
-#include "smetanka_render.h"
+#include "witch_components.h"
 #include "witch_enemies.h"
 #include "witch_player.h"
-
-
-static Font fnt;
-static Music music;
-
-static Background bckgrnd;
+#include "witch_resources.h"
 
 static AnimationClip plr_idle;
 static AnimationSet plr_anim_set;
 
-typedef struct {
-    Sound shoot;
-    Sound explosion;
-} Sounds;
+Game game;
 
-static Sounds snds;
-
-Spritesheets sprtshts;
-
-EcsHandles ecs_handles;
+uint8_t should_close;
 
 void init() {
-    fnt = load_font("fonts/monocraft.otf");
+    should_close = false;
 
-    sprtshts.player = load_pixel_texture("images/player.png");
-    sprtshts.enemy = load_pixel_texture("images/enemy.png");
-    bckgrnd.layer_1 = load_pixel_texture("images/background1.png");
-    bckgrnd.layer_2 = load_pixel_texture("images/background2.png");
+    init_resources(&game.resources);
 
-    snds.shoot = LoadSound("sounds/shoot.wav");
-    snds.explosion = LoadSound("sounds/explosion.wav");
-
-    music = LoadMusicStream("music/music.wav");
-    music.looping = true;
-
-    PlayMusicStream(music);
+    PlayMusicStream(game.resources.music[MUSIC_MAIN]);
 
     ecs_create_space();
+    init_components(&game.components);
+    init_game_background(&game.backgrounds);
 
-    ecs_handles.cmpnts.pos = ecs_register_component((char *)"Position", sizeof(Position));
-    ecs_handles.cmpnts.vel = ecs_register_component((char *)"Velocity", sizeof(Velocity));
-    ecs_handles.cmpnts.rndr = ecs_register_component((char *)"Render", sizeof(Render));
-    ecs_handles.cmpnts.anim = ecs_register_component((char *)"Animation", sizeof(Animation));
-    ecs_handles.cmpnts.prlx = ecs_register_component((char *)"Parallax", sizeof(IsParallax));
-    ecs_handles.cmpnts.enmy = ecs_register_component((char *)"Enemy", sizeof(IsEnemy));
-
-    EcsEntityHandle *layer_copies;
-    layer_copies = add_parallax_background_layer(&bckgrnd.layer_1, BG_LAYER_1_SPEED);
-    ecs_handles.entts.background_layers[0][0] = layer_copies[0];
-    ecs_handles.entts.background_layers[0][1] = layer_copies[1];
-    layer_copies = add_parallax_background_layer(&bckgrnd.layer_2, BG_LAYER_2_SPEED);
-    ecs_handles.entts.background_layers[1][0] = layer_copies[0];
-    ecs_handles.entts.background_layers[1][1] = layer_copies[1];
-
-    ecs_handles.entts.plr = ecs_create_entity();
-    Position plr_pos = PLAYER_START_POS;
-    ecs_add_component(ecs_handles.entts.plr, ecs_handles.cmpnts.pos, &plr_pos);
-    Render plr_rndr = {&sprtshts.player, PLAYER_DEFAULT_FRAME};
-    ecs_add_component(ecs_handles.entts.plr, ecs_handles.cmpnts.rndr, &plr_rndr);
-    Velocity plr_vel = {0.0, 0.0};
-    ecs_add_component(ecs_handles.entts.plr, ecs_handles.cmpnts.vel, &plr_vel);
-
-    plr_idle.start_frame = 0;
-    plr_idle.end_frame = 1;
-    plr_idle.frame_time = PLAYER_IDLE_ANIM_SPEED;
-    plr_idle.loop = 1;
-
-    plr_anim_set.clips = WR_MALLOC_TYPE(AnimationClip);
-    plr_anim_set.count = 1;
-    plr_anim_set.clips[0] = plr_idle;
-
-    Animation plr_anim;
-    plr_anim.set = &plr_anim_set;
-    plr_anim.current_clip = 0;
-    plr_anim.current_frame = 0;
-    plr_anim.timer = 0.0;
-    ecs_add_component(ecs_handles.entts.plr, ecs_handles.cmpnts.anim, &plr_anim);
+    game.player_handle = init_player();
 
     init_enemy_factory();
 }
 
 void update_and_draw() {
-    UpdateMusicStream(music);
+    UpdateMusicStream(game.resources.music[MUSIC_MAIN]);
 
     ClearBackground(SKY_COLOR);
 
     float delta_time = GetFrameTime();
 
-    process_input(delta_time);
-    system_spawn_enemies(delta_time);
-    system_clean_enemies(ecs_handles.cmpnts.enmy, ecs_handles.cmpnts.pos);
-    system_move_entities(ecs_handles.cmpnts.pos, ecs_handles.cmpnts.vel, delta_time);
-    system_animate_entities(ecs_handles.cmpnts.anim, ecs_handles.cmpnts.rndr,delta_time);
-    system_render_entities(ecs_handles.cmpnts.pos, ecs_handles.cmpnts.rndr);
-    system_move_parallax(ecs_handles.cmpnts.prlx, ecs_handles.cmpnts.pos, ecs_handles.cmpnts.rndr);
+    process_input(game.player_handle, delta_time);
 
-    DrawTextEx(fnt, TextFormat("%d", GetFPS()), CLITERAL(Position){3, 3}, 9, 1, DARKGREEN);
+    system_spawn_enemies(delta_time);
+    system_clean_enemies(game.components[CMP_ENEMY], game.components[CMP_POSITION]);
+    system_move_entities(game.components[CMP_POSITION], game.components[CMP_VELOCITY], delta_time);
+    system_animate_entities(game.components[CMP_ANIMATION], game.components[CMP_RENDER],delta_time);
+    system_render_entities(game.components[CMP_POSITION], game.components[CMP_RENDER]);
+    system_move_parallax(game.components[CMP_PARALLAX], game.components[CMP_POSITION], game.components[CMP_RENDER]);
+    system_collide_enemies(
+        game.player_handle,
+        game.components[CMP_ENEMY],
+        game.components[CMP_POSITION],
+        game.components[CMP_RENDER]
+    );
+
+    DrawTextEx(game.resources.fonts[FONT_MAIN], TextFormat("%d", GetFPS()), CLITERAL(Position){3, 3}, 9, 1, DARKGREEN);
     DrawTextEx(
-        fnt,
-        TextFormat("%d", ecs_get_component_count(ecs_handles.cmpnts.enmy)),
+        game.resources.fonts[FONT_MAIN],
+        TextFormat("%d", ecs_get_component_count(game.components[CMP_ENEMY])),
         CLITERAL(Position){3, 33}, 9, 1, DARKGREEN
     );
 }
 
 
 void unload() {
-    UnloadTexture(sprtshts.player);
-    UnloadTexture(sprtshts.enemy);
-    UnloadTexture(bckgrnd.layer_1);
-    UnloadTexture(bckgrnd.layer_2);
+    UnloadTexture(game.resources.sprites[SPRITESHEET_PLAYER]);
+    UnloadTexture(game.resources.sprites[SPRITESHEET_ENEMY]);
+    UnloadTexture(game.resources.sprites[BACKGROUND_URBAN]);
+    UnloadTexture(game.resources.sprites[BACKGROUND_CLOUDS]);
 
-    UnloadSound(snds.shoot);
-    UnloadSound(snds.explosion);
+    UnloadSound(game.resources.sounds[SOUND_SHOOT]);
+    UnloadSound(game.resources.sounds[SOUND_EXPLOSION]);
 
-    StopMusicStream(music);
-    UnloadMusicStream(music);
+    StopMusicStream(game.resources.music[MUSIC_MAIN]);
+    UnloadMusicStream(game.resources.music[MUSIC_MAIN]);
 
     ecs_destroy_space();
 }

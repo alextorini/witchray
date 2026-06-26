@@ -4,4 +4,4 @@
 
 #include "smetanka_ecs.h"
 
-EcsEntityHandle *add_parallax_background_layer(Texture *texture, float speed);
+void init_game_background(EcsEntityHandle (*background_list)[2][2]);

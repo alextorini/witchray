@@ -6,6 +6,9 @@
 #include "ext/raylib.h"
 
 #include "smetanka_ecs.h"
+#include "witch_resources.h"
+#include "witch_components.h"
+#include "witch_player.h"
 
 #define VIRTUAL_WIDTH 640
 #define VIRTUAL_HEIGHT 360
@@ -33,69 +36,16 @@
 #define WR_CALLOC_TYPE(type, count) ((type *)calloc(sizeof(type), (count)))
 #define WR_FREE free
 
-typedef Vector2 Position;
-typedef Vector2 Velocity;
-typedef bool IsParallax;
-typedef bool IsEnemy;
-
 typedef struct {
-    Texture *spritesheet;
-    Rectangle frame;
-    // int priority;
-} Render;
+    EcsEntityHandle player_handle;
+    EcsEntityHandle backgrounds[2][2];
+    ResourceMap resources;
+    EcsComponentId components[CMP_COUNT];
+} Game;
 
-typedef struct {
-    uint16_t start_frame;
-    uint16_t end_frame;
-    float frame_time;
-    uint8_t loop;
-} AnimationClip;
+extern Game game;
 
-typedef struct {
-    AnimationClip *clips;
-    uint32_t count;
-} AnimationSet;
-
-typedef struct {
-    AnimationSet *set;
-    uint16_t current_clip;
-    uint16_t current_frame;
-    float timer;
-} Animation;
-
-typedef struct {
-    Texture layer_1;
-    Texture layer_2;
-} Background;
-
-typedef struct {
-    EcsComponentId pos;
-    EcsComponentId vel;
-    EcsComponentId rndr;
-    EcsComponentId anim;
-    EcsComponentId prlx;
-    EcsComponentId enmy;
-} EcsComponentHandles;
-
-typedef struct {
-    EcsEntityHandle plr;
-    EcsEntityHandle background_layers[2][2];
-    EcsEntityHandle *enemies;
-} EcsEntityHandles;
-
-typedef struct {
-    EcsComponentHandles cmpnts;
-    EcsEntityHandles entts;
-} EcsHandles;
-
-typedef struct {
-    Texture player;
-    Texture enemy;
-} Spritesheets;
-
-extern Spritesheets sprtshts;
-
-extern EcsHandles ecs_handles;
+extern uint8_t should_close;
 
 void init();
 

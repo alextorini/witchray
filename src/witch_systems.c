@@ -2,17 +2,15 @@
 
 #include "ext/raylib.h"
 #include "ext/raymath.h"
-
 #include "smetanka_ecs.h"
-#include "witch_core.h"
 #include "witch_systems.h"
+#include "witch_components.h"
 
 void system_move_entities(EcsComponentId position_id, EcsComponentId velocity_id, float delta_time) {
-    EcsEntityIterator iterator =
-        ecs_get_entity_iterator(CLITERAL(EcsComponentId []){position_id, velocity_id}, 2);
-
+    EcsComponentId component_id_list[] = {position_id, velocity_id};
+    EcsEntityIterator iterator = ecs_get_entity_iterator(component_id_list, 2);
     EcsEntityHandle entity_handle;
-while ((entity_handle = ecs_get_next_entity(&iterator)) != INVALID_HANDLE) {
+    while ((entity_handle = ecs_get_next_entity(&iterator)) != INVALID_HANDLE) {
         Position *position = (Position *)ecs_get_entity_component(position_id, entity_handle);
         Velocity *velocity = (Velocity *)ecs_get_entity_component(velocity_id, entity_handle);
 
@@ -21,16 +19,8 @@ while ((entity_handle = ecs_get_next_entity(&iterator)) != INVALID_HANDLE) {
 }
 
 void system_move_parallax(EcsComponentId parallax_id, EcsComponentId position_id, EcsComponentId render_id) {
-    EcsEntityIterator iterator =
-        ecs_get_entity_iterator(
-            CLITERAL(EcsComponentId []){
-                position_id,
-                parallax_id,
-                render_id
-            },
-            3
-        );
-
+    EcsComponentId component_id_list[] = {parallax_id, position_id, render_id};
+    EcsEntityIterator iterator = ecs_get_entity_iterator(component_id_list, 3);
     EcsEntityHandle entity_handle;
     while ((entity_handle = ecs_get_next_entity(&iterator)) != INVALID_HANDLE) {
         Position *position = (Position *)ecs_get_entity_component(position_id, entity_handle);
@@ -43,9 +33,8 @@ void system_move_parallax(EcsComponentId parallax_id, EcsComponentId position_id
 }
 
 void system_animate_entities(EcsComponentId animation_id, EcsComponentId render_id, float delta_time) {
-    EcsEntityIterator iterator =
-        ecs_get_entity_iterator(CLITERAL(EcsComponentId []){animation_id, render_id}, 2);
-
+    EcsComponentId component_id_list[] = {animation_id, render_id};
+    EcsEntityIterator iterator = ecs_get_entity_iterator(component_id_list, 2);
     EcsEntityHandle entity_handle;
     while ((entity_handle = ecs_get_next_entity(&iterator)) != INVALID_HANDLE) {
         Animation *animation = (Animation*)ecs_get_entity_component(animation_id, entity_handle);
@@ -70,9 +59,8 @@ void system_animate_entities(EcsComponentId animation_id, EcsComponentId render_
 }
 
 void system_render_entities(EcsComponentId position_id, EcsComponentId render_id) {
-    EcsEntityIterator iterator =
-        ecs_get_entity_iterator(CLITERAL(EcsComponentId []){position_id, render_id}, 2);
-
+    EcsComponentId component_id_list[] = {position_id, render_id};
+    EcsEntityIterator iterator = ecs_get_entity_iterator(component_id_list, 2);
     EcsEntityHandle entity_handle;
     while ((entity_handle = ecs_get_next_entity(&iterator)) != INVALID_HANDLE) {
         Position *position = (Position*)ecs_get_entity_component(position_id, entity_handle);

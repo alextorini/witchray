@@ -4,17 +4,52 @@
 #include "ext/raylib.h"
 
 #include "smetanka_ecs.h"
+#include "witch_components.h"
 #include "witch_core.h"
+#include "witch_player.h"
 
 #define PLAYER_MAX_VELOCITY 200.0
 #define PLAYER_ACCELERATION 500.0
 #define PLAYER_BRAKING  250.0
 
-void process_input(float delta_time) {
-    EcsEntityHandle plr_id = ecs_handles.entts.plr;
-    Velocity *plr_vel = (Velocity *)ecs_get_entity_component(ecs_handles.cmpnts.vel, plr_id);
-    Position *plr_pos = (Position *)ecs_get_entity_component(ecs_handles.cmpnts.pos, plr_id);
-    Render *plr_rndr = (Render *)ecs_get_entity_component(ecs_handles.cmpnts.rndr, plr_id);
+static AnimationClip idle_animation;
+static AnimationSet animation_set;
+
+EcsEntityHandle init_player() {
+    EcsEntityHandle handle = ecs_create_entity();
+
+    Position position = PLAYER_START_POS;
+    ecs_add_component(handle, game.components[CMP_POSITION], &position);
+
+    Velocity velocity = {0.0, 0.0};
+    ecs_add_component(handle, game.components[CMP_VELOCITY], &velocity);
+
+    Render render = {&game.resources.sprites[SPRITESHEET_PLAYER], PLAYER_DEFAULT_FRAME};
+    ecs_add_component(handle, game.components[CMP_RENDER], &render);
+
+    idle_animation.start_frame = 0;
+    idle_animation.end_frame = 1;
+    idle_animation.frame_time = PLAYER_IDLE_ANIM_SPEED;
+    idle_animation.loop = 1;
+
+    animation_set.clips = WR_MALLOC_TYPE(AnimationClip);
+    animation_set.count = 1;
+    animation_set.clips[0] = idle_animation;
+
+    Animation animation;
+    animation.set = &animation_set;
+    animation.current_clip = 0;
+    animation.current_frame = 0;
+    animation.timer = 0.0;
+    ecs_add_component(handle, game.components[CMP_ANIMATION], &animation);
+
+    return handle;
+}
+
+void process_input(EcsEntityHandle player_handle, float delta_time) {
+    Velocity *velocity = (Velocity *)ecs_get_entity_component(game.components[CMP_VELOCITY], player_handle);
+    Position *position = (Position *)ecs_get_entity_component(game.components[CMP_POSITION], player_handle);
+    Render *render = (Render *)ecs_get_entity_component(game.components[CMP_RENDER], game.player_handle);
 
     float dx = 0.0;
     float dy = 0.0;
@@ -42,60 +77,61 @@ void process_input(float delta_time) {
         dy = dy / vector_length;
     }
 
+    float vector_length;
     if (dx != 0 || dy != 0) {
-        plr_vel->x += dx * delta_time * PLAYER_ACCELERATION;
-        plr_vel->y += dy * delta_time * PLAYER_ACCELERATION;
+        velocity->x += dx * delta_time * PLAYER_ACCELERATION;
+        velocity->y += dy * delta_time * PLAYER_ACCELERATION;
 
-        float velocity = sqrtf(plr_vel->x * plr_vel->x + plr_vel->y * plr_vel->y);
-        if (velocity > PLAYER_MAX_VELOCITY) {
-            float ratio = PLAYER_MAX_VELOCITY / velocity;
-            plr_vel->x *= ratio;
-            plr_vel->y *= ratio;
+        vector_length = sqrtf(velocity->x * velocity->x + velocity->y * velocity->y);
+        if (vector_length > PLAYER_MAX_VELOCITY) {
+            float ratio = PLAYER_MAX_VELOCITY / vector_length;
+            velocity->x *= ratio;
+            velocity->y *= ratio;
         }
     } else {
-        float vector_length = sqrtf(plr_vel->x * plr_vel->x + plr_vel->y * plr_vel->y);
+        vector_length = sqrtf(velocity->x * velocity->x + velocity->y * velocity->y);
         if (vector_length != 0) {
-            dx = plr_vel->x / vector_length;
-            dy = plr_vel->y / vector_length;
+            dx = velocity->x / vector_length;
+            dy = velocity->y / vector_length;
         } else {
             dx = 0.0;
             dy = 0.0;
         }
 
-        if (plr_vel->x > 0) {
-            plr_vel->x -= dx * delta_time * PLAYER_BRAKING;
-            if (plr_vel->x < 0) plr_vel->x = 0;
-        } else if (plr_vel->x < 0) {
-            plr_vel->x -= dx * delta_time * PLAYER_BRAKING;
-            if (plr_vel->x > 0) plr_vel->x = 0;
+        if (velocity->x > 0) {
+            velocity->x -= dx * delta_time * PLAYER_BRAKING;
+            if (velocity->x < 0) velocity->x = 0;
+        } else if (velocity->x < 0) {
+            velocity->x -= dx * delta_time * PLAYER_BRAKING;
+            if (velocity->x > 0) velocity->x = 0;
         }
 
-        if (plr_vel->y > 0) {
-            plr_vel->y -= dy * delta_time * PLAYER_BRAKING;
-            if (plr_vel->y < 0) plr_vel->y = 0;
-        } else if (plr_vel->y < 0) {
-            plr_vel->y -= dy * delta_time * PLAYER_BRAKING;
-            if (plr_vel->y > 0) plr_vel->y = 0;
+        if (velocity->y > 0) {
+            velocity->y -= dy * delta_time * PLAYER_BRAKING;
+            if (velocity->y < 0) velocity->y = 0;
+        } else if (velocity->y < 0) {
+            velocity->y -= dy * delta_time * PLAYER_BRAKING;
+            if (velocity->y > 0) velocity->y = 0;
         }
     }
 
-    if (plr_pos->x < 1) {
-        plr_pos->x = 1;
-        plr_vel->x = 0;
+    if (position->x < 1) {
+        position->x = 1;
+        velocity->x = 0;
     }
 
-    if (plr_pos->y < 1) {
-        plr_pos->y = 1;
-        plr_vel->y = 0;
+    if (position->y < 1) {
+        position->y = 1;
+        velocity->y = 0;
     }
 
-    if (plr_pos->x + plr_rndr->frame.width > VIRTUAL_WIDTH - 1) {
-        plr_pos->x = VIRTUAL_WIDTH - plr_rndr->frame.width - 1;
-        plr_vel->x = 0;
+    if (position->x + render->frame.width > VIRTUAL_WIDTH - 1) {
+        position->x = VIRTUAL_WIDTH - render->frame.width - 1;
+        velocity->x = 0;
     }
 
-    if (plr_pos->y + plr_rndr->frame.height > VIRTUAL_HEIGHT - 1) {
-        plr_pos->y = VIRTUAL_HEIGHT - plr_rndr->frame.height - 1;
-        plr_vel->y = 0;
+    if (position->y + render->frame.height > VIRTUAL_HEIGHT - 1) {
+        position->y = VIRTUAL_HEIGHT - render->frame.height - 1;
+        velocity->y = 0;
     }
 }

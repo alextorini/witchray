@@ -14,6 +14,7 @@
 
 typedef uint64_t EcsEntityHandle;
 typedef uint32_t EcsComponentId;
+typedef struct EcsSpace EcsSpace;
 
 typedef struct {
     EcsComponentId secondary_component_id_list[MAX_ITERATOR_COMPONENT_COUNT];
@@ -22,13 +23,13 @@ typedef struct {
     EcsComponentId base_component_id;
 } EcsEntityIterator;
 
-void ecs_create_space();
+EcsSpace *ecs_create_space();
 
 EcsComponentId ecs_register_component(const char *name, size_t data_size);
 
 EcsEntityHandle ecs_create_entity();
 
-void ecs_add_component(EcsEntityHandle entity_handle, EcsComponentId component_id, void *component_data);
+void *ecs_add_component(EcsEntityHandle entity_handle, EcsComponentId component_id, void *component_data);
 
 void *ecs_get_entity_component(EcsComponentId component_id, EcsEntityHandle entity_handle);
 
@@ -41,5 +42,7 @@ EcsEntityIterator ecs_get_entity_iterator(EcsComponentId *component_id_list, uin
 EcsEntityHandle ecs_get_next_entity(EcsEntityIterator *iterator);
 
 void ecs_destroy_entity(EcsEntityHandle ent_id);
+
+void ecs_clear_space();
 
 void ecs_destroy_space();

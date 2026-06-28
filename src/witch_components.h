@@ -34,6 +34,15 @@ typedef struct {
     float timer;
 } Animation;
 
+typedef struct {
+    Position offset;
+    Color color;
+    Font font;
+    float font_size;
+    float spacing;
+    char text[128];
+} TextRender;
+
 typedef enum {
     CMP_POSITION,
     CMP_VELOCITY,
@@ -41,6 +50,7 @@ typedef enum {
     CMP_ANIMATION,
     CMP_PARALLAX,
     CMP_ENEMY,
+    CMP_TEXT_RENDER,
     CMP_COUNT
 } ComponentIndex;
 

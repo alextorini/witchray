@@ -9,6 +9,7 @@
 void system_move_entities(EcsComponentId position_id, EcsComponentId velocity_id, float delta_time) {
     EcsComponentId component_id_list[] = {position_id, velocity_id};
     EcsEntityIterator iterator = ecs_get_entity_iterator(component_id_list, 2);
+
     EcsEntityHandle entity_handle;
     while ((entity_handle = ecs_get_next_entity(&iterator)) != INVALID_HANDLE) {
         Position *position = (Position *)ecs_get_entity_component(position_id, entity_handle);
@@ -21,6 +22,7 @@ void system_move_entities(EcsComponentId position_id, EcsComponentId velocity_id
 void system_move_parallax(EcsComponentId parallax_id, EcsComponentId position_id, EcsComponentId render_id) {
     EcsComponentId component_id_list[] = {parallax_id, position_id, render_id};
     EcsEntityIterator iterator = ecs_get_entity_iterator(component_id_list, 3);
+
     EcsEntityHandle entity_handle;
     while ((entity_handle = ecs_get_next_entity(&iterator)) != INVALID_HANDLE) {
         Position *position = (Position *)ecs_get_entity_component(position_id, entity_handle);
@@ -35,6 +37,7 @@ void system_move_parallax(EcsComponentId parallax_id, EcsComponentId position_id
 void system_animate_entities(EcsComponentId animation_id, EcsComponentId render_id, float delta_time) {
     EcsComponentId component_id_list[] = {animation_id, render_id};
     EcsEntityIterator iterator = ecs_get_entity_iterator(component_id_list, 2);
+
     EcsEntityHandle entity_handle;
     while ((entity_handle = ecs_get_next_entity(&iterator)) != INVALID_HANDLE) {
         Animation *animation = (Animation*)ecs_get_entity_component(animation_id, entity_handle);
@@ -61,11 +64,32 @@ void system_animate_entities(EcsComponentId animation_id, EcsComponentId render_
 void system_render_entities(EcsComponentId position_id, EcsComponentId render_id) {
     EcsComponentId component_id_list[] = {position_id, render_id};
     EcsEntityIterator iterator = ecs_get_entity_iterator(component_id_list, 2);
+
     EcsEntityHandle entity_handle;
     while ((entity_handle = ecs_get_next_entity(&iterator)) != INVALID_HANDLE) {
         Position *position = (Position*)ecs_get_entity_component(position_id, entity_handle);
         Render *render = (Render *)ecs_get_entity_component(render_id, entity_handle);
 
         DrawTextureRec(*render->spritesheet, render->frame, *position, WHITE);
+    }
+}
+
+void system_render_text(EcsComponentId position_id, EcsComponentId text_render_id) {
+    EcsComponentId component_id_list[] = {position_id, text_render_id};
+    EcsEntityIterator iterator = ecs_get_entity_iterator(component_id_list, 2);
+
+    EcsEntityHandle entity_handle;
+    while ((entity_handle = ecs_get_next_entity(&iterator)) != INVALID_HANDLE) {
+        Position *position = (Position*)ecs_get_entity_component(position_id, entity_handle);
+        TextRender *text_render = (TextRender *)ecs_get_entity_component(text_render_id, entity_handle);
+
+        DrawTextEx(
+            text_render->font,
+            text_render->text,
+            Vector2Add(*position, text_render->offset),
+            text_render->font_size,
+            text_render->spacing,
+            text_render->color
+        );
     }
 }

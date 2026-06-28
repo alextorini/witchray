@@ -6,7 +6,7 @@
 #include "witch_core.h"
 #include "witch_resources.h"
 
-#define SPAWN_COOLDOWN 0.01
+#define SPAWN_COOLDOWN 0.3
 #define ENEMY_SPEED 100.0
 #define MAX_ENEMIES_COUNT 10000
 #define ENEMY_WIDTH 32
@@ -17,20 +17,20 @@
 static uint16_t enemies_count;
 static float spawn_cooldown;
 
-// static AnimationClip idle_animation;
-// static AnimationSet animation_set;
+static AnimationClip idle_animation;
+static AnimationSet animation_set;
 
 void init_enemy_factory() {
     enemies_count = 0;
     spawn_cooldown = SPAWN_COOLDOWN;
 
-    // idle_animation.start_frame = 0;
-    // idle_animation.end_frame = 1;
-    // idle_animation.frame_time = ENEMY_FRAME_TIME;
-    // idle_animation.loop = 1;
-    // animation_set.clips = WR_MALLOC_TYPE(AnimationClip);
-    // animation_set.count = 1;
-    // animation_set.clips[0] = idle_animation;
+    idle_animation.start_frame = 0;
+    idle_animation.end_frame = 1;
+    idle_animation.frame_time = ENEMY_FRAME_TIME;
+    idle_animation.loop = 1;
+    animation_set.clips = WR_MALLOC_TYPE(AnimationClip);
+    animation_set.count = 1;
+    animation_set.clips[0] = idle_animation;
 }
 
 EcsEntityHandle create_enemy(Position *pos) {
@@ -46,13 +46,13 @@ EcsEntityHandle create_enemy(Position *pos) {
     IsEnemy enmy = true;
     ecs_add_component(handle, game.components[CMP_ENEMY], &enmy);
 
-    // Animation animation;
-    // animation.set = &animation_set;
-    // animation.current_clip = 0;
-    // animation.current_frame = 0;
-    // animation.timer = 0.0;
-    // ecs_add_component(handle, game.components[CMP_ANIMATION], &animation);
-    //
+    Animation animation;
+    animation.set = &animation_set;
+    animation.current_clip = 0;
+    animation.current_frame = 0;
+    animation.timer = 0.0;
+    ecs_add_component(handle, game.components[CMP_ANIMATION], &animation);
+
     enemies_count++;
 
     return handle;
@@ -100,8 +100,8 @@ void system_collide_enemies(
     EcsComponentId component_id_list[] = {enemy_id, position_id, render_id};
     EcsEntityIterator iterator = ecs_get_entity_iterator(component_id_list, 3);
 
-    Position *player_position = (Position *)ecs_get_entity_component(game.components[CMP_POSITION], player_handle);
-    Render *player_render = (Render *)ecs_get_entity_component(game.components[CMP_RENDER], player_handle);
+    Position *player_position = (Position *)ecs_get_entity_component(position_id, player_handle);
+    Render *player_render = (Render *)ecs_get_entity_component(render_id, player_handle);
 
     EcsEntityHandle enemy_handle;
     while ((enemy_handle = ecs_get_next_entity(&iterator)) != INVALID_HANDLE) {

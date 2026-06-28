@@ -16,6 +16,13 @@
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 720
 
+#define STATE_START_SCREEN 0
+#define STATE_GAME_INIT 1
+#define STATE_GAMEPLAY 2
+#define STATE_PAUSE 3
+#define STATE_GAMEOVER_INIT 4
+#define STATE_GAMEOVER 5
+
 #define SKY_COLOR CLITERAL(Color){255, 128, 156, 255}
 
 #define BG_LAYER_1_SPEED 50.0f
@@ -41,6 +48,7 @@ typedef struct {
     EcsEntityHandle backgrounds[2][2];
     ResourceMap resources;
     EcsComponentId components[CMP_COUNT];
+    int state;
 } Game;
 
 extern Game game;

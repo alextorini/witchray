@@ -8,4 +8,5 @@ void init_components(EcsComponentId (*cmp_ids)[CMP_COUNT]) {
     (*cmp_ids)[CMP_ANIMATION] = ecs_register_component((char *)"Animation", sizeof(Animation));
     (*cmp_ids)[CMP_PARALLAX] = ecs_register_component((char *)"Parallax", sizeof(IsParallax));
     (*cmp_ids)[CMP_ENEMY] = ecs_register_component((char *)"Enemy", sizeof(IsEnemy));
+    (*cmp_ids)[CMP_TEXT_RENDER] = ecs_register_component((char *)"Text", sizeof(TextRender));
 }

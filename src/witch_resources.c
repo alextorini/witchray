@@ -21,8 +21,8 @@ static Font load_font(const char *path) {
 
 void init_resources(ResourceMap *resource_map) {
     resource_map->fonts[FONT_MAIN] = load_font("fonts/monocraft.otf");
-    resource_map->sprites[SPRITESHEET_PLAYER] = load_pixel_texture("images/player.png");
-    resource_map->sprites[SPRITESHEET_ENEMY] = load_pixel_texture("images/enemy.png");
+    resource_map->sprites[SPRITESHEET_PLAYER] = load_pixel_texture(PLAYER_IMAGE_PATH);
+    resource_map->sprites[SPRITESHEET_ENEMY] = load_pixel_texture(ENEMY_IMAGE_PATH);
     resource_map->sprites[BACKGROUND_CLOUDS] = load_pixel_texture("images/background_clouds.png");
     resource_map->sprites[BACKGROUND_URBAN] = load_pixel_texture("images/background_urban.png");
 

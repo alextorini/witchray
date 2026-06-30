@@ -31,6 +31,8 @@ void init_enemy_factory() {
     animation_set.clips = WR_MALLOC_TYPE(AnimationClip);
     animation_set.count = 1;
     animation_set.clips[0] = idle_animation;
+
+    init_collision_map(ENEMY_IMAGE_PATH, (Rectangle)ENEMY_DEFAULT_FRAME, 1, game.enemies.collisions);
 }
 
 EcsEntityHandle create_enemy(Position *pos) {

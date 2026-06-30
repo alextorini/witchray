@@ -1,14 +1,12 @@
 #pragma once
 
 #include "smetanka_ecs.h"
+#include "witch_collision.h"
 #include "witch_components.h"
 
 typedef struct {
     EcsEntityHandle handle;
-    Position *position;
-    Velocity *velocity;
-    Render *render;
-    Animation *animation;
+    FrameCollisionMap collisions;
 } Player;
 
 EcsEntityHandle init_player();

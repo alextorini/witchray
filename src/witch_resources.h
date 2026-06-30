@@ -2,6 +2,9 @@
 
 #include "ext/raylib.h"
 
+#define PLAYER_IMAGE_PATH "images/player.png"
+#define ENEMY_IMAGE_PATH "images/enemy.png"
+
 typedef enum {
     SOUND_SHOOT,
     SOUND_EXPLOSION,

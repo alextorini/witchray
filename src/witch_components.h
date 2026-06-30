@@ -43,6 +43,7 @@ typedef struct {
     char text[128];
 } TextRender;
 
+
 typedef enum {
     CMP_POSITION,
     CMP_VELOCITY,

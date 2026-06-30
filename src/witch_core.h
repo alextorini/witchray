@@ -9,6 +9,7 @@
 #include "witch_resources.h"
 #include "witch_components.h"
 #include "witch_player.h"
+#include "witch_enemies.h"
 
 #define VIRTUAL_WIDTH 640
 #define VIRTUAL_HEIGHT 360
@@ -45,6 +46,8 @@
 
 typedef struct {
     EcsEntityHandle player_handle;
+    Player player;
+    Enemies enemies;
     EcsEntityHandle backgrounds[2][2];
     ResourceMap resources;
     EcsComponentId components[CMP_COUNT];

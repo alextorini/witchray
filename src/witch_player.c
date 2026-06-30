@@ -4,11 +4,13 @@
 #include "ext/raylib.h"
 
 #include "smetanka_ecs.h"
+#include "witch_collision.h"
 #include "witch_components.h"
 #include "witch_core.h"
 #include "witch_player.h"
 #include "witch_parallax.h"
 #include "witch_enemies.h"
+#include "witch_resources.h"
 #include "witch_start.h"
 
 #define PLAYER_MAX_VELOCITY 200.0
@@ -45,6 +47,8 @@ EcsEntityHandle init_player() {
     animation.current_frame = 0;
     animation.timer = 0.0;
     ecs_add_component(handle, game.components[CMP_ANIMATION], &animation);
+
+    init_collision_map(PLAYER_IMAGE_PATH, render.frame, 1, game.player.collisions);
 
     return handle;
 }

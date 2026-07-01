@@ -58,6 +58,7 @@ void update_and_draw() {
             game.components[CMP_POSITION],
             game.components[CMP_RENDER]
         );
+        game.seconds_alive += delta_time;
     }
     DrawTextEx(game.resources.fonts[FONT_MAIN], TextFormat("%d", GetFPS()), CLITERAL(Position){3, 3}, 9, 1, DARKGREEN);
     /* DrawTextEx(
@@ -65,6 +66,11 @@ void update_and_draw() {
         TextFormat("%d", ecs_get_component_count(game.components[CMP_ENEMY])),
         CLITERAL(Position){3, 33}, 9, 1, DARKGREEN
     ); */
+    DrawTextEx(
+        game.resources.fonts[FONT_MAIN],
+        TextFormat("Score: %d", (int)(game.seconds_alive) + game.enemies_killed * 10),
+        CLITERAL(Position){3, 33}, 9, 1, DARKGREEN
+    );
 }
 
 

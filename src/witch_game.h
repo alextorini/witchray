@@ -61,6 +61,8 @@ typedef struct {
     ResourceMap resources;
     EcsComponentId components[CMP_COUNT];
     int state;
+    float seconds_alive;
+    uint64_t enemies_killed;
 } Game;
 
 extern Game game;

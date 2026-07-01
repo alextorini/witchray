@@ -61,6 +61,8 @@ void process_input(EcsEntityHandle player_handle, float delta_time) {
             init_game_background(&game.backgrounds);
             game.player_handle = init_player();
             init_enemy_factory();
+            game.seconds_alive = 0.0f;
+            game.enemies_killed = 0;
             game.state = STATE_GAMEPLAY;
 
             return;

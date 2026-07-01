@@ -81,6 +81,7 @@ void system_fireballs_collide_enemies(
             )) {
                 ecs_destroy_entity(enemy_handle);
                 ecs_destroy_entity(fireball_handle);
+                game.enemies_killed++;
             }
         }
     }

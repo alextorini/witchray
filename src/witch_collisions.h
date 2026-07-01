@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ext/raylib.h"
-#include "stdint.h"
+#include <stdint.h>
+#include "smetanka_engine.h"
 
 typedef struct {
     uint8_t *frame_mask_list;

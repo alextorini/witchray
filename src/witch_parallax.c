@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
-#include "smetanka_ecs.h"
-#include "witch_core.h"
+#include "witch_parallax.h"
+#include "witch_game.h"
 
 static EcsEntityHandle create_layer_instance(Texture *texture, Position position, Velocity velocity) {
     EcsEntityHandle layer_id = ecs_create_entity();

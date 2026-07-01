@@ -1,5 +1,3 @@
-#include "ext/raylib.h"
-
 #include "witch_resources.h"
 
 static Texture load_pixel_texture(const char *path) {

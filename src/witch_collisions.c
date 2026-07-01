@@ -1,6 +1,5 @@
 #include <stdlib.h>
-#include "ext/raylib.h"
-#include "witch_collision.h"
+#include "witch_collisions.h"
 
 #define COL_MALLOC malloc
 #define COL_MALLOC_TYPE(type) ((type *)malloc(sizeof(type)))

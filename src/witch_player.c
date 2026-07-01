@@ -1,16 +1,9 @@
 #include <math.h>
 #include <stdint.h>
-
-#include "ext/raylib.h"
-
-#include "smetanka_ecs.h"
-#include "witch_collision.h"
-#include "witch_components.h"
-#include "witch_core.h"
-#include "witch_player.h"
-#include "witch_parallax.h"
 #include "witch_enemies.h"
-#include "witch_resources.h"
+#include "witch_game.h"
+#include "witch_parallax.h"
+#include "witch_player.h"
 #include "witch_start.h"
 
 #define PLAYER_MAX_VELOCITY 200.0

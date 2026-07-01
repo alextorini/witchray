@@ -1,17 +1,12 @@
-#include "ext/raylib.h"
-
 #include "smetanka_ecs.h"
-#include "smetanka_misc.h"
-#include "witch_core.h"
-#include "witch_systems.h"
 #include "witch_components.h"
+#include "witch_core.h"
 #include "witch_enemies.h"
+#include "witch_game.h"
 #include "witch_player.h"
 #include "witch_resources.h"
 #include "witch_start.h"
-
-static AnimationClip plr_idle;
-static AnimationSet plr_anim_set;
+#include "witch_systems.h"
 
 Game game;
 

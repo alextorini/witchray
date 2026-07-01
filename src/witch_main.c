@@ -1,6 +1,7 @@
 #include "ext/resource_dir.h"
 
 #include "witch_core.h"
+#include "witch_game.h"
 #include "smetanka_misc.h"
 
 int main() {

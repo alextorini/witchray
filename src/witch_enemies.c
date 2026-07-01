@@ -1,8 +1,11 @@
 #include <stdint.h>
+#include <stdlib.h>
 #include "smetanka_ecs.h"
 #include "witch_components.h"
-#include "witch_core.h"
+#include "witch_enemies.h"
+#include "witch_game.h"
 #include "witch_resources.h"
+#include "witch_collisions.h"
 
 #define SPAWN_COOLDOWN 0.3
 #define ENEMY_SPEED 100.0
@@ -10,7 +13,15 @@
 #define ENEMY_WIDTH 32
 #define ENEMY_HEIGHT 32
 
+#define ENEMY_DEFAULT_FRAME {0.0f, 0.0f, 32.0f, 32.0f}
 #define ENEMY_FRAME_TIME 0.5
+
+#define ENM_MALLOC malloc
+#define ENM_MALLOC_TYPE(type) ((type *)malloc(sizeof(type)))
+#define ENM_MALLOC_ARR(type, count) ((type *)malloc(sizeof(type) * (count)))
+#define ENM_CALLOC calloc
+#define ENM_CALLOC_TYPE(type, count) ((type *)calloc(sizeof(type), (count)))
+#define ENM_FREE free
 
 static uint16_t enemies_count;
 static float spawn_cooldown;
@@ -26,14 +37,14 @@ void init_enemy_factory() {
     idle_animation.end_frame = 1;
     idle_animation.frame_time = ENEMY_FRAME_TIME;
     idle_animation.loop = 1;
-    animation_set.clips = WR_MALLOC_TYPE(AnimationClip);
+    animation_set.clips = ENM_MALLOC_TYPE(AnimationClip);
     animation_set.count = 1;
     animation_set.clips[0] = idle_animation;
 
     init_collision_map(ENEMY_IMAGE_PATH, (Rectangle)ENEMY_DEFAULT_FRAME, 10, &game.enemies.collisions);
 }
 
-EcsEntityHandle create_enemy(Position *pos) {
+static EcsEntityHandle create_enemy(Position *pos) {
     EcsEntityHandle handle = ecs_create_entity();
 
     ecs_add_component(handle, game.components[CMP_POSITION], pos);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ext/raylib.h"
+#include "smetanka_engine.h"
 
 #define PLAYER_IMAGE_PATH "images/player.png"
 #define ENEMY_IMAGE_PATH "images/enemy.png"

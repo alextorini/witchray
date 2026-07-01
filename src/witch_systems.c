@@ -1,7 +1,5 @@
 #include <stdint.h>
 
-#include "ext/raylib.h"
-#include "ext/raymath.h"
 #include "smetanka_ecs.h"
 #include "witch_systems.h"
 #include "witch_components.h"

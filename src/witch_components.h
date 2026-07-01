@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdint.h>
-#include "ext/raylib.h"
+#include "smetanka_engine.h"
 #include "smetanka_ecs.h"
 
 typedef Vector2 Position;

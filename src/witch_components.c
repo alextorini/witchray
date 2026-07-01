@@ -1,4 +1,3 @@
-#include "smetanka_ecs.h"
 #include "witch_components.h"
 
 void init_components(EcsComponentId (*cmp_ids)[CMP_COUNT]) {

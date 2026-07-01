@@ -1,8 +1,4 @@
-#include "ext/raylib.h"
-#include "smetanka_ecs.h"
-#include "witch_components.h"
-#include "witch_core.h"
-#include "witch_resources.h"
+#include "witch_game.h"
 
 #define MAX_TEXT_LENGTH 128
 #define START_SCREEN_TEXT_COLOR WHITE
@@ -10,7 +6,6 @@
 #define START_SCREEN_TEXT_FONT_SIZE 36
 #define START_SCREEN_TEXT_FONT_SPACING 1
 #define START_SCREEN_TEXT "Press Any Key To Start"
-
 
 void init_start_screen() {
 

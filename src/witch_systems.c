@@ -57,7 +57,9 @@ void system_animate_entities(EcsComponentId animation_id, EcsComponentId render_
             animation->timer -= current_clip->frame_time;
         }
 
-        render->frame.x = render->frame.width * animation->current_frame;
+        render->frame.x = (int)(render->frame.width * animation->current_frame) % render->spritesheet->width;
+        render->frame.y = (/*NOLINT*/(int)(render->frame.width * animation->current_frame) /
+            render->spritesheet->width) * render->frame.height;
     }
 }
 

@@ -18,7 +18,7 @@ Game game;
 uint8_t should_close;
 
 void init() {
-    should_close = false;
+    should_close = 0;
 
     init_resources(&game.resources);
 
@@ -45,16 +45,17 @@ void update_and_draw() {
     }
     system_move_entities(game.components[CMP_POSITION], game.components[CMP_VELOCITY], delta_time);
     system_animate_entities(game.components[CMP_ANIMATION], game.components[CMP_RENDER],delta_time);
+    if (game.state == STATE_GAMEPLAY) {
+        system_collide_enemies(
+            game.player_handle,
+            game.components[CMP_ENEMY],
+            game.components[CMP_POSITION],
+            game.components[CMP_RENDER]
+        );
+    }
     system_render_entities(game.components[CMP_POSITION], game.components[CMP_RENDER]);
-    system_move_parallax(game.components[CMP_PARALLAX], game.components[CMP_POSITION], game.components[CMP_RENDER]);
-    system_collide_enemies(
-        game.player_handle,
-        game.components[CMP_ENEMY],
-        game.components[CMP_POSITION],
-        game.components[CMP_RENDER]
-    );
     system_render_text(game.components[CMP_POSITION], game.components[CMP_TEXT_RENDER]);
-
+    system_move_parallax(game.components[CMP_PARALLAX], game.components[CMP_POSITION], game.components[CMP_RENDER]);
     DrawTextEx(game.resources.fonts[FONT_MAIN], TextFormat("%d", GetFPS()), CLITERAL(Position){3, 3}, 9, 1, DARKGREEN);
     DrawTextEx(
         game.resources.fonts[FONT_MAIN],

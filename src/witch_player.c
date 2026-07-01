@@ -48,7 +48,7 @@ EcsEntityHandle init_player() {
     animation.timer = 0.0;
     ecs_add_component(handle, game.components[CMP_ANIMATION], &animation);
 
-    init_collision_map(PLAYER_IMAGE_PATH, render.frame, 1, game.player.collisions);
+    init_collision_map(PLAYER_IMAGE_PATH, render.frame, 6, &game.player.collisions);
 
     return handle;
 }

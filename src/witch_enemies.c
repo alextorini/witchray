@@ -1,7 +1,5 @@
 #include <stdint.h>
-#include <stdlib.h>
 #include "smetanka_ecs.h"
-#include "smetanka_misc.h"
 #include "witch_components.h"
 #include "witch_core.h"
 #include "witch_resources.h"
@@ -32,7 +30,7 @@ void init_enemy_factory() {
     animation_set.count = 1;
     animation_set.clips[0] = idle_animation;
 
-    init_collision_map(ENEMY_IMAGE_PATH, (Rectangle)ENEMY_DEFAULT_FRAME, 1, game.enemies.collisions);
+    init_collision_map(ENEMY_IMAGE_PATH, (Rectangle)ENEMY_DEFAULT_FRAME, 10, &game.enemies.collisions);
 }
 
 EcsEntityHandle create_enemy(Position *pos) {
@@ -104,17 +102,28 @@ void system_collide_enemies(
 
     Position *player_position = (Position *)ecs_get_entity_component(position_id, player_handle);
     Render *player_render = (Render *)ecs_get_entity_component(render_id, player_handle);
+    Animation *player_anim = (Animation *)ecs_get_entity_component(game.components[CMP_ANIMATION], player_handle);
+    uint32_t player_frame_index = 0;
+    if (player_anim) player_frame_index = player_anim->current_frame;
 
     EcsEntityHandle enemy_handle;
     while ((enemy_handle = ecs_get_next_entity(&iterator)) != INVALID_HANDLE) {
         Position *enemy_position = (Position *)ecs_get_entity_component(position_id, enemy_handle);
         Render *enemy_render = (Render *)ecs_get_entity_component(render_id, enemy_handle);
+        Animation *enemy_anim = (Animation *)ecs_get_entity_component(game.components[CMP_ANIMATION], enemy_handle);
 
-        if (aabb_intersect(
-                player_position->x, player_position->y, player_render->frame.width, player_render->frame.height,
-                enemy_position->x, enemy_position->y, enemy_render->frame.width, enemy_render->frame.height
-            )) {
+        uint32_t enemy_frame_index = 0;
+        if (enemy_anim) {
+            enemy_frame_index = enemy_anim->current_frame;
+        }
+
+        if (pixel_perfect_collision(
+            &game.player.collisions, player_frame_index, player_position->x, player_position->y,
+            &game.enemies.collisions, enemy_frame_index, enemy_position->x, enemy_position->y
+        )) {
             should_close = 1;
+
+            return;
         }
     }
 }

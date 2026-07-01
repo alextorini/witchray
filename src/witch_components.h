@@ -10,6 +10,10 @@ typedef uint8_t IsParallax;
 typedef uint8_t IsEnemy;
 
 typedef struct {
+    int32_t damage;
+} Fireball;
+
+typedef struct {
     Texture *spritesheet;
     Rectangle frame;
     // int priority;
@@ -43,7 +47,6 @@ typedef struct {
     char text[128];
 } TextRender;
 
-
 typedef enum {
     CMP_POSITION,
     CMP_VELOCITY,
@@ -52,6 +55,7 @@ typedef enum {
     CMP_PARALLAX,
     CMP_ENEMY,
     CMP_TEXT_RENDER,
+    CMP_FIREBALL,
     CMP_COUNT
 } ComponentIndex;
 

@@ -2,8 +2,9 @@
 
 #include "smetanka_engine.h"
 
-#define PLAYER_IMAGE_PATH "images/player.png"
 #define ENEMY_IMAGE_PATH "images/enemy.png"
+#define FIREBALL_IMAGE_PATH "images/fireball.png"
+#define PLAYER_IMAGE_PATH "images/player.png"
 
 typedef enum {
     SOUND_SHOOT,
@@ -21,6 +22,7 @@ typedef enum {
     SPRITESHEET_ENEMY,
     BACKGROUND_URBAN,
     BACKGROUND_CLOUDS,
+    SPRITESHEET_FIREBALL,
     SPRITE_COUNT
 } SpriteIndex;
 

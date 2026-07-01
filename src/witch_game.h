@@ -44,6 +44,10 @@ typedef struct {
 } Enemies;
 
 typedef struct {
+    FrameCollisionMap collisions;
+} Fireballs;
+
+typedef struct {
     EcsEntityHandle handle;
     FrameCollisionMap collisions;
 } Player;
@@ -52,6 +56,7 @@ typedef struct {
     EcsEntityHandle player_handle;
     Player player;
     Enemies enemies;
+    Fireballs fireballs;
     EcsEntityHandle backgrounds[2][2];
     ResourceMap resources;
     EcsComponentId components[CMP_COUNT];

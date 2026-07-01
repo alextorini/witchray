@@ -1,6 +1,7 @@
 #include <math.h>
 #include <stdint.h>
 #include "witch_enemies.h"
+#include "witch_fire.h"
 #include "witch_game.h"
 #include "witch_parallax.h"
 #include "witch_player.h"
@@ -42,6 +43,7 @@ EcsEntityHandle init_player() {
     ecs_add_component(handle, game.components[CMP_ANIMATION], &animation);
 
     init_collision_map(PLAYER_IMAGE_PATH, render.frame, 6, &game.player.collisions);
+    init_fireballs();
 
     return handle;
 }
@@ -154,4 +156,8 @@ void process_input(EcsEntityHandle player_handle, float delta_time) {
             velocity->y = 0;
         }
     }
+}
+
+void player_fire() {
+
 }

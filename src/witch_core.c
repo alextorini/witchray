@@ -2,6 +2,7 @@
 #include "witch_components.h"
 #include "witch_core.h"
 #include "witch_enemies.h"
+#include "witch_fire.h"
 #include "witch_game.h"
 #include "witch_player.h"
 #include "witch_resources.h"
@@ -37,9 +38,13 @@ void update_and_draw() {
     if (game.state == STATE_GAMEPLAY) {
         system_spawn_enemies(delta_time);
         system_clean_enemies(game.components[CMP_ENEMY], game.components[CMP_POSITION]);
+        cast_fireballs(game.player_handle, delta_time);
     }
     system_move_entities(game.components[CMP_POSITION], game.components[CMP_VELOCITY], delta_time);
     system_animate_entities(game.components[CMP_ANIMATION], game.components[CMP_RENDER],delta_time);
+    system_render_entities(game.components[CMP_POSITION], game.components[CMP_RENDER]);
+    system_render_text(game.components[CMP_POSITION], game.components[CMP_TEXT_RENDER]);
+    system_move_parallax(game.components[CMP_PARALLAX], game.components[CMP_POSITION], game.components[CMP_RENDER]);
     if (game.state == STATE_GAMEPLAY) {
         system_collide_enemies(
             game.player_handle,
@@ -47,16 +52,19 @@ void update_and_draw() {
             game.components[CMP_POSITION],
             game.components[CMP_RENDER]
         );
+        system_fireballs_collide_enemies(
+            game.components[CMP_FIREBALL],
+            game.components[CMP_ENEMY],
+            game.components[CMP_POSITION],
+            game.components[CMP_RENDER]
+        );
     }
-    system_render_entities(game.components[CMP_POSITION], game.components[CMP_RENDER]);
-    system_render_text(game.components[CMP_POSITION], game.components[CMP_TEXT_RENDER]);
-    system_move_parallax(game.components[CMP_PARALLAX], game.components[CMP_POSITION], game.components[CMP_RENDER]);
     DrawTextEx(game.resources.fonts[FONT_MAIN], TextFormat("%d", GetFPS()), CLITERAL(Position){3, 3}, 9, 1, DARKGREEN);
-    DrawTextEx(
+    /* DrawTextEx(
         game.resources.fonts[FONT_MAIN],
         TextFormat("%d", ecs_get_component_count(game.components[CMP_ENEMY])),
         CLITERAL(Position){3, 33}, 9, 1, DARKGREEN
-    );
+    ); */
 }
 
 

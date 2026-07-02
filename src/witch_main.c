@@ -1,3 +1,4 @@
+#include "ext/raylib.h"
 #include "ext/resource_dir.h"
 
 #include "witch_core.h"
@@ -29,6 +30,11 @@ int main() {
         EndTextureMode();
 
         BeginDrawing();
+        if (IsKeyPressed(KEY_F)) {
+            ToggleFullscreen();
+            destRec.width = (float)GetScreenWidth();
+            destRec.height = (float)GetScreenHeight();
+        }
 
         DrawTexturePro(virtualScreen.texture, sourceRec, destRec, CLITERAL(Vector2){0, 0}, 0.0f, WHITE);
 

@@ -61,26 +61,27 @@ void update_and_draw() {
             game.components[CMP_POSITION],
             game.components[CMP_RENDER]
         );
+        system_clean_fireballs(game.components[CMP_FIREBALL], game.components[CMP_POSITION]);
         game.seconds_alive += delta_time;
     }
     DrawTextEx(game.resources.fonts[FONT_MAIN], TextFormat("%d", GetFPS()), CLITERAL(Position){3, 3}, 9, 1, DARKGREEN);
-    /* DrawTextEx(
+    DrawTextEx(
         game.resources.fonts[FONT_MAIN],
-        TextFormat("%d", ecs_get_component_count(game.components[CMP_ENEMY])),
-        CLITERAL(Position){3, 33}, 9, 1, DARKGREEN
-    ); */
+        TextFormat("%d", ecs_get_component_count(game.components[CMP_FIREBALL])),
+        CLITERAL(Position){3, 63}, 9, 1, DARKGREEN
+    );
 
     game.score = (uint64_t)(game.seconds_alive) + game.enemies_killed * 10;
     if (game.score > game.highscore) game.highscore = game.score;
     DrawTextEx(
         game.resources.fonts[FONT_MAIN],
         TextFormat("SCORE: %d", game.score),
-        CLITERAL(Position){3, 33}, 9, 1, DARKGREEN
+        CLITERAL(Position){3, 23}, 9, 1, DARKGREEN
     );
     DrawTextEx(
         game.resources.fonts[FONT_MAIN],
         TextFormat("HIGHSCORE: %d", game.highscore),
-        CLITERAL(Position){3, 53}, 9, 1, DARKGREEN
+        CLITERAL(Position){3, 43}, 9, 1, DARKGREEN
     );
 }
 

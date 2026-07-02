@@ -1,5 +1,6 @@
 #include <math.h>
 #include <stdint.h>
+#include "ext/raylib.h"
 #include "witch_enemies.h"
 #include "witch_fire.h"
 #include "witch_game.h"

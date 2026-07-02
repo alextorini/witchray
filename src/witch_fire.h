@@ -13,3 +13,5 @@ void system_fireballs_collide_enemies(
     EcsComponentId position_id,
     EcsComponentId render_id
 );
+
+void system_clean_fireballs(EcsComponentId fireball_id, EcsComponentId position_id);

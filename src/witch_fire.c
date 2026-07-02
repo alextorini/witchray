@@ -86,3 +86,16 @@ void system_fireballs_collide_enemies(
         }
     }
 }
+
+void system_clean_fireballs(EcsComponentId fireball_id, EcsComponentId position_id) {
+    EcsComponentId component_id_list[] = {fireball_id, position_id};
+    EcsEntityIterator iterator = ecs_get_entity_iterator(component_id_list, 2);
+    EcsEntityHandle entity_handle;
+    while ((entity_handle = ecs_get_next_entity(&iterator)) != INVALID_HANDLE) {
+        Position *position = (Position *)ecs_get_entity_component(position_id, entity_handle);
+
+        if (position->x > VIRTUAL_WIDTH) {
+            ecs_destroy_entity(entity_handle);
+        }
+    }
+}

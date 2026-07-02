@@ -8,6 +8,8 @@
 #include "witch_components.h"
 #include "witch_resources.h"
 
+#define GAME_VERSION 0
+
 #define VIRTUAL_WIDTH 640
 #define VIRTUAL_HEIGHT 360
 
@@ -63,6 +65,8 @@ typedef struct {
     int state;
     float seconds_alive;
     uint64_t enemies_killed;
+    uint64_t score;
+    uint64_t highscore;
 } Game;
 
 extern Game game;

@@ -60,10 +60,10 @@ void system_fireballs_collide_enemies(
     while ((fireball_handle = ecs_get_next_entity(&fireball_iterator)) != INVALID_HANDLE) {
         Position *fireball_position = (Position *)ecs_get_entity_component(position_id, fireball_handle);
         Render *fireball_render = (Render *)ecs_get_entity_component(render_id, fireball_handle);
-        // Animation *fireball_anim =
-        //     (Animation *)ecs_get_entity_component(game.components[CMP_ANIMATION], fireball_handle);
+        Animation *fireball_anim =
+            (Animation *)ecs_get_entity_component(game.components[CMP_ANIMATION], fireball_handle);
         uint32_t fireball_frame_index = 0;
-        // if (fireball_anim) fireball_frame_index = fireball_anim->current_frame;
+        if (fireball_anim) fireball_frame_index = fireball_anim->current_frame;
         EcsEntityIterator enemy_iterator = ecs_get_entity_iterator(enemy_component_id_list, 3);
         while ((enemy_handle = ecs_get_next_entity(&enemy_iterator)) != INVALID_HANDLE) {
             Position *enemy_position = (Position *)ecs_get_entity_component(position_id, enemy_handle);

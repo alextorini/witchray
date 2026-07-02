@@ -1,11 +1,12 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "smetanka_ecs.h"
+#include "witch_collisions.h"
 #include "witch_components.h"
 #include "witch_enemies.h"
 #include "witch_game.h"
 #include "witch_resources.h"
-#include "witch_collisions.h"
+#include "witch_save.h"
 
 #define SPAWN_COOLDOWN 0.3
 #define ENEMY_SPEED 100.0
@@ -132,6 +133,7 @@ void system_collide_enemies(
             &game.player.collisions, player_frame_index, player_position->x, player_position->y,
             &game.enemies.collisions, enemy_frame_index, enemy_position->x, enemy_position->y
         )) {
+            save_game();
             should_close = 1;
 
             return;

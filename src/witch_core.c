@@ -6,6 +6,7 @@
 #include "witch_game.h"
 #include "witch_player.h"
 #include "witch_resources.h"
+#include "witch_save.h"
 #include "witch_start.h"
 #include "witch_systems.h"
 
@@ -22,6 +23,8 @@ void init() {
 
     ecs_create_space();
     init_components(&game.components);
+
+    load_game();
 
     init_start_screen();
 }
@@ -66,10 +69,18 @@ void update_and_draw() {
         TextFormat("%d", ecs_get_component_count(game.components[CMP_ENEMY])),
         CLITERAL(Position){3, 33}, 9, 1, DARKGREEN
     ); */
+
+    game.score = (uint64_t)(game.seconds_alive) + game.enemies_killed * 10;
+    if (game.score > game.highscore) game.highscore = game.score;
     DrawTextEx(
         game.resources.fonts[FONT_MAIN],
-        TextFormat("Score: %d", (int)(game.seconds_alive) + game.enemies_killed * 10),
+        TextFormat("SCORE: %d", game.score),
         CLITERAL(Position){3, 33}, 9, 1, DARKGREEN
+    );
+    DrawTextEx(
+        game.resources.fonts[FONT_MAIN],
+        TextFormat("HIGHSCORE: %d", game.highscore),
+        CLITERAL(Position){3, 53}, 9, 1, DARKGREEN
     );
 }
 

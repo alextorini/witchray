@@ -1,8 +1,8 @@
 #pragma once
 
 #include <stdint.h>
-#include "smetanka_engine.h"
 #include "smetanka_ecs.h"
+#include "smetanka_engine.h"
 
 typedef Vector2 Position;
 typedef Vector2 Velocity;

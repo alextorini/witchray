@@ -1,41 +1,9 @@
 #pragma once
 
-#include "smetanka_engine.h"
+#include "witch_game.h"
 
 #define ENEMY_IMAGE_PATH "images/enemy.png"
 #define FIREBALL_IMAGE_PATH "images/fireball.png"
 #define PLAYER_IMAGE_PATH "images/player.png"
 
-typedef enum {
-    SOUND_SHOOT,
-    SOUND_EXPLOSION,
-    SOUND_COUNT
-} SoundIndex;
-
-typedef enum {
-    MUSIC_MAIN,
-    MUSIC_COUNT
-} MusicIndex;
-
-typedef enum {
-    SPRITESHEET_PLAYER,
-    SPRITESHEET_ENEMY,
-    BACKGROUND_URBAN,
-    BACKGROUND_CLOUDS,
-    SPRITESHEET_FIREBALL,
-    SPRITE_COUNT
-} SpriteIndex;
-
-typedef enum {
-    FONT_MAIN,
-    FONT_COUNT
-} FontIndex;
-
-typedef struct {
-    Font fonts[FONT_COUNT];
-    Texture sprites[SPRITE_COUNT];
-    Sound sounds[SOUND_COUNT];
-    Music music[MUSIC_COUNT];
-} ResourceMap;
-
-void init_resources(ResourceMap *resource_map);
+void resources_init(Game *game);

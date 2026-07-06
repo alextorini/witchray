@@ -1,47 +1,35 @@
-#include "ext/raylib.h"
-#include "ext/resource_dir.h"
-
 #include "witch_core.h"
-#include "witch_game.h"
-#include "smetanka_misc.h"
+#include "smetanka_engine.h"
 
 int main() {
-    SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI);
+    SmetankaInitData init_data = {
+        .window_name = "Witch Alice",
+        .window_width = WINDOW_WIDTH,
+        .window_height = WINDOW_HEIGHT,
+        .virtual_width = VIRTUAL_WIDTH,
+        .virutal_height = VIRTUAL_HEIGHT,
+        .config_flags = FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI,
+        .fps = 60,
+        .resource_dir = "res",
+        .fullscreen = 0
+    };
+    smetanka_init(&init_data);
 
-    SetTargetFPS(60);
+    Game *game = WR_MALLOC_TYPE(Game);
 
-    InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "WitchRay");
-
-    InitAudioDevice();
-
-    SearchAndSetResourceDir("res");
-
-    init();
-
-    RenderTexture2D virtualScreen = LoadRenderTexture(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
-    Rectangle sourceRec = {0.0f, 0.0f, (float)virtualScreen.texture.width, (float)-virtualScreen.texture.height};
-    Rectangle destRec = {0.0f, 0.0f, (float)GetScreenWidth(), (float)GetScreenHeight()};
+    init(game);
 
     while (!WindowShouldClose() && !should_close) {
-        BeginTextureMode(virtualScreen);
+        smetanka_begin_texture_mode();
 
-        update_and_draw();
+        update_and_draw(game, GetFrameTime());
 
-        EndTextureMode();
+        smetanka_end_texture_mode();
 
-        BeginDrawing();
-        if (IsKeyPressed(KEY_F)) {
-            ToggleFullscreen();
-            destRec.width = (float)GetScreenWidth();
-            destRec.height = (float)GetScreenHeight();
-        }
-
-        DrawTexturePro(virtualScreen.texture, sourceRec, destRec, CLITERAL(Vector2){0, 0}, 0.0f, WHITE);
-
-        EndDrawing();
+        smetanka_render();
     }
 
-    unload();
+    unload(game);
 
     CloseAudioDevice();
 

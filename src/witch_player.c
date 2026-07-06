@@ -1,12 +1,9 @@
-#include <math.h>
 #include <stdint.h>
-#include "ext/raylib.h"
-#include "witch_enemies.h"
+
 #include "witch_fire.h"
 #include "witch_game.h"
-#include "witch_parallax.h"
 #include "witch_player.h"
-#include "witch_start.h"
+#include "witch_resources.h"
 
 #define PLAYER_MAX_VELOCITY 200.0
 #define PLAYER_ACCELERATION 500.0
@@ -15,17 +12,17 @@
 static AnimationClip idle_animation;
 static AnimationSet animation_set;
 
-EcsEntityHandle init_player() {
+EcsEntityHandle init_player(Game *game) {
     EcsEntityHandle handle = ecs_create_entity();
 
     Position position = PLAYER_START_POS;
-    ecs_add_component(handle, game.components[CMP_POSITION], &position);
+    ecs_add_component(handle, game->components[CMP_POSITION], &position);
 
     Velocity velocity = {0.0, 0.0};
-    ecs_add_component(handle, game.components[CMP_VELOCITY], &velocity);
+    ecs_add_component(handle, game->components[CMP_VELOCITY], &velocity);
 
-    Render render = {&game.resources.sprites[SPRITESHEET_PLAYER], PLAYER_DEFAULT_FRAME};
-    ecs_add_component(handle, game.components[CMP_RENDER], &render);
+    Render render = {&game->resources.sprites[SPRITESHEET_PLAYER], PLAYER_DEFAULT_FRAME};
+    ecs_add_component(handle, game->components[CMP_RENDER], &render);
 
     idle_animation.start_frame = 0;
     idle_animation.end_frame = 1;
@@ -41,126 +38,10 @@ EcsEntityHandle init_player() {
     animation.current_clip = 0;
     animation.current_frame = 0;
     animation.timer = 0.0;
-    ecs_add_component(handle, game.components[CMP_ANIMATION], &animation);
+    ecs_add_component(handle, game->components[CMP_ANIMATION], &animation);
 
-    init_collision_map(PLAYER_IMAGE_PATH, render.frame, 6, &game.player.collisions);
-    init_fireballs();
+    init_collision_map(PLAYER_IMAGE_PATH, render.frame, 6, &game->player.collisions);
+    init_fireballs(game);
 
     return handle;
-}
-
-void process_input(EcsEntityHandle player_handle, float delta_time) {
-    if (game.state == STATE_START_SCREEN) {
-        if (GetKeyPressed() != 0 ||
-            IsMouseButtonPressed(MOUSE_BUTTON_LEFT) ||
-            IsMouseButtonPressed(MOUSE_BUTTON_RIGHT) ||
-            GetGamepadButtonPressed() != 0) {
-            game.state = STATE_GAME_INIT;
-
-            destroy_start_screen();
-
-            init_game_background(&game.backgrounds);
-            game.player_handle = init_player();
-            init_enemy_factory();
-            game.seconds_alive = 0.0f;
-            game.enemies_killed = 0;
-            game.state = STATE_GAMEPLAY;
-
-            return;
-        }
-    }
-
-    if (game.state == STATE_GAMEPLAY) {
-        Velocity *velocity = (Velocity *)ecs_get_entity_component(game.components[CMP_VELOCITY], player_handle);
-        Position *position = (Position *)ecs_get_entity_component(game.components[CMP_POSITION], player_handle);
-        Render *render = (Render *)ecs_get_entity_component(game.components[CMP_RENDER], game.player_handle);
-
-        float dx = 0.0;
-        float dy = 0.0;
-        if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) dx--;
-        if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) dx++;
-        if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) dy--;
-        if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) dy++;
-
-        if (IsGamepadAvailable(0)) {
-            dx += GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_X);
-            dy += GetGamepadAxisMovement(0, GAMEPAD_AXIS_LEFT_Y);
-
-            if (dx <= GAMEPAD_DEADZONE && dx > -GAMEPAD_DEADZONE) dx = 0;
-            if (dy <= GAMEPAD_DEADZONE && dy > -GAMEPAD_DEADZONE) dy = 0;
-        }
-
-        if (dx > 1.0) dx = 1.0;
-        if (dx < -1.0) dx = -1.0;
-        if (dy > 1.0) dy = 1.0;
-        if (dy < -1.0) dy = -1.0;
-
-        if (dx != 0 && dy != 0) {
-            float vector_length = sqrtf(dx * dx + dy * dy);
-            dx = dx / vector_length;
-            dy = dy / vector_length;
-        }
-
-        float vector_length;
-        if (dx != 0 || dy != 0) {
-            velocity->x += dx * delta_time * PLAYER_ACCELERATION;
-            velocity->y += dy * delta_time * PLAYER_ACCELERATION;
-
-            vector_length = sqrtf(velocity->x * velocity->x + velocity->y * velocity->y);
-            if (vector_length > PLAYER_MAX_VELOCITY) {
-                float ratio = PLAYER_MAX_VELOCITY / vector_length;
-                velocity->x *= ratio;
-                velocity->y *= ratio;
-            }
-        } else {
-            vector_length = sqrtf(velocity->x * velocity->x + velocity->y * velocity->y);
-            if (vector_length != 0) {
-                dx = velocity->x / vector_length;
-                dy = velocity->y / vector_length;
-            } else {
-                dx = 0.0;
-                dy = 0.0;
-            }
-
-            if (velocity->x > 0) {
-                velocity->x -= dx * delta_time * PLAYER_BRAKING;
-                if (velocity->x < 0) velocity->x = 0;
-            } else if (velocity->x < 0) {
-                velocity->x -= dx * delta_time * PLAYER_BRAKING;
-                if (velocity->x > 0) velocity->x = 0;
-            }
-
-            if (velocity->y > 0) {
-                velocity->y -= dy * delta_time * PLAYER_BRAKING;
-                if (velocity->y < 0) velocity->y = 0;
-            } else if (velocity->y < 0) {
-                velocity->y -= dy * delta_time * PLAYER_BRAKING;
-                if (velocity->y > 0) velocity->y = 0;
-            }
-        }
-
-        if (position->x < 1) {
-            position->x = 1;
-            velocity->x = 0;
-        }
-
-        if (position->y < 1) {
-            position->y = 1;
-            velocity->y = 0;
-        }
-
-        if (position->x + render->frame.width > VIRTUAL_WIDTH - 1) {
-            position->x = VIRTUAL_WIDTH - render->frame.width - 1;
-            velocity->x = 0;
-        }
-
-        if (position->y + render->frame.height > VIRTUAL_HEIGHT - 1) {
-            position->y = VIRTUAL_HEIGHT - render->frame.height - 1;
-            velocity->y = 0;
-        }
-    }
-}
-
-void player_fire() {
-
 }

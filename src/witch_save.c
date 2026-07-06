@@ -7,16 +7,16 @@ typedef struct {
     uint64_t highscore;
 } Save;
 
-void save_game() {
+void save_game(Game *game) {
     Save save = {
         .game_version = GAME_VERSION,
-        .highscore = game.highscore
+        .highscore = game->highscore
     };
 
     SaveFileData("save.dat", (unsigned char *)&save, sizeof(save));
 }
 
-void load_game() {
+void load_game(Game *game) {
     int bytes_read;
     unsigned char *data = LoadFileData("save.dat", &bytes_read);
 
@@ -26,7 +26,7 @@ void load_game() {
 
     Save save = *(Save *)data;
 
-    game.highscore = save.highscore;
+    game->highscore = save.highscore;
 
     UnloadFileData(data);
 }

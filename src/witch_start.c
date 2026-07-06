@@ -1,18 +1,21 @@
 #include "witch_game.h"
+#include "witch_input_read.h"
+#include "witch_start.h"
+#include "witch_state.h"
 
 #define MAX_TEXT_LENGTH 128
 #define START_SCREEN_TEXT_COLOR WHITE
-#define START_SCREEN_TEXT_FONT game.resources.fonts[FONT_MAIN]
+#define START_SCREEN_TEXT_FONT game->resources.fonts[FONT_MAIN]
 #define START_SCREEN_TEXT_FONT_SIZE 36
 #define START_SCREEN_TEXT_FONT_SPACING 1
 #define START_SCREEN_TEXT "Press Any Key To Start"
 
-void init_start_screen() {
+void init_start_screen(Game *game) {
 
     EcsEntityHandle start_label_handle = ecs_create_entity();
 
     Position start_label_position = {.x = 40, .y = 150};
-    ecs_add_component(start_label_handle, game.components[CMP_POSITION], &start_label_position);
+    ecs_add_component(start_label_handle, game->components[CMP_POSITION], &start_label_position);
 
     TextRender start_label_text_render = {
         .offset = {0, 0},
@@ -23,8 +26,22 @@ void init_start_screen() {
         .text = START_SCREEN_TEXT
     };
 
-    ecs_add_component(start_label_handle, game.components[CMP_TEXT_RENDER], &start_label_text_render);
+    ecs_add_component(start_label_handle, game->components[CMP_TEXT_RENDER], &start_label_text_render);
 }
+
+void gameplay_start() {
+}
+
+static void start_screen_input_process(InputState *input, Game *game) {
+    if (input->any_key) {
+        state_change(game, STATE_GAMEPLAY);
+    }
+}
+
+void start_screen_update(InputState *input, Game *game, float dt) {
+    start_screen_input_process(input, game);
+}
+
 
 void destroy_start_screen() {
     ecs_clear_space();

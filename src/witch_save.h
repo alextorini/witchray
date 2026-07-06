@@ -1,4 +1,6 @@
 #pragma once
 
-void save_game();
-void load_game();
+#include "witch_game.h"
+
+void save_game(Game *game);
+void load_game(Game *game);

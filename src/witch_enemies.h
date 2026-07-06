@@ -1,16 +1,11 @@
 #pragma once
 
-#include "smetanka_ecs.h"
+#include "witch_game.h"
 
-void init_enemy_factory();
+void init_enemy_factory(Game *game);
 
-void system_spawn_enemies(float dt);
+void system_spawn_enemies(Game *game, float dt);
 
-void system_clean_enemies(EcsComponentId enemy_id, EcsComponentId position_id);
+void system_clean_enemies(Game *game);
 
-void system_collide_enemies(
-    EcsEntityHandle player_handle,
-    EcsComponentId enemy_id,
-    EcsComponentId position_id,
-    EcsComponentId render_id
-);
+void system_collide_enemies(Game *game);

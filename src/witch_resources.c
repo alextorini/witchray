@@ -1,3 +1,4 @@
+#include "witch_game.h"
 #include "witch_resources.h"
 
 static Texture load_pixel_texture(const char *path) {
@@ -17,17 +18,17 @@ static Font load_font(const char *path) {
     return LoadFontEx(path, 18, codepoints, 350);
 }
 
-void init_resources(ResourceMap *resource_map) {
-    resource_map->fonts[FONT_MAIN] = load_font("fonts/monocraft.otf");
-    resource_map->sprites[SPRITESHEET_PLAYER] = load_pixel_texture(PLAYER_IMAGE_PATH);
-    resource_map->sprites[SPRITESHEET_ENEMY] = load_pixel_texture(ENEMY_IMAGE_PATH);
-    resource_map->sprites[SPRITESHEET_FIREBALL] = load_pixel_texture(FIREBALL_IMAGE_PATH);
-    resource_map->sprites[BACKGROUND_CLOUDS] = load_pixel_texture("images/background_clouds.png");
-    resource_map->sprites[BACKGROUND_URBAN] = load_pixel_texture("images/background_urban.png");
+void resources_init(Game *game) {
+    game->resources.fonts[FONT_MAIN] = load_font("fonts/monocraft.otf");
+    game->resources.sprites[SPRITESHEET_PLAYER] = load_pixel_texture(PLAYER_IMAGE_PATH);
+    game->resources.sprites[SPRITESHEET_ENEMY] = load_pixel_texture(ENEMY_IMAGE_PATH);
+    game->resources.sprites[SPRITESHEET_FIREBALL] = load_pixel_texture(FIREBALL_IMAGE_PATH);
+    game->resources.sprites[BACKGROUND_URBAN] = load_pixel_texture("images/background_urban.png");
+    game->resources.sprites[BACKGROUND_CLOUDS] = load_pixel_texture("images/background_clouds.png");
 
-    resource_map->sounds[SOUND_SHOOT] = LoadSound("sounds/shoot.wav");
-    resource_map->sounds[SOUND_EXPLOSION] = LoadSound("sounds/explosion.wav");
+    game->resources.sounds[SOUND_SHOOT] = LoadSound("sounds/shoot.wav");
+    game->resources.sounds[SOUND_EXPLOSION] = LoadSound("sounds/explosion.wav");
 
-    resource_map->music[MUSIC_MAIN] = LoadMusicStream("music/music.wav");
-    resource_map->music[MUSIC_MAIN].looping = true;
+    game->resources.music[MUSIC_MAIN] = LoadMusicStream("music/music.wav");
+    game->resources.music[MUSIC_MAIN].looping = true;
 }

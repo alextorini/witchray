@@ -1,12 +1,11 @@
 #pragma once
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
-
 #include "smetanka_ecs.h"
 #include "witch_collisions.h"
 #include "witch_components.h"
-#include "witch_resources.h"
 
 #define GAME_VERSION 0
 
@@ -31,7 +30,6 @@
 #define PLAYER_START_POS {50, 50}
 #define PLAYER_DEFAULT_FRAME {0.0f, 0.0f, 41.0f, 27.0f}
 #define PLAYER_SPEED 3.0f
-#define GAMEPAD_DEADZONE 0.1f
 #define PLAYER_IDLE_ANIM_SPEED 0.25f
 
 #define WR_MALLOC malloc
@@ -54,6 +52,37 @@ typedef struct {
     FrameCollisionMap collisions;
 } Player;
 
+typedef enum {
+    SOUND_SHOOT,
+    SOUND_EXPLOSION,
+    SOUND_COUNT
+} SoundIndex;
+typedef enum {
+    MUSIC_MAIN,
+    MUSIC_COUNT
+} MusicIndex;
+
+typedef enum {
+    SPRITESHEET_PLAYER,
+    SPRITESHEET_ENEMY,
+    BACKGROUND_URBAN,
+    BACKGROUND_CLOUDS,
+    SPRITESHEET_FIREBALL,
+    SPRITE_COUNT
+} SpriteIndex;
+
+typedef enum {
+    FONT_MAIN,
+    FONT_COUNT
+} FontIndex;
+
+typedef struct {
+    Font fonts[FONT_COUNT];
+    Texture sprites[SPRITE_COUNT];
+    Sound sounds[SOUND_COUNT];
+    Music music[MUSIC_COUNT];
+} ResourceMap;
+
 typedef struct {
     EcsEntityHandle player_handle;
     Player player;
@@ -69,7 +98,8 @@ typedef struct {
     uint64_t highscore;
 } Game;
 
-extern Game game;
-
 extern uint8_t should_close;
 
+static inline void wr_malloc(size_t size) {
+    malloc(size);
+}

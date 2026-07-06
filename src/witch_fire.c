@@ -13,42 +13,42 @@
 
 static float fireball_cooldown = 0.0;
 
-void init_fireballs() {
-    init_collision_map(FIREBALL_IMAGE_PATH, (Rectangle)FIREBALL_DEFAULT_FRAME, 10, &game.fireballs.collisions);
+void init_fireballs(Game *game) {
+    init_collision_map(FIREBALL_IMAGE_PATH, (Rectangle)FIREBALL_DEFAULT_FRAME, 10, &game->fireballs.collisions);
 }
 
-static void create_fireball(Position *position, Velocity *velocity) {
+static void create_fireball(Position *position, Velocity *velocity, Game *game) {
     EcsEntityHandle handle = ecs_create_entity();
-    ecs_add_component(handle, game.components[CMP_POSITION], position);
-    ecs_add_component(handle, game.components[CMP_VELOCITY], velocity);
+    ecs_add_component(handle, game->components[CMP_POSITION], position);
+    ecs_add_component(handle, game->components[CMP_VELOCITY], velocity);
 
     Fireball fireball = {1};
-    ecs_add_component(handle, game.components[CMP_FIREBALL], &fireball);
+    ecs_add_component(handle, game->components[CMP_FIREBALL], &fireball);
 
-    Render rndr = {&game.resources.sprites[SPRITESHEET_FIREBALL], FIREBALL_DEFAULT_FRAME};
-    ecs_add_component(handle, game.components[CMP_RENDER], &rndr);
+    Render rndr = {&game->resources.sprites[SPRITESHEET_FIREBALL], FIREBALL_DEFAULT_FRAME};
+    ecs_add_component(handle, game->components[CMP_RENDER], &rndr);
 }
 
-void cast_fireballs(EcsEntityHandle player_handle, float delta_time) {
-    Position *player_position = (Position *)ecs_get_entity_component(game.components[CMP_POSITION], player_handle);
+void cast_fireballs(Game *game, float dt) {
+    Position *player_position = (Position *)ecs_get_entity_component(game->components[CMP_POSITION], game->player.handle);
     if (fireball_cooldown <= 0) {
         Position fireball_position = Vector2Add(*player_position, (Position)FIREBALL_CAST_POSITION);
         Velocity fireball_velocity = {FIREBALL_SPEED, 0};
-        create_fireball(&fireball_position, &fireball_velocity);
+        create_fireball(&fireball_position, &fireball_velocity, game);
         fireball_cooldown = FIREBALL_COOLDOWN;
 
         return;
     }
 
-    fireball_cooldown -= delta_time;
+    fireball_cooldown -= dt;
 }
 
-void system_fireballs_collide_enemies(
-    EcsComponentId fireball_id,
-    EcsComponentId enemy_id,
-    EcsComponentId position_id,
-    EcsComponentId render_id
-) {
+void system_fireballs_collide_enemies(Game *game) {
+    EcsComponentId fireball_id = game->components[CMP_FIREBALL];
+    EcsComponentId enemy_id = game->components[CMP_ENEMY];
+    EcsComponentId position_id = game->components[CMP_POSITION];
+    EcsComponentId render_id = game->components[CMP_RENDER];
+
     EcsComponentId enemy_component_id_list[] = {enemy_id, position_id, render_id};
     EcsEntityIterator enemy_iterator = ecs_get_entity_iterator(enemy_component_id_list, 3);
 
@@ -61,14 +61,14 @@ void system_fireballs_collide_enemies(
         Position *fireball_position = (Position *)ecs_get_entity_component(position_id, fireball_handle);
         Render *fireball_render = (Render *)ecs_get_entity_component(render_id, fireball_handle);
         Animation *fireball_anim =
-            (Animation *)ecs_get_entity_component(game.components[CMP_ANIMATION], fireball_handle);
+            (Animation *)ecs_get_entity_component(game->components[CMP_ANIMATION], fireball_handle);
         uint32_t fireball_frame_index = 0;
         if (fireball_anim) fireball_frame_index = fireball_anim->current_frame;
         EcsEntityIterator enemy_iterator = ecs_get_entity_iterator(enemy_component_id_list, 3);
         while ((enemy_handle = ecs_get_next_entity(&enemy_iterator)) != INVALID_HANDLE) {
             Position *enemy_position = (Position *)ecs_get_entity_component(position_id, enemy_handle);
             Render *enemy_render = (Render *)ecs_get_entity_component(render_id, enemy_handle);
-            Animation *enemy_anim = (Animation *)ecs_get_entity_component(game.components[CMP_ANIMATION], enemy_handle);
+            Animation *enemy_anim = (Animation *)ecs_get_entity_component(game->components[CMP_ANIMATION], enemy_handle);
 
             uint32_t enemy_frame_index = 0;
             if (enemy_anim) {
@@ -76,12 +76,12 @@ void system_fireballs_collide_enemies(
             }
 
             if (pixel_perfect_collision(
-                &game.fireballs.collisions, fireball_frame_index, fireball_position->x, fireball_position->y,
-                &game.enemies.collisions, enemy_frame_index, enemy_position->x, enemy_position->y
+                &game->fireballs.collisions, fireball_frame_index, fireball_position->x, fireball_position->y,
+                &game->enemies.collisions, enemy_frame_index, enemy_position->x, enemy_position->y
             )) {
                 ecs_destroy_entity(enemy_handle);
                 ecs_destroy_entity(fireball_handle);
-                game.enemies_killed++;
+                game->enemies_killed++;
             }
         }
     }

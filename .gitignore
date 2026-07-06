@@ -1,4 +1,5 @@
 .vs/
 build/
+compile_commands.json
 res/save.dat
 

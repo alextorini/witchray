@@ -1,10 +1,10 @@
 #pragma once
 
 #include <stdint.h>
-#include <stdlib.h>
+#include "witch_game.h"
 
-void init();
+void init(Game *game);
 
-void update_and_draw();
+void update_and_draw(Game *game, float delta_time);
 
-void unload();
+void unload(Game *game);

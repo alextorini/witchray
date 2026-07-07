@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include "smetanka_engine.h"
 #include "witch_collisions.h"
 
 #define COL_MALLOC malloc
@@ -9,9 +10,10 @@
 #define COL_FREE free
 
 void init_collision_map(const char *image_path, Rectangle frame, uint32_t frames_count, FrameCollisionMap *col_map) {
-    Image image = LoadImage(image_path);
+    Image image = load_image(image_path);
+    Color *pixels = load_image_colors(image);
+    unload_image(image);
 
-    Color *pixels = LoadImageColors(image);
     uint32_t img_w = (uint32_t)image.width;
     uint32_t img_h = (uint32_t)image.height;
 
@@ -19,6 +21,8 @@ void init_collision_map(const char *image_path, Rectangle frame, uint32_t frames
     for (uint32_t i = 0; i < img_w * img_h; i++) {
         image_mask[i] = pixels[i].a > 0;
     }
+
+    unload_image_colors(pixels);
 
     col_map->width = (uint32_t)frame.width;
     col_map->height = (uint32_t)frame.height;
@@ -42,11 +46,9 @@ void init_collision_map(const char *image_path, Rectangle frame, uint32_t frames
     }
 
     COL_FREE(image_mask);
-    UnloadImageColors(pixels);
-    UnloadImage(image);
 }
 
-uint8_t pixel_perfect_collision(
+uint8_t check_collision(
     const FrameCollisionMap *a_col, uint32_t a_frame_index, float ax, float ay,
     const FrameCollisionMap *b_col, uint32_t b_frame_index, float bx, float by
 ) {

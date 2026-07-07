@@ -33,20 +33,6 @@ static inline uint64_t increase_handle_gen(uint64_t handle) {
     return pack_handle(get_handle_id(handle), get_handle_gen(handle) + 1);
 }
 
-static inline uint8_t aabb_intersect(
-    float ax, float ay, float aw, float ah,
-    float bx, float by, float bw, float bh)
-{
-    return ax < bx + bw &&
-           ax + aw > bx &&
-           ay < by + bh &&
-           ay + ah > by;
-}
-
-static inline float get_vector2_magnitude(float x, float y) {
-    return sqrt(x * x + y * y);
-}
-
 static inline void log_abort() {
         fprintf(stderr, "info: %s:%d\n", __FILE__, __LINE__); \
         abort(); \

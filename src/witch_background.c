@@ -1,6 +1,5 @@
 #include <stdlib.h>
 
-#include "witch_game.h"
 #include "witch_background.h"
 
 static EcsEntityHandle create_layer_instance(Texture *texture, Position position, Velocity velocity, Game *game) {

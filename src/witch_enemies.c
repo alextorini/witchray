@@ -132,7 +132,7 @@ void system_collide_enemies(Game *game) {
             enemy_frame_index = enemy_anim->current_frame;
         }
 
-        if (pixel_perfect_collision(
+        if (check_collision(
             &game->player.collisions, player_frame_index, player_position->x, player_position->y,
             &game->enemies.collisions, enemy_frame_index, enemy_position->x, enemy_position->y
         )) {

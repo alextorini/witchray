@@ -19,21 +19,17 @@ int main() {
 
     init(game);
 
-    while (!WindowShouldClose() && !should_close) {
-        smetanka_begin_texture_mode();
+    while (!window_should_close() && !should_close) {
+        begin_texture_mode();
 
-        update_and_draw(game, GetFrameTime());
+        update_and_draw(game, get_dt());
 
-        smetanka_end_texture_mode();
+        end_texture_mode();
 
         smetanka_render();
     }
 
     unload(game);
-
-    CloseAudioDevice();
-
-    CloseWindow();
 
     return 0;
 }

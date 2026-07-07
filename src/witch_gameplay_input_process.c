@@ -1,5 +1,4 @@
 #include "witch_gameplay_input_process.h"
-#include "smetanka_misc.h"
 #include "witch_input_read.h"
 
 #define PLAYER_MAX_VELOCITY 200.0
@@ -19,7 +18,7 @@ void gameplay_input_process(InputState *input, Game *game, float dt) {
         velocity->x += input->move.x * dt * PLAYER_ACCELERATION;
         velocity->y += input->move.y * dt * PLAYER_ACCELERATION;
 
-        move_magnitude = get_vector2_magnitude(velocity->x, velocity->y);
+        move_magnitude = xy_magnitude(velocity->x, velocity->y);
         if (move_magnitude > PLAYER_MAX_VELOCITY) {
             float ratio = PLAYER_MAX_VELOCITY / move_magnitude;
             velocity->x *= ratio;
@@ -27,7 +26,7 @@ void gameplay_input_process(InputState *input, Game *game, float dt) {
         }
     } else {
         float dx, dy;
-        move_magnitude = get_vector2_magnitude(velocity->x, velocity->y);
+        move_magnitude = xy_magnitude(velocity->x, velocity->y);
         if (move_magnitude != 0) {
             dx = velocity->x / move_magnitude;
             dy = velocity->y / move_magnitude;

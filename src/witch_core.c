@@ -1,3 +1,4 @@
+#include "smetanka_engine.h"
 #include "witch_game_update.h"
 #include "witch_render.h"
 #include "witch_resources.h"
@@ -11,7 +12,7 @@ void init(Game *game) {
 
     resources_init(game);
 
-    PlayMusicStream(game->resources.music[MUSIC_MAIN]);
+    play_music_stream(game->resources.music[MUSIC_MAIN]);
 
     ecs_create_space();
 
@@ -31,16 +32,16 @@ void update_and_draw(Game *game, float delta_time) {
 }
 
 void unload(Game *game) {
-    UnloadTexture(game->resources.sprites[SPRITESHEET_PLAYER]);
-    UnloadTexture(game->resources.sprites[SPRITESHEET_ENEMY]);
-    UnloadTexture(game->resources.sprites[BACKGROUND_URBAN]);
-    UnloadTexture(game->resources.sprites[BACKGROUND_CLOUDS]);
+    unload_texture(game->resources.sprites[SPRITESHEET_PLAYER]);
+    unload_texture(game->resources.sprites[SPRITESHEET_ENEMY]);
+    unload_texture(game->resources.sprites[BACKGROUND_URBAN]);
+    unload_texture(game->resources.sprites[BACKGROUND_CLOUDS]);
 
-    UnloadSound(game->resources.sounds[SOUND_SHOOT]);
-    UnloadSound(game->resources.sounds[SOUND_EXPLOSION]);
+    unload_sound(game->resources.sounds[SOUND_SHOOT]);
+    unload_sound(game->resources.sounds[SOUND_EXPLOSION]);
 
-    StopMusicStream(game->resources.music[MUSIC_MAIN]);
-    UnloadMusicStream(game->resources.music[MUSIC_MAIN]);
+    stop_music_stream(game->resources.music[MUSIC_MAIN]);
+    unload_music_stream(game->resources.music[MUSIC_MAIN]);
 
     ecs_destroy_space();
 }

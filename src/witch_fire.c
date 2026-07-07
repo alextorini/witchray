@@ -75,13 +75,15 @@ void system_fireballs_collide_enemies(Game *game) {
                 enemy_frame_index = enemy_anim->current_frame;
             }
 
-            if (pixel_perfect_collision(
+            if (check_collision(
                 &game->fireballs.collisions, fireball_frame_index, fireball_position->x, fireball_position->y,
                 &game->enemies.collisions, enemy_frame_index, enemy_position->x, enemy_position->y
             )) {
+                // TODO: implement delayed destroy
                 ecs_destroy_entity(enemy_handle);
                 ecs_destroy_entity(fireball_handle);
                 game->enemies_killed++;
+                break;
             }
         }
     }

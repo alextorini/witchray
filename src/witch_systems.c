@@ -2,6 +2,8 @@
 
 #include "smetanka_ecs.h"
 #include "witch_systems.h"
+#include "smetanka_engine.h"
+#include "smetanka_math.h"
 #include "witch_components.h"
 
 void system_move_entities(EcsComponentId position_id, EcsComponentId velocity_id, float delta_time) {
@@ -13,7 +15,7 @@ void system_move_entities(EcsComponentId position_id, EcsComponentId velocity_id
         Position *position = (Position *)ecs_get_entity_component(position_id, entity_handle);
         Velocity *velocity = (Velocity *)ecs_get_entity_component(velocity_id, entity_handle);
 
-        *position = Vector2Add(*position, Vector2Scale(*velocity, delta_time));
+        *position = vector2_sum(*position, vector2_scale(*velocity, delta_time));
     }
 }
 
@@ -70,7 +72,7 @@ void system_render_entities(EcsComponentId position_id, EcsComponentId render_id
         Position *position = (Position*)ecs_get_entity_component(position_id, entity_handle);
         Render *render = (Render *)ecs_get_entity_component(render_id, entity_handle);
 
-        DrawTextureRec(*render->spritesheet, render->frame, *position, WHITE);
+        draw_texture_rec(*render->spritesheet, render->frame, *position, WHITE);
     }
 }
 
@@ -83,10 +85,10 @@ void system_render_text(EcsComponentId position_id, EcsComponentId text_render_i
         Position *position = (Position*)ecs_get_entity_component(position_id, entity_handle);
         TextRender *text_render = (TextRender *)ecs_get_entity_component(text_render_id, entity_handle);
 
-        DrawTextEx(
+        draw_text(
             text_render->font,
             text_render->text,
-            Vector2Add(*position, text_render->offset),
+            vector2_sum(*position, text_render->offset),
             text_render->font_size,
             text_render->spacing,
             text_render->color

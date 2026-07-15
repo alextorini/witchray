@@ -14,7 +14,6 @@
 
 typedef uint64_t EcsEntityHandle;
 typedef uint32_t EcsComponentId;
-typedef struct EcsSpace EcsSpace;
 
 typedef struct {
     EcsComponentId secondaryComponentIdList[MAX_ITERATOR_COMPONENT_COUNT];
@@ -23,7 +22,7 @@ typedef struct {
     EcsComponentId baseComponentId;
 } EcsEntityIterator;
 
-EcsSpace *ecsCreateSpace();
+void ecsCreateSpace();
 
 EcsComponentId ecsRegisterComponent(const char *name, size_t dataSize);
 

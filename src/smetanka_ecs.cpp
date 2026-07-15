@@ -40,7 +40,7 @@ typedef struct {
     uint32_t capacity;
 } EntityFreeSlotPool;
 
-struct EcsSpace {
+typedef struct {
     EcsEntityId nextEntityId;
     uint32_t currentEntitiesCapacity;
     EcsComponentId currentComponentId;
@@ -48,11 +48,11 @@ struct EcsSpace {
     EcsEntity *entityList;
     EcsComponent *componentList;
     EntityFreeSlotPool entityFreeSlotsPool;
-};
+} EcsSpace;
 
 static EcsSpace *space;
 
-EcsSpace *ecsCreateSpace() {
+void ecsCreateSpace() {
     space = ECS_MALLOC_TYPE(EcsSpace);
     if (!space) {
         ABORT();
@@ -94,8 +94,6 @@ EcsSpace *ecsCreateSpace() {
     for (int i = 0; i < space->entityFreeSlotsPool.capacity; i++) {
         space->entityFreeSlotsPool.idList[i] = INVALID_ID;
     }
-
-    return space;
 }
 
 EcsComponentId ecsRegisterComponent(const char *name, size_t dataSize) {

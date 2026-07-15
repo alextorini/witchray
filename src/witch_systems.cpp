@@ -6,27 +6,27 @@
 #include "smetanka_math.h"
 #include "witch_components.h"
 
-void system_move_entities(EcsComponentId position_id, EcsComponentId velocity_id, float delta_time) {
-    EcsComponentId component_id_list[] = {position_id, velocity_id};
-    EcsEntityIterator iterator = ecs_get_entity_iterator(component_id_list, 2);
+void systemMoveEntities(EcsComponentId positionId, EcsComponentId velocityId, float dt) {
+    EcsComponentId componentIdList[] = {positionId, velocityId};
+    EcsEntityIterator iterator = ecsGetEntityIterator(componentIdList, 2);
 
-    EcsEntityHandle entity_handle;
-    while ((entity_handle = ecs_get_next_entity(&iterator)) != INVALID_HANDLE) {
-        Position *position = (Position *)ecs_get_entity_component(position_id, entity_handle);
-        Velocity *velocity = (Velocity *)ecs_get_entity_component(velocity_id, entity_handle);
+    EcsEntityHandle entityHandle;
+    while ((entityHandle = ecsGetNextEntity(&iterator)) != INVALID_HANDLE) {
+        Position *position = (Position *)ecsGetEntityComponent(positionId, entityHandle);
+        Velocity *velocity = (Velocity *)ecsGetEntityComponent(velocityId, entityHandle);
 
-        *position = vector2_sum(*position, vector2_scale(*velocity, delta_time));
+        *position = vector2Sum(*position, vector2Scale(*velocity, dt));
     }
 }
 
-void system_move_parallax(EcsComponentId parallax_id, EcsComponentId position_id, EcsComponentId render_id) {
-    EcsComponentId component_id_list[] = {parallax_id, position_id, render_id};
-    EcsEntityIterator iterator = ecs_get_entity_iterator(component_id_list, 3);
+void systemMoveParallax(EcsComponentId parallaxId, EcsComponentId positionId, EcsComponentId renderId) {
+    EcsComponentId componentIdList[] = {parallaxId, positionId, renderId};
+    EcsEntityIterator iterator = ecsGetEntityIterator(componentIdList, 3);
 
-    EcsEntityHandle entity_handle;
-    while ((entity_handle = ecs_get_next_entity(&iterator)) != INVALID_HANDLE) {
-        Position *position = (Position *)ecs_get_entity_component(position_id, entity_handle);
-        Render *render = (Render *)ecs_get_entity_component(render_id, entity_handle);
+    EcsEntityHandle entityHandle;
+    while ((entityHandle = ecsGetNextEntity(&iterator)) != INVALID_HANDLE) {
+        Position *position = (Position *)ecsGetEntityComponent(positionId, entityHandle);
+        Render *render = (Render *)ecsGetEntityComponent(renderId, entityHandle);
 
         if (position->x + render->frame.width < 0) {
             position->x += render->frame.width * 2.0f;
@@ -34,64 +34,64 @@ void system_move_parallax(EcsComponentId parallax_id, EcsComponentId position_id
     }
 }
 
-void system_animate_entities(EcsComponentId animation_id, EcsComponentId render_id, float delta_time) {
-    EcsComponentId component_id_list[] = {animation_id, render_id};
-    EcsEntityIterator iterator = ecs_get_entity_iterator(component_id_list, 2);
+void systemAnimateEntities(EcsComponentId animation_id, EcsComponentId render_id, float delta_time) {
+    EcsComponentId componentIdList[] = {animation_id, render_id};
+    EcsEntityIterator iterator = ecsGetEntityIterator(componentIdList, 2);
 
-    EcsEntityHandle entity_handle;
-    while ((entity_handle = ecs_get_next_entity(&iterator)) != INVALID_HANDLE) {
-        Animation *animation = (Animation*)ecs_get_entity_component(animation_id, entity_handle);
-        Render *render = (Render *)ecs_get_entity_component(render_id, entity_handle);
+    EcsEntityHandle entityHandle;
+    while ((entityHandle = ecsGetNextEntity(&iterator)) != INVALID_HANDLE) {
+        Animation *animation = (Animation*)ecsGetEntityComponent(animation_id, entityHandle);
+        Render *render = (Render *)ecsGetEntityComponent(render_id, entityHandle);
 
-        AnimationClip *current_clip = &animation->set->clips[animation->current_clip];
+        AnimationClip *currentClip = &animation->set->clips[animation->currentClip];
         animation->timer += delta_time;
 
-        if (current_clip->frame_time <= 0.00001f) return;
+        if (currentClip->frameTime <= 0.00001f) return;
 
-        while (animation->timer >= current_clip->frame_time) {
-            animation->current_frame++;
-            if (animation->current_frame > current_clip->end_frame) {
-                animation->current_frame = current_clip->start_frame;
+        while (animation->timer >= currentClip->frameTime) {
+            animation->currentFrame++;
+            if (animation->currentFrame > currentClip->endFrame) {
+                animation->currentFrame = currentClip->startFrame;
             }
 
-            animation->timer -= current_clip->frame_time;
+            animation->timer -= currentClip->frameTime;
         }
 
-        render->frame.x = (int)(render->frame.width * animation->current_frame) % render->spritesheet->width;
-        render->frame.y = (/*NOLINT*/(int)(render->frame.width * animation->current_frame) /
+        render->frame.x = (int)(render->frame.width * animation->currentFrame) % render->spritesheet->width;
+        render->frame.y = (/*NOLINT*/(int)(render->frame.width * animation->currentFrame) /
             render->spritesheet->width) * render->frame.height;
     }
 }
 
-void system_render_entities(EcsComponentId position_id, EcsComponentId render_id) {
-    EcsComponentId component_id_list[] = {position_id, render_id};
-    EcsEntityIterator iterator = ecs_get_entity_iterator(component_id_list, 2);
+void systemRenderEntities(EcsComponentId positionId, EcsComponentId renderId) {
+    EcsComponentId componentIdList[] = {positionId, renderId};
+    EcsEntityIterator iterator = ecsGetEntityIterator(componentIdList, 2);
 
-    EcsEntityHandle entity_handle;
-    while ((entity_handle = ecs_get_next_entity(&iterator)) != INVALID_HANDLE) {
-        Position *position = (Position*)ecs_get_entity_component(position_id, entity_handle);
-        Render *render = (Render *)ecs_get_entity_component(render_id, entity_handle);
+    EcsEntityHandle entityHandle;
+    while ((entityHandle = ecsGetNextEntity(&iterator)) != INVALID_HANDLE) {
+        Position *position = (Position*)ecsGetEntityComponent(positionId, entityHandle);
+        Render *render = (Render *)ecsGetEntityComponent(renderId, entityHandle);
 
-        draw_texture_rec(*render->spritesheet, render->frame, *position, WHITE);
+        smeDrawTextureRec(*render->spritesheet, render->frame, *position, WHITE);
     }
 }
 
-void system_render_text(EcsComponentId position_id, EcsComponentId text_render_id) {
-    EcsComponentId component_id_list[] = {position_id, text_render_id};
-    EcsEntityIterator iterator = ecs_get_entity_iterator(component_id_list, 2);
+void systemRenderText(EcsComponentId positionId, EcsComponentId textRenderId) {
+    EcsComponentId componentIdList[] = {positionId, textRenderId};
+    EcsEntityIterator iterator = ecsGetEntityIterator(componentIdList, 2);
 
-    EcsEntityHandle entity_handle;
-    while ((entity_handle = ecs_get_next_entity(&iterator)) != INVALID_HANDLE) {
-        Position *position = (Position*)ecs_get_entity_component(position_id, entity_handle);
-        TextRender *text_render = (TextRender *)ecs_get_entity_component(text_render_id, entity_handle);
+    EcsEntityHandle entityHandle;
+    while ((entityHandle = ecsGetNextEntity(&iterator)) != INVALID_HANDLE) {
+        Position *position = (Position*)ecsGetEntityComponent(positionId, entityHandle);
+        TextRender *textRender = (TextRender *)ecsGetEntityComponent(textRenderId, entityHandle);
 
-        draw_text(
-            text_render->font,
-            text_render->text,
-            vector2_sum(*position, text_render->offset),
-            text_render->font_size,
-            text_render->spacing,
-            text_render->color
+        smeDrawText(
+            textRender->font,
+            textRender->text,
+            vector2Sum(*position, textRender->offset),
+            textRender->fontSize,
+            textRender->spacing,
+            textRender->color
         );
     }
 }

@@ -3,24 +3,24 @@
 #include "witch_game.h"
 
 typedef struct {
-    uint64_t game_version;
+    uint64_t gameVersion;
     uint64_t highscore;
 } Save;
 
-void save_game(Game *game) {
+void saveGame(Game *game) {
     Save save = {
-        .game_version = GAME_VERSION,
+        .gameVersion = GAME_VERSION,
         .highscore = game->highscore
     };
 
-    save_file_data("save.dat", (unsigned char *)&save, sizeof(save));
+    smeSaveFileData("save.dat", (unsigned char *)&save, sizeof(save));
 }
 
-void load_game(Game *game) {
-    int bytes_read;
-    unsigned char *data = load_file_data("save.dat", &bytes_read);
+void loadGame(Game *game) {
+    int bytesRead;
+    unsigned char *data = smeLoadFileData("save.dat", &bytesRead);
 
-    if (bytes_read != sizeof(Save)) {
+    if (bytesRead != sizeof(Save)) {
         return;
     }
 
@@ -28,5 +28,5 @@ void load_game(Game *game) {
 
     game->highscore = save.highscore;
 
-    unload_file_data(data);
+    smeUnloadFileData(data);
 }

@@ -20,9 +20,9 @@ typedef struct {
 } Render;
 
 typedef struct {
-    uint16_t start_frame;
-    uint16_t end_frame;
-    float frame_time;
+    uint16_t startFrame;
+    uint16_t endFrame;
+    float frameTime;
     uint8_t loop;
 } AnimationClip;
 
@@ -33,8 +33,8 @@ typedef struct {
 
 typedef struct {
     AnimationSet *set;
-    uint16_t current_clip;
-    uint16_t current_frame;
+    uint16_t currentClip;
+    uint16_t currentFrame;
     float timer;
 } Animation;
 
@@ -42,7 +42,7 @@ typedef struct {
     Position offset;
     Color color;
     Font font;
-    float font_size;
+    float fontSize;
     float spacing;
     char text[128];
 } TextRender;
@@ -59,4 +59,4 @@ typedef enum {
     CMP_COUNT
 } ComponentIndex;
 
-void init_components(EcsComponentId (*cmp_ids)[CMP_COUNT]);
+void initComponents(EcsComponentId (*cmpIds)[CMP_COUNT]);

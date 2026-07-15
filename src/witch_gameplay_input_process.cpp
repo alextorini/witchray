@@ -5,31 +5,31 @@
 #define PLAYER_ACCELERATION 500.0
 #define PLAYER_BRAKING  250.0
 
-void gameplay_input_process(InputState *input, Game *game, float dt) {
+void gameplayInputProcess(InputState *input, Game *game, float dt) {
     // TODO: Get rid of all this components dependencies.
     // Maybe this function should only generate something like forces,
     // which will applied to the player in some other system
-    Velocity *velocity = (Velocity *)ecs_get_entity_component(game->components[CMP_VELOCITY], game->player.handle);
-    Position *position = (Position *)ecs_get_entity_component(game->components[CMP_POSITION], game->player.handle);
-    Render *render = (Render *)ecs_get_entity_component(game->components[CMP_RENDER], game->player.handle);
+    Velocity *velocity = (Velocity *)ecsGetEntityComponent(game->components[CMP_VELOCITY], game->player.handle);
+    Position *position = (Position *)ecsGetEntityComponent(game->components[CMP_POSITION], game->player.handle);
+    Render *render = (Render *)ecsGetEntityComponent(game->components[CMP_RENDER], game->player.handle);
 
-    float move_magnitude;
+    float moveMagnitude;
     if ( input->move.x != 0 || input->move.y != 0) {
         velocity->x += input->move.x * dt * PLAYER_ACCELERATION;
         velocity->y += input->move.y * dt * PLAYER_ACCELERATION;
 
-        move_magnitude = xy_magnitude(velocity->x, velocity->y);
-        if (move_magnitude > PLAYER_MAX_VELOCITY) {
-            float ratio = PLAYER_MAX_VELOCITY / move_magnitude;
+        moveMagnitude = xyMagnitude(velocity->x, velocity->y);
+        if (moveMagnitude > PLAYER_MAX_VELOCITY) {
+            float ratio = PLAYER_MAX_VELOCITY / moveMagnitude;
             velocity->x *= ratio;
             velocity->y *= ratio;
         }
     } else {
         float dx, dy;
-        move_magnitude = xy_magnitude(velocity->x, velocity->y);
-        if (move_magnitude != 0) {
-            dx = velocity->x / move_magnitude;
-            dy = velocity->y / move_magnitude;
+        moveMagnitude = xyMagnitude(velocity->x, velocity->y);
+        if (moveMagnitude != 0) {
+            dx = velocity->x / moveMagnitude;
+            dy = velocity->y / moveMagnitude;
         } else {
             dx = 0.0;
             dy = 0.0;

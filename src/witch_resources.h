@@ -6,4 +6,4 @@
 #define FIREBALL_IMAGE_PATH "images/fireball.png"
 #define PLAYER_IMAGE_PATH "images/player.png"
 
-void resources_init(Game *game);
+void resourcesInit(Game *game);

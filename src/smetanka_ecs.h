@@ -17,32 +17,32 @@ typedef uint32_t EcsComponentId;
 typedef struct EcsSpace EcsSpace;
 
 typedef struct {
-    EcsComponentId secondary_component_id_list[MAX_ITERATOR_COMPONENT_COUNT];
-    uint16_t component_count;
+    EcsComponentId secondaryComponentIdList[MAX_ITERATOR_COMPONENT_COUNT];
+    uint16_t componentCount;
     uint32_t index;
-    EcsComponentId base_component_id;
+    EcsComponentId baseComponentId;
 } EcsEntityIterator;
 
-EcsSpace *ecs_create_space();
+EcsSpace *ecsCreateSpace();
 
-EcsComponentId ecs_register_component(const char *name, size_t data_size);
+EcsComponentId ecsRegisterComponent(const char *name, size_t dataSize);
 
-EcsEntityHandle ecs_create_entity();
+EcsEntityHandle ecsCreateEntity();
 
-void *ecs_add_component(EcsEntityHandle entity_handle, EcsComponentId component_id, void *component_data);
+void *ecsAddComponent(EcsEntityHandle entityHandle, EcsComponentId componentId, void *componentData);
 
-void *ecs_get_entity_component(EcsComponentId component_id, EcsEntityHandle entity_handle);
+void *ecsGetEntityComponent(EcsComponentId componentId, EcsEntityHandle entityHandle);
 
-uint32_t ecs_get_component_count(EcsComponentId cmp_id);
+uint32_t ecsGetComponentCount(EcsComponentId cmpId);
 
-EcsEntityHandle ecs_get_component_dense(EcsComponentId cmp_id, uint32_t dense_id);
+EcsEntityHandle ecsGetComponentDense(EcsComponentId cmpId, uint32_t denseId);
 
-EcsEntityIterator ecs_get_entity_iterator(EcsComponentId *component_id_list, uint16_t count);
+EcsEntityIterator ecsGetEntityIterator(EcsComponentId *componentIdList, uint16_t count);
 
-EcsEntityHandle ecs_get_next_entity(EcsEntityIterator *iterator);
+EcsEntityHandle ecsGetNextEntity(EcsEntityIterator *iterator);
 
-void ecs_destroy_entity(EcsEntityHandle ent_id);
+void ecsDestroyEntity(EcsEntityHandle entityHandle);
 
-void ecs_clear_space();
+void ecsClearSpace();
 
-void ecs_destroy_space();
+void ecsDestroySpace();

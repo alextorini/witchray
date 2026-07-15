@@ -2,5 +2,5 @@
 
 #include "witch_game.h"
 
-void state_change(Game *game, int state);
+void stateChange(Game *game, int state);
 

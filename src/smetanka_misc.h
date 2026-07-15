@@ -6,9 +6,9 @@
 #include <stdlib.h>
 
 #if defined(__cplusplus)
-    #define CLITERAL(type)      type
+    #define CLITERAL(type) type
 #else
-    #define CLITERAL(type)      (type)
+    #define CLITERAL(type) (type)
 #endif
 
 #define ABORT() \
@@ -17,23 +17,23 @@
         abort(); \
     } while (0)
 
-static inline uint32_t get_handle_id(uint64_t handle) {
+static inline uint32_t getHandleId(uint64_t handle) {
     return (uint32_t)handle;
 }
 
-static inline uint32_t get_handle_gen(uint64_t handle) {
+static inline uint32_t getHandleGen(uint64_t handle) {
     return (uint32_t)(handle >> 32);
 }
 
-static inline uint64_t pack_handle(uint32_t id, uint32_t gen) {
+static inline uint64_t packHandle(uint32_t id, uint32_t gen) {
     return (((uint64_t)gen) << 32) | ((uint64_t)id);
 }
 
-static inline uint64_t increase_handle_gen(uint64_t handle) {
-    return pack_handle(get_handle_id(handle), get_handle_gen(handle) + 1);
+static inline uint64_t increaseHandleGen(uint64_t handle) {
+    return packHandle(getHandleId(handle), getHandleGen(handle) + 1);
 }
 
-static inline void log_abort() {
+static inline void logAbort() {
         fprintf(stderr, "info: %s:%d\n", __FILE__, __LINE__); \
         abort(); \
 }

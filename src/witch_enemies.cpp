@@ -24,60 +24,60 @@
 #define ENM_CALLOC_TYPE(type, count) ((type *)calloc(sizeof(type), (count)))
 #define ENM_FREE free
 
-static uint16_t enemies_count;
-static float spawn_cooldown;
+static uint16_t enemiesCount;
+static float spawnCooldown;
 
-static AnimationClip idle_animation;
-static AnimationSet animation_set;
+static AnimationClip idleAnimation;
+static AnimationSet animationSet;
 
-void init_enemy_factory(Game *game) {
-    enemies_count = 0;
-    spawn_cooldown = SPAWN_COOLDOWN;
+void initEnemyFactory(Game *game) {
+    enemiesCount = 0;
+    spawnCooldown = SPAWN_COOLDOWN;
 
-    idle_animation.start_frame = 0;
-    idle_animation.end_frame = 1;
-    idle_animation.frame_time = ENEMY_FRAME_TIME;
-    idle_animation.loop = 1;
-    animation_set.clips = ENM_MALLOC_TYPE(AnimationClip);
-    animation_set.count = 1;
-    animation_set.clips[0] = idle_animation;
+    idleAnimation.startFrame = 0;
+    idleAnimation.endFrame = 1;
+    idleAnimation.frameTime = ENEMY_FRAME_TIME;
+    idleAnimation.loop = 1;
+    animationSet.clips = ENM_MALLOC_TYPE(AnimationClip);
+    animationSet.count = 1;
+    animationSet.clips[0] = idleAnimation;
 
-    init_collision_map(ENEMY_IMAGE_PATH, (Rectangle)ENEMY_DEFAULT_FRAME, 10, &game->enemies.collisions);
+    initCollisionMap(ENEMY_IMAGE_PATH, (Rectangle)ENEMY_DEFAULT_FRAME, 10, &game->enemies.collisions);
 }
 
-static EcsEntityHandle create_enemy(Position *pos, Game *game) {
-    EcsEntityHandle handle = ecs_create_entity();
+static EcsEntityHandle createEnemy(Position *pos, Game *game) {
+    EcsEntityHandle handle = ecsCreateEntity();
 
-    ecs_add_component(handle, game->components[CMP_POSITION], pos);
+    ecsAddComponent(handle, game->components[CMP_POSITION], pos);
     Render rndr = {&game->resources.sprites[SPRITESHEET_ENEMY], ENEMY_DEFAULT_FRAME};
-    ecs_add_component(handle, game->components[CMP_RENDER], &rndr);
+    ecsAddComponent(handle, game->components[CMP_RENDER], &rndr);
 
     Velocity vel = {-ENEMY_SPEED, 0};
-    ecs_add_component(handle, game->components[CMP_VELOCITY], &vel);
+    ecsAddComponent(handle, game->components[CMP_VELOCITY], &vel);
 
     IsEnemy enmy = true;
-    ecs_add_component(handle, game->components[CMP_ENEMY], &enmy);
+    ecsAddComponent(handle, game->components[CMP_ENEMY], &enmy);
 
     Animation animation;
-    animation.set = &animation_set;
-    animation.current_clip = 0;
-    animation.current_frame = 0;
+    animation.set = &animationSet;
+    animation.currentClip = 0;
+    animation.currentFrame = 0;
     animation.timer = 0.0;
-    ecs_add_component(handle, game->components[CMP_ANIMATION], &animation);
+    ecsAddComponent(handle, game->components[CMP_ANIMATION], &animation);
 
-    enemies_count++;
+    enemiesCount++;
 
     return handle;
 }
 
-void system_spawn_enemies(Game *game, float dt) {
-    if (spawn_cooldown >= 0) {
-        spawn_cooldown -= dt;
+void systemSpawnEnemies(Game *game, float dt) {
+    if (spawnCooldown >= 0) {
+        spawnCooldown -= dt;
 
         return;
     }
 
-    if (enemies_count >= MAX_ENEMIES_COUNT) {
+    if (enemiesCount >= MAX_ENEMIES_COUNT) {
         return;
     }
 
@@ -85,59 +85,59 @@ void system_spawn_enemies(Game *game, float dt) {
     pos.x = VIRTUAL_WIDTH;
     pos.y = rand() % (VIRTUAL_HEIGHT - ENEMY_HEIGHT + 1);
 
-    create_enemy(&pos, game);
+    createEnemy(&pos, game);
 
-    spawn_cooldown = SPAWN_COOLDOWN;
+    spawnCooldown = SPAWN_COOLDOWN;
 }
 
-void system_clean_enemies(Game *game) {
-    EcsComponentId enemy_id = game->components[CMP_ENEMY];
-    EcsComponentId position_id =game->components[CMP_POSITION];
+void systemCleanEnemies(Game *game) {
+    EcsComponentId enemyId = game->components[CMP_ENEMY];
+    EcsComponentId positionId =game->components[CMP_POSITION];
 
-    EcsComponentId component_id_list[] = {enemy_id, position_id};
-    EcsEntityIterator iterator = ecs_get_entity_iterator(component_id_list, 2);
-    EcsEntityHandle entity_handle;
-    while ((entity_handle = ecs_get_next_entity(&iterator)) != INVALID_HANDLE) {
-        Position *position = (Position *)ecs_get_entity_component(position_id, entity_handle);
+    EcsComponentId componentIdList[] = {enemyId, positionId};
+    EcsEntityIterator iterator = ecsGetEntityIterator(componentIdList, 2);
+    EcsEntityHandle entityHandle;
+    while ((entityHandle = ecsGetNextEntity(&iterator)) != INVALID_HANDLE) {
+        Position *position = (Position *)ecsGetEntityComponent(positionId, entityHandle);
 
         if (position->x < -ENEMY_WIDTH) {
-            ecs_destroy_entity(entity_handle);
+            ecsDestroyEntity(entityHandle);
         }
     }
 }
 
-void system_collide_enemies(Game *game) {
-    EcsEntityHandle player_handle = game->player.handle;
-    EcsComponentId enemy_id = game->components[CMP_ENEMY];
-    EcsComponentId position_id = game->components[CMP_POSITION];
-    EcsComponentId render_id = game->components[CMP_RENDER];
+void systemCollideEnemies(Game *game) {
+    EcsEntityHandle playerHandle = game->player.handle;
+    EcsComponentId enemyId = game->components[CMP_ENEMY];
+    EcsComponentId positionId = game->components[CMP_POSITION];
+    EcsComponentId renderId = game->components[CMP_RENDER];
 
-    EcsComponentId component_id_list[] = {enemy_id, position_id, render_id};
-    EcsEntityIterator iterator = ecs_get_entity_iterator(component_id_list, 3);
+    EcsComponentId componentIdList[] = {enemyId, positionId, renderId};
+    EcsEntityIterator iterator = ecsGetEntityIterator(componentIdList, 3);
 
-    Position *player_position = (Position *)ecs_get_entity_component(position_id, player_handle);
-    Render *player_render = (Render *)ecs_get_entity_component(render_id, player_handle);
-    Animation *player_anim = (Animation *)ecs_get_entity_component(game->components[CMP_ANIMATION], player_handle);
-    uint32_t player_frame_index = 0;
-    if (player_anim) player_frame_index = player_anim->current_frame;
+    Position *playerPosition = (Position *)ecsGetEntityComponent(positionId, playerHandle);
+    Render *playerRender = (Render *)ecsGetEntityComponent(renderId, playerHandle);
+    Animation *playerAnim = (Animation *)ecsGetEntityComponent(game->components[CMP_ANIMATION], playerHandle);
+    uint32_t playerFrameIndex = 0;
+    if (playerAnim) playerFrameIndex = playerAnim->currentFrame;
 
-    EcsEntityHandle enemy_handle;
-    while ((enemy_handle = ecs_get_next_entity(&iterator)) != INVALID_HANDLE) {
-        Position *enemy_position = (Position *)ecs_get_entity_component(position_id, enemy_handle);
-        Render *enemy_render = (Render *)ecs_get_entity_component(render_id, enemy_handle);
-        Animation *enemy_anim = (Animation *)ecs_get_entity_component(game->components[CMP_ANIMATION], enemy_handle);
+    EcsEntityHandle enemyHandle;
+    while ((enemyHandle = ecsGetNextEntity(&iterator)) != INVALID_HANDLE) {
+        Position *enemyPosition = (Position *)ecsGetEntityComponent(positionId, enemyHandle);
+        Render *enemyRender = (Render *)ecsGetEntityComponent(renderId, enemyHandle);
+        Animation *enemyAnim = (Animation *)ecsGetEntityComponent(game->components[CMP_ANIMATION], enemyHandle);
 
-        uint32_t enemy_frame_index = 0;
-        if (enemy_anim) {
-            enemy_frame_index = enemy_anim->current_frame;
+        uint32_t enemyFrameIndex = 0;
+        if (enemyAnim) {
+            enemyFrameIndex = enemyAnim->currentFrame;
         }
 
-        if (check_collision(
-            &game->player.collisions, player_frame_index, player_position->x, player_position->y,
-            &game->enemies.collisions, enemy_frame_index, enemy_position->x, enemy_position->y
+        if (checkCollision(
+            &game->player.collisions, playerFrameIndex, playerPosition->x, playerPosition->y,
+            &game->enemies.collisions, enemyFrameIndex, enemyPosition->x, enemyPosition->y
         )) {
-            save_game(game);
-            should_close = 1;
+            saveGame(game);
+            shouldClose = 1;
 
             return;
         }

@@ -5,43 +5,43 @@
 #include "witch_save.h"
 #include "witch_start.h"
 
-uint8_t should_close;
+uint8_t shouldClose;
 
 void init(Game *game) {
-    should_close = 0;
+    shouldClose = 0;
 
-    resources_init(game);
+    resourcesInit(game);
 
-    play_music_stream(game->resources.music[MUSIC_MAIN]);
+    smePlayMusicStream(game->resources.music[MUSIC_MAIN]);
 
-    ecs_create_space();
+    ecsCreateSpace();
 
-    init_components(&game->components);
+    initComponents(&game->components);
 
-    load_game(game);
+    loadGame(game);
 
-    init_start_screen(game);
+    initStartScreen(game);
 }
 
-void update_and_draw(Game *game, float delta_time) {
-    InputState input = input_read();
+void updateAndDraw(Game *game, float deltaTime) {
+    InputState input = inputRead();
 
-    game_update(&input, game, delta_time);
+    gameUpdate(&input, game, deltaTime);
 
     render(game);
 }
 
 void unload(Game *game) {
-    unload_texture(game->resources.sprites[SPRITESHEET_PLAYER]);
-    unload_texture(game->resources.sprites[SPRITESHEET_ENEMY]);
-    unload_texture(game->resources.sprites[BACKGROUND_URBAN]);
-    unload_texture(game->resources.sprites[BACKGROUND_CLOUDS]);
+    smeUnloadTexture(game->resources.sprites[SPRITESHEET_PLAYER]);
+    smeUnloadTexture(game->resources.sprites[SPRITESHEET_ENEMY]);
+    smeUnloadTexture(game->resources.sprites[BACKGROUND_URBAN]);
+    smeUnloadTexture(game->resources.sprites[BACKGROUND_CLOUDS]);
 
-    unload_sound(game->resources.sounds[SOUND_SHOOT]);
-    unload_sound(game->resources.sounds[SOUND_EXPLOSION]);
+    smeUnloadSound(game->resources.sounds[SOUND_SHOOT]);
+    smeUnloadSound(game->resources.sounds[SOUND_EXPLOSION]);
 
-    stop_music_stream(game->resources.music[MUSIC_MAIN]);
-    unload_music_stream(game->resources.music[MUSIC_MAIN]);
+    smeStopMusicStream(game->resources.music[MUSIC_MAIN]);
+    smeUnloadMusicStream(game->resources.music[MUSIC_MAIN]);
 
-    ecs_destroy_space();
+    ecsDestroySpace();
 }

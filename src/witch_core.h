@@ -5,6 +5,6 @@
 
 void init(Game *game);
 
-void update_and_draw(Game *game, float delta_time);
+void updateAndDraw(Game *game, float deltaTime);
 
 void unload(Game *game);

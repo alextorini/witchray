@@ -2,31 +2,31 @@
 #include "witch_core.h"
 
 int main() {
-    SmetankaInitData init_data = {
-        .window_name = "Witch Alice",
-        .window_width = WINDOW_WIDTH,
-        .window_height = WINDOW_HEIGHT,
-        .virtual_width = VIRTUAL_WIDTH,
-        .virutal_height = VIRTUAL_HEIGHT,
-        .config_flags = FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI,
+    SmeInitData initData = {
+        .windowName = "Witch Alice",
+        .windowWidth = WINDOW_WIDTH,
+        .windowHeight = WINDOW_HEIGHT,
+        .virtualWidth = VIRTUAL_WIDTH,
+        .virutalHeight = VIRTUAL_HEIGHT,
+        .configFlags = FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI,
         .fps = 60,
-        .resource_dir = "res",
+        .resourceDir = "res",
         .fullscreen = 0
     };
-    smetanka_init(&init_data);
+    smeInit(&initData);
 
     Game *game = WR_MALLOC_TYPE(Game);
 
     init(game);
 
-    while (!window_should_close() && !should_close) {
-        begin_texture_mode();
+    while (!smeShouldClose() && !shouldClose) {
+        smeBeginTextureMode();
 
-        update_and_draw(game, get_dt());
+        updateAndDraw(game, smeGetFrameTime());
 
-        end_texture_mode();
+        smeEndTextureMode();
 
-        smetanka_render();
+        smeRender();
     }
 
     unload(game);

@@ -10,41 +10,38 @@
 #define START_SCREEN_TEXT_FONT_SPACING 1
 #define START_SCREEN_TEXT "Press Any Key To Start"
 
-void init_start_screen(Game *game) {
+void initStartScreen(Game *game) {
 
-    EcsEntityHandle start_label_handle = ecs_create_entity();
+    EcsEntityHandle startLabelHandle = ecsCreateEntity();
 
-    Position start_label_position = {.x = 40, .y = 150};
-    ecs_add_component(start_label_handle, game->components[CMP_POSITION], &start_label_position);
+    Position startLabelPosition = {.x = 40, .y = 150};
+    ecsAddComponent(startLabelHandle, game->components[CMP_POSITION], &startLabelPosition);
 
     TextRender start_label_text_render = {
         .offset = {0, 0},
         .color = START_SCREEN_TEXT_COLOR,
         .font = START_SCREEN_TEXT_FONT,
-        .font_size = START_SCREEN_TEXT_FONT_SIZE,
+        .fontSize = START_SCREEN_TEXT_FONT_SIZE,
         .spacing = START_SCREEN_TEXT_FONT_SPACING,
         .text = START_SCREEN_TEXT
     };
 
-    ecs_add_component(start_label_handle, game->components[CMP_TEXT_RENDER], &start_label_text_render);
+    ecsAddComponent(startLabelHandle, game->components[CMP_TEXT_RENDER], &start_label_text_render);
 
     game->state = STATE_START_SCREEN;
 }
 
-void gameplay_start() {
-}
-
-static void start_screen_input_process(InputState *input, Game *game) {
-    if (input->any_key) {
-        state_change(game, STATE_GAMEPLAY);
+static void startScreenInputProcess(InputState *input, Game *game) {
+    if (input->anyKey) {
+        stateChange(game, STATE_GAMEPLAY);
     }
 }
 
-void start_screen_update(InputState *input, Game *game, float dt) {
-    start_screen_input_process(input, game);
+void startScreenUpdate(InputState *input, Game *game, float dt) {
+    startScreenInputProcess(input, game);
 }
 
 
-void destroy_start_screen() {
-    ecs_clear_space();
+void destroyStartScreen() {
+    ecsClearSpace();
 }

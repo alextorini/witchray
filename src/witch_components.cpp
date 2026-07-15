@@ -1,12 +1,12 @@
 #include "witch_components.h"
 
-void init_components(EcsComponentId (*cmp_ids)[CMP_COUNT]) {
-    (*cmp_ids)[CMP_ANIMATION] = ecs_register_component((char *)"Animation", sizeof(Animation));
-    (*cmp_ids)[CMP_ENEMY] = ecs_register_component((char *)"Enemy", sizeof(IsEnemy));
-    (*cmp_ids)[CMP_FIREBALL] = ecs_register_component((char *)"Fireball", sizeof(Fireball));
-    (*cmp_ids)[CMP_PARALLAX] = ecs_register_component((char *)"Parallax", sizeof(IsParallax));
-    (*cmp_ids)[CMP_POSITION] = ecs_register_component((char *)"Position", sizeof(Position));
-    (*cmp_ids)[CMP_RENDER] = ecs_register_component((char *)"Render", sizeof(Render));
-    (*cmp_ids)[CMP_TEXT_RENDER] = ecs_register_component((char *)"Text", sizeof(TextRender));
-    (*cmp_ids)[CMP_VELOCITY] = ecs_register_component((char *)"Velocity", sizeof(Velocity));
+void initComponents(EcsComponentId (*cmpIds)[CMP_COUNT]) {
+    (*cmpIds)[CMP_ANIMATION] = ecsRegisterComponent((char *)"Animation", sizeof(Animation));
+    (*cmpIds)[CMP_ENEMY] = ecsRegisterComponent((char *)"Enemy", sizeof(IsEnemy));
+    (*cmpIds)[CMP_FIREBALL] = ecsRegisterComponent((char *)"Fireball", sizeof(Fireball));
+    (*cmpIds)[CMP_PARALLAX] = ecsRegisterComponent((char *)"Parallax", sizeof(IsParallax));
+    (*cmpIds)[CMP_POSITION] = ecsRegisterComponent((char *)"Position", sizeof(Position));
+    (*cmpIds)[CMP_RENDER] = ecsRegisterComponent((char *)"Render", sizeof(Render));
+    (*cmpIds)[CMP_TEXT_RENDER] = ecsRegisterComponent((char *)"Text", sizeof(TextRender));
+    (*cmpIds)[CMP_VELOCITY] = ecsRegisterComponent((char *)"Velocity", sizeof(Velocity));
 }

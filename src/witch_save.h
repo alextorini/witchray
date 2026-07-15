@@ -2,5 +2,5 @@
 
 #include "witch_game.h"
 
-void save_game(Game *game);
-void load_game(Game *game);
+void saveGame(Game *game);
+void loadGame(Game *game);

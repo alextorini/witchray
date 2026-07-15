@@ -92,14 +92,14 @@ typedef struct {
     ResourceMap resources;
     EcsComponentId components[CMP_COUNT];
     int state;
-    float seconds_alive;
-    uint64_t enemies_killed;
+    float secondsAlive;
+    uint64_t enemiesKilled;
     uint64_t score;
     uint64_t highscore;
 } Game;
 
-extern uint8_t should_close;
+extern uint8_t shouldClose;
 
-static inline void wr_malloc(size_t size) {
+static inline void wrMalloc(size_t size) {
     malloc(size);
 }

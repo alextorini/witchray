@@ -1,5 +1,5 @@
-#include "witch_core.h"
 #include "smetanka_engine.h"
+#include "witch_core.h"
 
 int main() {
     SmetankaInitData init_data = {

@@ -27,6 +27,8 @@ void init_start_screen(Game *game) {
     };
 
     ecs_add_component(start_label_handle, game->components[CMP_TEXT_RENDER], &start_label_text_render);
+
+    game->state = STATE_START_SCREEN;
 }
 
 void gameplay_start() {

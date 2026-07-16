@@ -5,10 +5,8 @@
 #include "witch_save.h"
 #include "witch_start.h"
 
-uint8_t shouldClose;
-
 void init(Game *game) {
-    shouldClose = 0;
+    game->shouldClose = 0;
 
     resourcesInit(game);
 

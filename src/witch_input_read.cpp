@@ -1,3 +1,4 @@
+#include <cmath>
 #include "witch_input_read.h"
 
 #define GAMEPAD_DEADZONE 0.1f

@@ -11,7 +11,6 @@
 #define START_SCREEN_TEXT "Press Any Key To Start"
 
 void initStartScreen(Game *game) {
-
     EcsEntityHandle startLabelHandle = ecsCreateEntity();
 
     Position startLabelPosition = {.x = 40, .y = 150};
@@ -28,6 +27,7 @@ void initStartScreen(Game *game) {
 
     ecsAddComponent(startLabelHandle, game->components[CMP_TEXT_RENDER], &start_label_text_render);
 
+    game->score = 0;
     game->state = STATE_START_SCREEN;
 }
 

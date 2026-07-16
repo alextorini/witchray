@@ -24,8 +24,8 @@
 
 #define SKY_COLOR CLITERAL(Color){255, 128, 156, 255}
 
-#define BG_LAYER_1_SPEED 50.0f
-#define BG_LAYER_2_SPEED 150.0f
+#define BG_LAYER_1_SPEED 25.0f
+#define BG_LAYER_2_SPEED 75.0f
 
 #define PLAYER_START_POS {50, 50}
 #define PLAYER_DEFAULT_FRAME {0.0f, 0.0f, 41.0f, 27.0f}
@@ -96,6 +96,7 @@ typedef struct {
     uint64_t enemiesKilled;
     uint64_t score;
     uint64_t highscore;
+    uint8_t shouldClose;
 } Game;
 
 extern uint8_t shouldClose;

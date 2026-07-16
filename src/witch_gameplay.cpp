@@ -20,6 +20,7 @@ void gameplayUpdate(InputState *input, Game *game, float dt) {
     gameplayInputProcess(input, game, dt);
 
     systemSpawnEnemies(game, dt);
+    systemEnemiesFire(game, dt);
     systemCleanEnemies(game);
     castFireballs(game, dt);
 
@@ -28,7 +29,7 @@ void gameplayUpdate(InputState *input, Game *game, float dt) {
 
     systemMoveParallax(game->components[CMP_PARALLAX], game->components[CMP_POSITION], game->components[CMP_RENDER]);
     systemCollideEnemies(game);
-    systemFireballsCollideEnemies(game);
+    systemFireballsCollide(game);
     systemCleanFireballs(game->components[CMP_FIREBALL], game->components[CMP_POSITION]);
     game->secondsAlive += dt;
 

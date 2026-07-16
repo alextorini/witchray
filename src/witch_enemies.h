@@ -9,3 +9,5 @@ void systemSpawnEnemies(Game *game, float dt);
 void systemCleanEnemies(Game *game);
 
 void systemCollideEnemies(Game *game);
+
+void systemEnemiesFire(Game *game, float dt);

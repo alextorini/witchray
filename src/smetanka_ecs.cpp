@@ -78,7 +78,6 @@ void ecsCreateSpace() {
         ABORT();
     }
 
-
     space->entityFreeSlotsPool.capacity = INITIAL_ENTITIES_CAPACITY;
     space->entityFreeSlotsPool.count = 0;
     space->entityFreeSlotsPool.idList = ECS_MALLOC_ARR(uint32_t, space->entityFreeSlotsPool.capacity);

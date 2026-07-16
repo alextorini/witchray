@@ -2,11 +2,13 @@
 #include "ext/raylib.h"
 #include "ext/raymath.h"
 #include "smetanka_ecs.h"
+#include "witch_collisions.h"
 #include "witch_components.h"
 #include "witch_game.h"
 #include "witch_resources.h"
+#include "witch_save.h"
 
-#define FIREBALL_DEFAULT_FRAME {0.0f, 0.0f, 3.0f, 3.0f}
+#define FIREBALL_DEFAULT_FRAME {0.0f, 0.0f, 5.0f, 5.0f}
 #define FIREBALL_CAST_POSITION {38.0f, 18.0f}
 #define FIREBALL_COOLDOWN 0.4
 #define FIREBALL_SPEED 300.0
@@ -17,12 +19,12 @@ void initFireballs(Game *game) {
     initCollisionMap(FIREBALL_IMAGE_PATH, (Rectangle)FIREBALL_DEFAULT_FRAME, 10, &game->fireballs.collisions);
 }
 
-static void createFireball(Position *position, Velocity *velocity, Game *game) {
+void createFireball(Position *position, Velocity *velocity, Caster caster, Game *game) {
     EcsEntityHandle handle = ecsCreateEntity();
     ecsAddComponent(handle, game->components[CMP_POSITION], position);
     ecsAddComponent(handle, game->components[CMP_VELOCITY], velocity);
 
-    Fireball fireball = {1};
+    Fireball fireball = {.damage = 1, .caster = caster};
     ecsAddComponent(handle, game->components[CMP_FIREBALL], &fireball);
 
     Render rndr = {&game->resources.sprites[SPRITESHEET_FIREBALL], FIREBALL_DEFAULT_FRAME};
@@ -34,7 +36,7 @@ void castFireballs(Game *game, float dt) {
     if (fireballCooldown <= 0) {
         Position fireballPosition = Vector2Add(*playerPosition, (Position)FIREBALL_CAST_POSITION);
         Velocity fireballVelocity = {FIREBALL_SPEED, 0};
-        createFireball(&fireballPosition, &fireballVelocity, game);
+        createFireball(&fireballPosition, &fireballVelocity, CASTER_PLAYER, game);
         fireballCooldown = FIREBALL_COOLDOWN;
 
         return;
@@ -43,7 +45,7 @@ void castFireballs(Game *game, float dt) {
     fireballCooldown -= dt;
 }
 
-void systemFireballsCollideEnemies(Game *game) {
+void systemFireballsCollide(Game *game) {
     EcsComponentId fireballId = game->components[CMP_FIREBALL];
     EcsComponentId enemyId = game->components[CMP_ENEMY];
     EcsComponentId positionId = game->components[CMP_POSITION];
@@ -58,12 +60,31 @@ void systemFireballsCollideEnemies(Game *game) {
     EcsEntityHandle fireballHandle;
     EcsEntityHandle enemyHandle;
     while ((fireballHandle = ecsGetNextEntity(&fireballIterator)) != INVALID_HANDLE) {
+        Fireball *fireball = (Fireball *)ecsGetEntityComponent(fireballId, fireballHandle);
+
         Position *fireballPosition = (Position *)ecsGetEntityComponent(positionId, fireballHandle);
         Render *fireballRender = (Render *)ecsGetEntityComponent(renderId, fireballHandle);
         Animation *fireballAnim =
             (Animation *)ecsGetEntityComponent(game->components[CMP_ANIMATION], fireballHandle);
         uint32_t fireballFrameIndex = 0;
         if (fireballAnim) fireballFrameIndex = fireballAnim->currentFrame;
+
+        if (fireball->caster == CASTER_ENEMY) {
+            Animation *playerAnim = (Animation *)ecsGetEntityComponent(game->components[CMP_ANIMATION], game->player.handle);
+            Position *playerPos = (Position *)ecsGetEntityComponent(game->components[CMP_POSITION], game->player.handle);
+            if(checkCollision(
+                &game->fireballs.collisions, fireballFrameIndex, fireballPosition->x, fireballPosition->y,
+                &game->player.collisions, playerAnim->currentFrame, playerPos->x, playerPos->y
+            )) {
+                saveGame(game);
+                game->shouldClose = 1;
+
+                return;
+            }
+
+            continue;
+        }
+
         EcsEntityIterator enemyIterator = ecsGetEntityIterator(enemyComponentIdList, 3);
         while ((enemyHandle = ecsGetNextEntity(&enemyIterator)) != INVALID_HANDLE) {
             Position *enemyPosition = (Position *)ecsGetEntityComponent(positionId, enemyHandle);

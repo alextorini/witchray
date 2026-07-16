@@ -5,8 +5,10 @@
 
 void initFireballs(Game *game);
 
+void createFireball(Position *position, Velocity *velocity, Caster caster, Game *game);
+
 void castFireballs(Game *game, float dt);
 
-void systemFireballsCollideEnemies(Game *game);
+void systemFireballsCollide(Game *game);
 
 void systemCleanFireballs(EcsComponentId fireballId, EcsComponentId positionId);

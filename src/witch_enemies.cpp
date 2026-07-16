@@ -4,18 +4,21 @@
 #include "witch_collisions.h"
 #include "witch_components.h"
 #include "witch_enemies.h"
+#include "witch_fire.h"
 #include "witch_game.h"
 #include "witch_resources.h"
 #include "witch_save.h"
 
-#define SPAWN_COOLDOWN 0.3
-#define ENEMY_SPEED 100.0
+#define SPAWN_COOLDOWN 0.6
+#define ENEMY_SPEED 50.0
 #define MAX_ENEMIES_COUNT 10000
 #define ENEMY_WIDTH 32
 #define ENEMY_HEIGHT 32
 
 #define ENEMY_DEFAULT_FRAME {0.0f, 0.0f, 32.0f, 32.0f}
 #define ENEMY_FRAME_TIME 0.5
+
+#define ENEMY_FIREBALL_SPEED 150.0f
 
 #define ENM_MALLOC malloc
 #define ENM_MALLOC_TYPE(type) ((type *)malloc(sizeof(type)))
@@ -57,6 +60,18 @@ static EcsEntityHandle createEnemy(Position *pos, Game *game) {
 
     IsEnemy enmy = true;
     ecsAddComponent(handle, game->components[CMP_ENEMY], &enmy);
+
+    EnemyWeaponList weaponList;
+
+    weaponList.weapons[0] = {
+        .type = 1,
+        .damage = 1.0f,
+        .cooldown = 2.0f,
+    };
+
+    weaponList.weapons[1] = {0};
+    weaponList.weapons[2] = {0};
+    ecsAddComponent(handle, game->components[CMP_ENEMY_WEAPON_LIST], &weaponList);
 
     Animation animation;
     animation.set = &animationSet;
@@ -137,10 +152,53 @@ void systemCollideEnemies(Game *game) {
             &game->enemies.collisions, enemyFrameIndex, enemyPosition->x, enemyPosition->y
         )) {
             saveGame(game);
-            shouldClose = 1;
+            game->shouldClose = 1;
 
             return;
         }
+    }
+}
+
+void systemEnemiesFire(Game *game, float dt) {
+    EcsEntityHandle playerHandle = game->player.handle;
+    EcsComponentId enemyId = game->components[CMP_ENEMY];
+    EcsComponentId positionId = game->components[CMP_POSITION];
+    EcsComponentId renderId = game->components[CMP_RENDER];
+    EcsComponentId eWeaponListId = game->components[CMP_ENEMY_WEAPON_LIST];
+
+    EcsComponentId componentIdList[] = {enemyId, positionId, renderId, eWeaponListId};
+    EcsEntityIterator iterator = ecsGetEntityIterator(componentIdList, 4);
+
+    Position *playerPosition = (Position *)ecsGetEntityComponent(positionId, playerHandle);
+
+    EcsEntityHandle enemyHandle;
+    while ((enemyHandle = ecsGetNextEntity(&iterator)) != INVALID_HANDLE) {
+        Position *enemyPosition = (Position *)ecsGetEntityComponent(positionId, enemyHandle);
+        Render *enemyRender = (Render *)ecsGetEntityComponent(renderId, enemyHandle);
+        Animation *enemyAnim = (Animation *)ecsGetEntityComponent(game->components[CMP_ANIMATION], enemyHandle);
+        EnemyWeaponList *eWeaponList =
+            (EnemyWeaponList *)ecsGetEntityComponent(game->components[CMP_ENEMY_WEAPON_LIST], enemyHandle);
+
+        for (int i = 0; i < 3; i++) {
+            if (eWeaponList->weapons[i].type == 0) {
+                continue;
+            }
+
+            if (eWeaponList->weapons[i].cooldown > 0) {
+                eWeaponList->weapons[i].cooldown -= dt;
+                continue;
+            }
+
+            float x = playerPosition->x - enemyPosition->x;
+            float y = playerPosition->y - enemyPosition->y;
+            float distance = xyMagnitude(x, y);
+
+            Velocity velocity = {x / distance * ENEMY_FIREBALL_SPEED, y / distance * ENEMY_FIREBALL_SPEED};
+
+            createFireball(enemyPosition, &velocity, CASTER_ENEMY, game);
+            eWeaponList->weapons[i].cooldown = 3;
+        }
+
     }
 }
 

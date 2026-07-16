@@ -19,7 +19,7 @@ int main() {
 
     init(game);
 
-    while (!smeShouldClose() && !shouldClose) {
+    while (!smeShouldClose() && !game->shouldClose) {
         smeBeginTextureMode();
 
         updateAndDraw(game, smeGetFrameTime());

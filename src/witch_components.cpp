@@ -1,4 +1,5 @@
 #include "witch_components.h"
+#include "smetanka_ecs.h"
 
 void initComponents(EcsComponentId (*cmpIds)[CMP_COUNT]) {
     (*cmpIds)[CMP_ANIMATION] = ecsRegisterComponent((char *)"Animation", sizeof(Animation));
@@ -9,4 +10,5 @@ void initComponents(EcsComponentId (*cmpIds)[CMP_COUNT]) {
     (*cmpIds)[CMP_RENDER] = ecsRegisterComponent((char *)"Render", sizeof(Render));
     (*cmpIds)[CMP_TEXT_RENDER] = ecsRegisterComponent((char *)"Text", sizeof(TextRender));
     (*cmpIds)[CMP_VELOCITY] = ecsRegisterComponent((char *)"Velocity", sizeof(Velocity));
+    (*cmpIds)[CMP_ENEMY_WEAPON_LIST] = ecsRegisterComponent((char *)"EnemyWeaponList", sizeof(EnemyWeaponList));
 }

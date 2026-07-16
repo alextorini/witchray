@@ -9,9 +9,25 @@ typedef Vector2 Velocity;
 typedef uint8_t IsParallax;
 typedef uint8_t IsEnemy;
 
+typedef enum {
+    CASTER_PLAYER,
+    CASTER_ENEMY,
+} Caster;
+
 typedef struct {
     int32_t damage;
+    Caster caster;
 } Fireball;
+
+typedef struct {
+    int16_t type;
+    float damage;
+    float cooldown;
+} WeaponSlot;
+
+typedef struct {
+    WeaponSlot weapons[3];
+} EnemyWeaponList;
 
 typedef struct {
     Texture *spritesheet;
@@ -56,6 +72,7 @@ typedef enum {
     CMP_ENEMY,
     CMP_TEXT_RENDER,
     CMP_FIREBALL,
+    CMP_ENEMY_WEAPON_LIST,
     CMP_COUNT
 } ComponentIndex;
 

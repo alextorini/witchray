@@ -20,14 +20,31 @@ typedef struct {
 } Fireball;
 
 typedef struct {
+    float current;
+    float max;
+} Health;
+
+typedef struct {
     int16_t type;
     float damage;
     float cooldown;
 } WeaponSlot;
 
+typedef enum {
+    ENTITY_STATE_IDLE,
+    ENTITY_STATE_DYING,
+    ENTITY_STATE_DIE,
+    ENTITY_STATE_COUNT
+} EntityStateIndex;
+
 typedef struct {
     WeaponSlot weapons[3];
 } EnemyWeaponList;
+
+typedef struct {
+    EntityStateIndex id;
+    float cooldown;
+} EntityState;
 
 typedef struct {
     Texture *spritesheet;
@@ -73,6 +90,8 @@ typedef enum {
     CMP_TEXT_RENDER,
     CMP_FIREBALL,
     CMP_ENEMY_WEAPON_LIST,
+    CMP_ENTITY_STATE,
+    CMP_HEALTH,
     CMP_COUNT
 } ComponentIndex;
 

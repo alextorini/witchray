@@ -1,5 +1,7 @@
 #include <stdint.h>
 
+#include "smetanka_ecs.h"
+#include "witch_components.h"
 #include "witch_fire.h"
 #include "witch_game.h"
 #include "witch_player.h"
@@ -20,6 +22,9 @@ EcsEntityHandle initPlayer(Game *game) {
 
     Velocity velocity = {0.0, 0.0};
     ecsAddComponent(handle, game->components[CMP_VELOCITY], &velocity);
+
+    Health health = {.current = PLAYER_MAX_HEALTH, .max = PLAYER_MAX_HEALTH};
+    ecsAddComponent(handle, game->components[CMP_HEALTH], &handle);
 
     Render render = {&game->resources.sprites[SPRITESHEET_PLAYER], PLAYER_DEFAULT_FRAME};
     ecsAddComponent(handle, game->components[CMP_RENDER], &render);

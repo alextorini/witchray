@@ -11,4 +11,6 @@ void initComponents(EcsComponentId (*cmpIds)[CMP_COUNT]) {
     (*cmpIds)[CMP_TEXT_RENDER] = ecsRegisterComponent((char *)"Text", sizeof(TextRender));
     (*cmpIds)[CMP_VELOCITY] = ecsRegisterComponent((char *)"Velocity", sizeof(Velocity));
     (*cmpIds)[CMP_ENEMY_WEAPON_LIST] = ecsRegisterComponent((char *)"EnemyWeaponList", sizeof(EnemyWeaponList));
+    (*cmpIds)[CMP_ENTITY_STATE] = ecsRegisterComponent((char *)"EntityState", sizeof(EntityState));
+    (*cmpIds)[CMP_HEALTH] = ecsRegisterComponent((char *)"Health", sizeof(Health));
 }

@@ -6,8 +6,15 @@ void systemMoveEntities(EcsComponentId positionId, EcsComponentId velocityId, fl
 
 void systemMoveParallax(EcsComponentId parallaxId, EcsComponentId positionId, EcsComponentId renderId);
 
-void systemAnimateEntities(EcsComponentId animationId, EcsComponentId renderId, float dt);
+void systemAnimateEntities(
+    EcsComponentId animation_id,
+    EcsComponentId render_id,
+    EcsComponentId entityStateComponentId,
+    float delta_time
+);
 
-void systemRenderEntities(EcsComponentId positionId, EcsComponentId renderId);
+void systemRenderEntities(EcsComponentId positionId, EcsComponentId renderId, EcsComponentId entityStateComponentId);
 
 void systemRenderText(EcsComponentId positionId, EcsComponentId textRenderId);
+
+void systemDestroyEntities(EcsComponentId entityStateComponentId);

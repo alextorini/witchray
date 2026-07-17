@@ -4,7 +4,11 @@
 #include "witch_systems.h"
 
 void render(Game *game) {
-    systemRenderEntities(game->components[CMP_POSITION], game->components[CMP_RENDER]);
+    systemRenderEntities(
+        game->components[CMP_POSITION],
+        game->components[CMP_RENDER],
+        game->components[CMP_ENTITY_STATE]
+    );
     systemRenderText(game->components[CMP_POSITION], game->components[CMP_TEXT_RENDER]);
     smeDrawTextF(
         game->resources.fonts[FONT_MAIN],

@@ -34,12 +34,22 @@ void systemMoveParallax(EcsComponentId parallaxId, EcsComponentId positionId, Ec
     }
 }
 
-void systemAnimateEntities(EcsComponentId animation_id, EcsComponentId render_id, float delta_time) {
+void systemAnimateEntities(
+    EcsComponentId animation_id,
+    EcsComponentId render_id,
+    EcsComponentId entityStateComponentId,
+    float delta_time
+) {
     EcsComponentId componentIdList[] = {animation_id, render_id};
     EcsEntityIterator iterator = ecsGetEntityIterator(componentIdList, 2);
 
     EcsEntityHandle entityHandle;
     while ((entityHandle = ecsGetNextEntity(&iterator)) != INVALID_HANDLE) {
+        EntityState *entityState = (EntityState *)ecsGetEntityComponent(entityStateComponentId, entityHandle);
+        if (entityState && entityState->id == ENTITY_STATE_DIE) {
+            continue;
+        }
+
         Animation *animation = (Animation*)ecsGetEntityComponent(animation_id, entityHandle);
         Render *render = (Render *)ecsGetEntityComponent(render_id, entityHandle);
 
@@ -63,12 +73,17 @@ void systemAnimateEntities(EcsComponentId animation_id, EcsComponentId render_id
     }
 }
 
-void systemRenderEntities(EcsComponentId positionId, EcsComponentId renderId) {
+void systemRenderEntities(EcsComponentId positionId, EcsComponentId renderId, EcsComponentId entityStateComponentId) {
     EcsComponentId componentIdList[] = {positionId, renderId};
     EcsEntityIterator iterator = ecsGetEntityIterator(componentIdList, 2);
 
     EcsEntityHandle entityHandle;
     while ((entityHandle = ecsGetNextEntity(&iterator)) != INVALID_HANDLE) {
+        EntityState *entityState = (EntityState *)ecsGetEntityComponent(entityStateComponentId, entityHandle);
+        if (entityState && entityState->id == ENTITY_STATE_DIE) {
+            continue;
+        }
+
         Position *position = (Position*)ecsGetEntityComponent(positionId, entityHandle);
         Render *render = (Render *)ecsGetEntityComponent(renderId, entityHandle);
 
@@ -93,5 +108,25 @@ void systemRenderText(EcsComponentId positionId, EcsComponentId textRenderId) {
             textRender->spacing,
             textRender->color
         );
+    }
+}
+
+void systemDestroyEntities(EcsComponentId entityStateComponentId) {
+    EcsComponentId componentIdList[] = {entityStateComponentId};
+    EcsEntityIterator iterator = ecsGetEntityIterator(componentIdList, 1);
+
+    EcsEntityHandle entityHandle;
+    while ((entityHandle = ecsGetNextEntity(&iterator)) != INVALID_HANDLE) {
+        EntityState *entityState = (EntityState *)ecsGetEntityComponent(entityStateComponentId, entityHandle);
+        if (entityState->id == ENTITY_STATE_DYING) {
+            entityState->cooldown -= smeGetFrameTime();
+            if (entityState->cooldown <= 0.0f) {
+                entityState->id = ENTITY_STATE_DIE;
+            }
+        }
+
+        if (entityState->id == ENTITY_STATE_DIE) {
+            ecsDestroyEntity(entityHandle);
+        }
     }
 }

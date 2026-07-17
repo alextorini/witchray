@@ -11,4 +11,4 @@ void castFireballs(Game *game, float dt);
 
 void systemFireballsCollide(Game *game);
 
-void systemCleanFireballs(EcsComponentId fireballId, EcsComponentId positionId);
+void systemCleanFireballs(EcsComponentId fireballId, EcsComponentId positionId, EcsComponentId entityStateComponentId);

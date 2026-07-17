@@ -16,6 +16,7 @@
 static float fireballCooldown = 0.0;
 
 void initFireballs(Game *game) {
+    game->fireballs.deathCooldown = 0.0f;
     initCollisionMap(FIREBALL_IMAGE_PATH, (Rectangle)FIREBALL_DEFAULT_FRAME, 10, &game->fireballs.collisions);
 }
 
@@ -29,6 +30,9 @@ void createFireball(Position *position, Velocity *velocity, Caster caster, Game 
 
     Render rndr = {&game->resources.sprites[SPRITESHEET_FIREBALL], FIREBALL_DEFAULT_FRAME};
     ecsAddComponent(handle, game->components[CMP_RENDER], &rndr);
+
+    EntityState state = {.id = ENTITY_STATE_IDLE, .cooldown = 0.0f};
+    ecsAddComponent(handle, game->components[CMP_ENTITY_STATE], &state);
 }
 
 void castFireballs(Game *game, float dt) {
@@ -60,6 +64,12 @@ void systemFireballsCollide(Game *game) {
     EcsEntityHandle fireballHandle;
     EcsEntityHandle enemyHandle;
     while ((fireballHandle = ecsGetNextEntity(&fireballIterator)) != INVALID_HANDLE) {
+        EntityState *fireballState =
+            (EntityState *)ecsGetEntityComponent(game->components[CMP_ENTITY_STATE], fireballHandle);
+        if (fireballState->id != ENTITY_STATE_IDLE) {
+            continue;
+        }
+
         Fireball *fireball = (Fireball *)ecsGetEntityComponent(fireballId, fireballHandle);
 
         Position *fireballPosition = (Position *)ecsGetEntityComponent(positionId, fireballHandle);
@@ -87,6 +97,12 @@ void systemFireballsCollide(Game *game) {
 
         EcsEntityIterator enemyIterator = ecsGetEntityIterator(enemyComponentIdList, 3);
         while ((enemyHandle = ecsGetNextEntity(&enemyIterator)) != INVALID_HANDLE) {
+            EntityState *enemyState =
+                (EntityState *)ecsGetEntityComponent(game->components[CMP_ENTITY_STATE], enemyHandle);
+            if (enemyState->id != ENTITY_STATE_IDLE) {
+                continue;
+            }
+
             Position *enemyPosition = (Position *)ecsGetEntityComponent(positionId, enemyHandle);
             Render *enemyRender = (Render *)ecsGetEntityComponent(renderId, enemyHandle);
             Animation *enemyAnim = (Animation *)ecsGetEntityComponent(game->components[CMP_ANIMATION], enemyHandle);
@@ -100,25 +116,39 @@ void systemFireballsCollide(Game *game) {
                 &game->fireballs.collisions, fireballFrameIndex, fireballPosition->x, fireballPosition->y,
                 &game->enemies.collisions, enemyFrameIndex, enemyPosition->x, enemyPosition->y
             )) {
-                // TODO: implement delayed destroy
-                ecsDestroyEntity(enemyHandle);
-                ecsDestroyEntity(fireballHandle);
+                enemyState->id = ENTITY_STATE_DYING;
+                enemyState->cooldown = game->enemies.deathCooldown;
+
+                enemyAnim->currentClip = 1;
+                enemyAnim->currentFrame = 5;
+                enemyAnim->timer = 0.0;
+
+                fireballState->id = ENTITY_STATE_DIE;
+
                 game->enemiesKilled++;
+
                 break;
             }
         }
     }
 }
 
-void systemCleanFireballs(EcsComponentId fireballId, EcsComponentId positionId) {
+void systemCleanFireballs(EcsComponentId fireballId, EcsComponentId positionId, EcsComponentId entityStateComponentId) {
     EcsComponentId componentIdList[] = {fireballId, positionId};
     EcsEntityIterator iterator = ecsGetEntityIterator(componentIdList, 2);
     EcsEntityHandle entityHandle;
     while ((entityHandle = ecsGetNextEntity(&iterator)) != INVALID_HANDLE) {
+        EntityState *fireballState = (EntityState *)ecsGetEntityComponent(entityStateComponentId, entityHandle);
+        if (fireballState->id == ENTITY_STATE_DIE) {
+            continue;
+        }
+
         Position *position = (Position *)ecsGetEntityComponent(positionId, entityHandle);
 
-        if (position->x > VIRTUAL_WIDTH) {
-            ecsDestroyEntity(entityHandle);
+        if (position->x > VIRTUAL_WIDTH || position->x < -(Rectangle)FIREBALL_DEFAULT_FRAME.width
+            || position->y > VIRTUAL_HEIGHT || position->y < -(Rectangle)FIREBALL_DEFAULT_FRAME.height
+        ) {
+            fireballState->id = ENTITY_STATE_DIE;
         }
     }
 }

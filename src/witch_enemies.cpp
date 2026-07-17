@@ -9,14 +9,17 @@
 #include "witch_resources.h"
 #include "witch_save.h"
 
-#define SPAWN_COOLDOWN 0.6
-#define ENEMY_SPEED 50.0
+#define SPAWN_COOLDOWN 0.6f
+#define ENEMY_SPEED 50.0f
 #define MAX_ENEMIES_COUNT 10000
 #define ENEMY_WIDTH 32
 #define ENEMY_HEIGHT 32
 
 #define ENEMY_DEFAULT_FRAME {0.0f, 0.0f, 32.0f, 32.0f}
-#define ENEMY_FRAME_TIME 0.5
+#define ENEMY_IDLE_FRAME_TIME 0.5f
+#define ENEMY_DYING_FRAME_TIME 0.05f
+
+#define ENEMY_MAX_HEALTH 3.0f
 
 #define ENEMY_FIREBALL_SPEED 150.0f
 
@@ -27,23 +30,32 @@
 #define ENM_CALLOC_TYPE(type, count) ((type *)calloc(sizeof(type), (count)))
 #define ENM_FREE free
 
-static uint16_t enemiesCount;
 static float spawnCooldown;
 
 static AnimationClip idleAnimation;
+static AnimationClip deathAnimation;
+
 static AnimationSet animationSet;
 
 void initEnemyFactory(Game *game) {
-    enemiesCount = 0;
     spawnCooldown = SPAWN_COOLDOWN;
 
     idleAnimation.startFrame = 0;
     idleAnimation.endFrame = 1;
-    idleAnimation.frameTime = ENEMY_FRAME_TIME;
+    idleAnimation.frameTime = ENEMY_IDLE_FRAME_TIME;
     idleAnimation.loop = 1;
-    animationSet.clips = ENM_MALLOC_TYPE(AnimationClip);
-    animationSet.count = 1;
+
+    deathAnimation.startFrame = 5;
+    deathAnimation.endFrame = 9;
+    deathAnimation.frameTime = ENEMY_DYING_FRAME_TIME;
+    deathAnimation.loop = 0;
+
+    animationSet.count = 2;
+    animationSet.clips = ENM_MALLOC_ARR(AnimationClip, animationSet.count);
     animationSet.clips[0] = idleAnimation;
+    animationSet.clips[1] = deathAnimation;
+
+    game->enemies.deathCooldown = (deathAnimation.endFrame - deathAnimation.startFrame + 1) * ENEMY_DYING_FRAME_TIME;
 
     initCollisionMap(ENEMY_IMAGE_PATH, (Rectangle)ENEMY_DEFAULT_FRAME, 10, &game->enemies.collisions);
 }
@@ -60,6 +72,12 @@ static EcsEntityHandle createEnemy(Position *pos, Game *game) {
 
     IsEnemy enmy = true;
     ecsAddComponent(handle, game->components[CMP_ENEMY], &enmy);
+
+    Health health = {.current = ENEMY_MAX_HEALTH, .max = ENEMY_MAX_HEALTH};
+    ecsAddComponent(handle, game->components[CMP_HEALTH], &health);
+
+    EntityState state = {.id = ENTITY_STATE_IDLE, .cooldown = 0};
+    ecsAddComponent(handle, game->components[CMP_ENTITY_STATE], &state);
 
     EnemyWeaponList weaponList;
 
@@ -80,8 +98,6 @@ static EcsEntityHandle createEnemy(Position *pos, Game *game) {
     animation.timer = 0.0;
     ecsAddComponent(handle, game->components[CMP_ANIMATION], &animation);
 
-    enemiesCount++;
-
     return handle;
 }
 
@@ -92,7 +108,7 @@ void systemSpawnEnemies(Game *game, float dt) {
         return;
     }
 
-    if (enemiesCount >= MAX_ENEMIES_COUNT) {
+    if (ecsGetComponentCount(game->components[CMP_ENEMY]) >= MAX_ENEMIES_COUNT) {
         return;
     }
 
@@ -138,6 +154,11 @@ void systemCollideEnemies(Game *game) {
 
     EcsEntityHandle enemyHandle;
     while ((enemyHandle = ecsGetNextEntity(&iterator)) != INVALID_HANDLE) {
+        EntityState *enemyState = (EntityState *)ecsGetEntityComponent(game->components[CMP_ENTITY_STATE], enemyHandle);
+        if (enemyState->id != ENTITY_STATE_IDLE) {
+            continue;
+        }
+
         Position *enemyPosition = (Position *)ecsGetEntityComponent(positionId, enemyHandle);
         Render *enemyRender = (Render *)ecsGetEntityComponent(renderId, enemyHandle);
         Animation *enemyAnim = (Animation *)ecsGetEntityComponent(game->components[CMP_ANIMATION], enemyHandle);
@@ -173,6 +194,11 @@ void systemEnemiesFire(Game *game, float dt) {
 
     EcsEntityHandle enemyHandle;
     while ((enemyHandle = ecsGetNextEntity(&iterator)) != INVALID_HANDLE) {
+        EntityState *enemyState = (EntityState *)ecsGetEntityComponent(game->components[CMP_ENTITY_STATE], enemyHandle);
+        if (enemyState->id != ENTITY_STATE_IDLE) {
+            continue;
+        }
+
         Position *enemyPosition = (Position *)ecsGetEntityComponent(positionId, enemyHandle);
         Render *enemyRender = (Render *)ecsGetEntityComponent(renderId, enemyHandle);
         Animation *enemyAnim = (Animation *)ecsGetEntityComponent(game->components[CMP_ANIMATION], enemyHandle);

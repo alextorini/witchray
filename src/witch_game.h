@@ -32,6 +32,8 @@
 #define PLAYER_SPEED 3.0f
 #define PLAYER_IDLE_ANIM_SPEED 0.25f
 
+#define PLAYER_MAX_HEALTH 10.0f
+
 #define WR_MALLOC malloc
 #define WR_MALLOC_TYPE(type) ((type *)malloc(sizeof(type)))
 #define WR_MALLOC_ARR(type, count) ((type *)malloc(sizeof(type) * (count)))
@@ -41,15 +43,18 @@
 
 typedef struct {
     FrameCollisionMap collisions;
+    float deathCooldown;
 } Enemies;
 
 typedef struct {
     FrameCollisionMap collisions;
+    float deathCooldown;
 } Fireballs;
 
 typedef struct {
     EcsEntityHandle handle;
     FrameCollisionMap collisions;
+    float deathCooldown;
 } Player;
 
 typedef enum {
@@ -57,6 +62,7 @@ typedef enum {
     SOUND_EXPLOSION,
     SOUND_COUNT
 } SoundIndex;
+
 typedef enum {
     MUSIC_MAIN,
     MUSIC_COUNT

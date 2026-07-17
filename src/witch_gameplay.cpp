@@ -1,3 +1,4 @@
+#include "witch_components.h"
 #include "witch_enemies.h"
 #include "witch_gameplay.h"
 #include "witch_fire.h"
@@ -25,12 +26,27 @@ void gameplayUpdate(InputState *input, Game *game, float dt) {
     castFireballs(game, dt);
 
     systemMoveEntities(game->components[CMP_POSITION], game->components[CMP_VELOCITY], dt);
-    systemAnimateEntities(game->components[CMP_ANIMATION], game->components[CMP_RENDER], dt);
+
+    systemAnimateEntities(
+        game->components[CMP_ANIMATION],
+        game->components[CMP_RENDER],
+        game->components[CMP_RENDER],
+        dt
+    );
 
     systemMoveParallax(game->components[CMP_PARALLAX], game->components[CMP_POSITION], game->components[CMP_RENDER]);
+
     systemCollideEnemies(game);
+
     systemFireballsCollide(game);
-    systemCleanFireballs(game->components[CMP_FIREBALL], game->components[CMP_POSITION]);
+    systemCleanFireballs(
+        game->components[CMP_FIREBALL],
+        game->components[CMP_POSITION],
+        game->components[CMP_ENTITY_STATE]
+    );
+
+    systemDestroyEntities(game->components[CMP_ENTITY_STATE]);
+
     game->secondsAlive += dt;
 
     game->score = (uint64_t)(game->secondsAlive) + game->enemiesKilled * 10;

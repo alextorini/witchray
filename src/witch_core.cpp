@@ -1,4 +1,6 @@
+#include "ext/raylib.h"
 #include "smetanka_engine.h"
+#include "witch_game.h"
 #include "witch_game_update.h"
 #include "witch_render.h"
 #include "witch_resources.h"
@@ -21,12 +23,12 @@ void init(Game *game) {
     initStartScreen(game);
 }
 
-void updateAndDraw(Game *game, float deltaTime) {
+void updateAndRender(Game *game, RenderTexture *screen, float deltaTime) {
     InputState input = inputRead();
 
     gameUpdate(&input, game, deltaTime);
 
-    render(game);
+    render(game, screen);
 }
 
 void unload(Game *game) {

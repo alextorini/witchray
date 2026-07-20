@@ -113,8 +113,8 @@ void systemSpawnEnemies(Game *game, float dt) {
     }
 
     Position pos;
-    pos.x = VIRTUAL_WIDTH;
-    pos.y = rand() % (VIRTUAL_HEIGHT - ENEMY_HEIGHT + 1);
+    pos.x = PLAYSCREEN_WIDTH;
+    pos.y = rand() % (PLAYSCREEN_HEIGHT - ENEMY_HEIGHT + 1);
 
     createEnemy(&pos, game);
 

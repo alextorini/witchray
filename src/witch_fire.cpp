@@ -145,8 +145,8 @@ void systemCleanFireballs(EcsComponentId fireballId, EcsComponentId positionId, 
 
         Position *position = (Position *)ecsGetEntityComponent(positionId, entityHandle);
 
-        if (position->x > VIRTUAL_WIDTH || position->x < -(Rectangle)FIREBALL_DEFAULT_FRAME.width
-            || position->y > VIRTUAL_HEIGHT || position->y < -(Rectangle)FIREBALL_DEFAULT_FRAME.height
+        if (position->x > PLAYSCREEN_WIDTH || position->x < -(Rectangle)FIREBALL_DEFAULT_FRAME.width
+            || position->y > PLAYSCREEN_HEIGHT || position->y < -(Rectangle)FIREBALL_DEFAULT_FRAME.height
         ) {
             fireballState->id = ENTITY_STATE_DIE;
         }

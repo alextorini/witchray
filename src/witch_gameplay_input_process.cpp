@@ -63,13 +63,13 @@ void gameplayInputProcess(InputState *input, Game *game, float dt) {
             velocity->y = 0;
         }
 
-        if (position->x + render->frame.width > VIRTUAL_WIDTH - 1) {
-            position->x = VIRTUAL_WIDTH - render->frame.width - 1;
+        if (position->x + render->frame.width > PLAYSCREEN_WIDTH - 1) {
+            position->x = PLAYSCREEN_WIDTH - render->frame.width - 1;
             velocity->x = 0;
         }
 
-        if (position->y + render->frame.height > VIRTUAL_HEIGHT - 1) {
-            position->y = VIRTUAL_HEIGHT - render->frame.height - 1;
+        if (position->y + render->frame.height > PLAYSCREEN_HEIGHT - 1) {
+            position->y = PLAYSCREEN_HEIGHT - render->frame.height - 1;
             velocity->y = 0;
         }
 }

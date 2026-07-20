@@ -9,8 +9,14 @@
 
 #define GAME_VERSION 0
 
-#define VIRTUAL_WIDTH 640
+constexpr int VIRTUAL_WIDTH = 640;
 #define VIRTUAL_HEIGHT 360
+
+#define PLAYSCREEN_WIDTH 640
+#define PLAYSCREEN_HEIGHT 360
+
+#define UI_WIDTH 640
+#define UI_HEIGHT 40
 
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 720

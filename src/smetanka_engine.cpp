@@ -4,12 +4,12 @@
 #include <stdio.h>
 
 typedef struct {
-    RenderTexture2D virtualScreen;
+    RenderTexture virtualScreen;
     Rectangle sourceRec;
     Rectangle destRec;
 } Screen;
 
-static Screen screen;
+typedef RenderTexture RenderTexture;
 
 void smeInit(SmeInitData *initData) {
     SetConfigFlags(initData->configFlags);
@@ -21,12 +21,6 @@ void smeInit(SmeInitData *initData) {
     InitAudioDevice();
 
     SearchAndSetResourceDir(initData->resourceDir);
-
-    screen.virtualScreen = LoadRenderTexture(initData->virtualWidth, initData->virutalHeight);
-    screen.sourceRec = (Rectangle)
-        {0.0f, 0.0f, (float)screen.virtualScreen.texture.width, (float)-screen.virtualScreen.texture.height};
-    screen.destRec = (Rectangle)
-        {0.0f, 0.0f, (float)GetScreenWidth(), (float)GetScreenHeight()};
 }
 
 bool smeShouldClose() {
@@ -38,24 +32,27 @@ void smeClose() {
     CloseWindow();
 }
 
-void smeBeginTextureMode() {
-    BeginTextureMode(screen.virtualScreen);
+RenderTexture SmeLoadRenderTexture(int width, int height) {
+   return LoadRenderTexture(width, height);
+}
+
+void smeBeginTextureMode(RenderTexture texture) {
+    BeginTextureMode(texture);
 }
 
 void smeEndTextureMode() {
     EndTextureMode();
 }
 
-void smeRender() {
-    BeginDrawing();
+void smeRenderVirtualScreen(RenderTexture *virtualScreen, Rectangle *sourceRec, Rectangle *destRec) {
 
     if (IsKeyPressed(KEY_F)) {
         ToggleFullscreen();
-        screen.destRec.width = (float)GetScreenWidth();
-        screen.destRec.height = (float)GetScreenHeight();
+        destRec->width = (float)GetScreenWidth();
+        destRec->height = (float)GetScreenHeight();
     }
 
-    DrawTexturePro(screen.virtualScreen.texture, screen.sourceRec, screen.destRec,
+    DrawTexturePro(virtualScreen->texture, *sourceRec, *destRec,
                    CLITERAL(Vector2){0, 0}, 0.0f, WHITE);
 
     EndDrawing();

@@ -2,4 +2,4 @@
 
 #include "witch_game.h"
 
-void render(Game *game);
+void render(Game *game, RenderTexture *screen);

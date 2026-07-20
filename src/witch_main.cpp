@@ -1,13 +1,12 @@
 #include "smetanka_engine.h"
 #include "witch_core.h"
+#include "witch_game.h"
 
 int main() {
     SmeInitData initData = {
-        .windowName = "Witch Alice",
+        .windowName = "Retro Witch",
         .windowWidth = WINDOW_WIDTH,
         .windowHeight = WINDOW_HEIGHT,
-        .virtualWidth = VIRTUAL_WIDTH,
-        .virutalHeight = VIRTUAL_HEIGHT,
         .configFlags = FLAG_VSYNC_HINT | FLAG_WINDOW_HIGHDPI,
         .fps = 60,
         .resourceDir = "res",
@@ -19,14 +18,18 @@ int main() {
 
     init(game);
 
+
+    RenderTexture virtualScreen = SmeLoadRenderTexture(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
+    Rectangle virtualScreenRec = (Rectangle)
+        {0.0f, 0.0f, (float)virtualScreen.texture.width, (float)-virtualScreen.texture.height};
+    Rectangle windowRec = (Rectangle){0.0f, 0.0f, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT};
+
     while (!smeShouldClose() && !game->shouldClose) {
-        smeBeginTextureMode();
+        smeBeginTextureMode(virtualScreen);
 
-        updateAndDraw(game, smeGetFrameTime());
+        updateAndRender(game, &virtualScreen, smeGetFrameTime());
 
-        smeEndTextureMode();
-
-        smeRender();
+        smeRenderVirtualScreen(&virtualScreen, &virtualScreenRec, &windowRec);
     }
 
     unload(game);

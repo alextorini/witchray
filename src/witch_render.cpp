@@ -3,13 +3,18 @@
 #include "witch_render.h"
 #include "witch_systems.h"
 
-void render(Game *game) {
+void render(Game *game, RenderTexture *screen) {
+    smeBeginTextureMode(*screen);
+
+    ClearBackground(SKY_COLOR);
+
     systemRenderEntities(
         game->components[CMP_POSITION],
         game->components[CMP_RENDER],
         game->components[CMP_ENTITY_STATE]
     );
     systemRenderText(game->components[CMP_POSITION], game->components[CMP_TEXT_RENDER]);
+
     smeDrawTextF(
         game->resources.fonts[FONT_MAIN],
         CLITERAL(Position){3, 23},
@@ -25,4 +30,6 @@ void render(Game *game) {
         game->resources.fonts[FONT_MAIN],
         CLITERAL(Position){3, 63}, 9, 1, DARKGREEN, "%d", ecsGetComponentCount(game->components[CMP_FIREBALL])
     );
+
+    smeEndTextureMode();
 }

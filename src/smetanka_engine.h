@@ -29,10 +29,12 @@ void smeInit(SmeInitData *data);
 bool smeShouldClose();
 void smeClose();
 
-void smeBeginTextureMode();
+RenderTexture SmeLoadRenderTexture(int width, int height);
+
+void smeBeginTextureMode(RenderTexture texture);
 void smeEndTextureMode();
 
-void smeRender();
+void smeRenderVirtualScreen(RenderTexture *virtualScreen, Rectangle *sourceRec, Rectangle *destRec);
 
 float smeGetFrameTime();
 

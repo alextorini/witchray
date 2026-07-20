@@ -1,10 +1,14 @@
 #include <stdint.h>
 
+#include "ext/raylib.h"
 #include "smetanka_ecs.h"
 #include "witch_systems.h"
 #include "smetanka_engine.h"
 #include "smetanka_math.h"
 #include "witch_components.h"
+#include "witch_game.h"
+#include "witch_save.h"
+#include "witch_state.h"
 
 void systemMoveEntities(EcsComponentId positionId, EcsComponentId velocityId, float dt) {
     EcsComponentId componentIdList[] = {positionId, velocityId};
@@ -73,7 +77,7 @@ void systemAnimateEntities(
     }
 }
 
-void systemRenderEntities(EcsComponentId positionId, EcsComponentId renderId, EcsComponentId entityStateComponentId) {
+void systemRenderEntities(EcsComponentId positionId, EcsComponentId renderId, EcsComponentId entityStateComponentId, ResourceMap *resources) {
     EcsComponentId componentIdList[] = {positionId, renderId};
     EcsEntityIterator iterator = ecsGetEntityIterator(componentIdList, 2);
 
@@ -87,7 +91,24 @@ void systemRenderEntities(EcsComponentId positionId, EcsComponentId renderId, Ec
         Position *position = (Position*)ecsGetEntityComponent(positionId, entityHandle);
         Render *render = (Render *)ecsGetEntityComponent(renderId, entityHandle);
 
+        float flashColor[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+        SetShaderValue(
+            resources->shaders.damageFlash.shader,
+            resources->shaders.damageFlash.colorLoc,
+            flashColor,
+            SHADER_UNIFORM_VEC4
+        );
+
+        float flashStrength = (entityState)  ? entityState->cooldown * 3 : 0.0f;
+        SetShaderValue(
+            resources->shaders.damageFlash.shader,
+            resources->shaders.damageFlash.strengthLoc,
+            &flashStrength,
+            SHADER_UNIFORM_FLOAT
+        );
+        BeginShaderMode(resources->shaders.damageFlash.shader);
         smeDrawTextureRec(*render->spritesheet, render->frame, *position, WHITE);
+        EndShaderMode();
     }
 }
 
@@ -111,21 +132,31 @@ void systemRenderText(EcsComponentId positionId, EcsComponentId textRenderId) {
     }
 }
 
-void systemDestroyEntities(EcsComponentId entityStateComponentId) {
+void systemProcessEntityStates(EcsComponentId entityStateComponentId, Game *game) {
     EcsComponentId componentIdList[] = {entityStateComponentId};
     EcsEntityIterator iterator = ecsGetEntityIterator(componentIdList, 1);
 
     EcsEntityHandle entityHandle;
     while ((entityHandle = ecsGetNextEntity(&iterator)) != INVALID_HANDLE) {
         EntityState *entityState = (EntityState *)ecsGetEntityComponent(entityStateComponentId, entityHandle);
+        entityState->cooldown -= smeGetFrameTime();
+        if (entityState->cooldown < 0.0f) {
+            entityState->cooldown = 0.0f;
+        };
+
         if (entityState->id == ENTITY_STATE_DYING) {
-            entityState->cooldown -= smeGetFrameTime();
             if (entityState->cooldown <= 0.0f) {
                 entityState->id = ENTITY_STATE_DIE;
             }
         }
 
         if (entityState->id == ENTITY_STATE_DIE) {
+            if (entityHandle == game->player.handle) {
+                saveGame(game);
+                stateChange(game, STATE_START_SCREEN);
+                return;
+            }
+
             ecsDestroyEntity(entityHandle);
         }
     }

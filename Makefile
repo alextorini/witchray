@@ -57,8 +57,7 @@ build-web:
 		-DPLATFORM_WEB \
 		-s USE_GLFW=3 \
 		-s ASYNCIFY \
-		-sALLOW_MEMORY_GROWTH=0 -sINITIAL_MEMORY=67108864 \
-		-s TOTAL_MEMORY=134217728 \
+		-sALLOW_MEMORY_GROWTH=0 -sINITIAL_MEMORY=128MB \
 		--shell-file ~/raylib/raylib/src/minshell.html \
 		--preload-file $(RES_DIR)
 	@echo "[✓ Web build complete: open http://localhost:8000/build/web in browser after 'make run-web']"

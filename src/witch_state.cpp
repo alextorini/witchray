@@ -15,6 +15,21 @@ void stateChange(Game *game, int state) {
             gameplayInit(game);
 
             game->state = state;
+
+            break;
+        }
+        case STATE_GAMEPLAY: {
+            if (state != STATE_START_SCREEN) {
+                ABORT();
+            }
+
+            gameplayDestroy(game);
+
+            startScreenInit(game);
+
+            game->state = state;
+
+            break;
         }
     }
 

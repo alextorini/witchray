@@ -18,7 +18,6 @@ int main() {
 
     init(game);
 
-
     RenderTexture virtualScreen = SmeLoadRenderTexture(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
     Rectangle virtualScreenRec = (Rectangle)
         {0.0f, 0.0f, (float)virtualScreen.texture.width, (float)-virtualScreen.texture.height};

@@ -10,7 +10,7 @@
 #define START_SCREEN_TEXT_FONT_SPACING 1
 #define START_SCREEN_TEXT "Press Any Key To Start"
 
-void initStartScreen(Game *game) {
+void startScreenInit(Game *game) {
     EcsEntityHandle startLabelHandle = ecsCreateEntity();
 
     Position startLabelPosition = {.x = 40, .y = 150};

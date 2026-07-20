@@ -1,6 +1,7 @@
 #pragma once
 
 #include "smetanka_ecs.h"
+#include "witch_game.h"
 
 void systemMoveEntities(EcsComponentId positionId, EcsComponentId velocityId, float dt);
 
@@ -13,8 +14,9 @@ void systemAnimateEntities(
     float delta_time
 );
 
-void systemRenderEntities(EcsComponentId positionId, EcsComponentId renderId, EcsComponentId entityStateComponentId);
+void systemRenderEntities(EcsComponentId positionId, EcsComponentId renderId,
+                          EcsComponentId entityStateComponentId, ResourceMap *resources);
 
 void systemRenderText(EcsComponentId positionId, EcsComponentId textRenderId);
 
-void systemDestroyEntities(EcsComponentId entityStateComponentId);
+void systemProcessEntityStates(EcsComponentId entityStateComponentId, Game *game);

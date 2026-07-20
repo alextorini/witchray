@@ -45,7 +45,8 @@ void gameplayUpdate(InputState *input, Game *game, float dt) {
         game->components[CMP_ENTITY_STATE]
     );
 
-    systemDestroyEntities(game->components[CMP_ENTITY_STATE]);
+    systemProcessEntityStates(game->components[CMP_ENTITY_STATE], game);
+    if (game->state == STATE_START_SCREEN) return;
 
     game->secondsAlive += dt;
 
@@ -55,4 +56,5 @@ void gameplayUpdate(InputState *input, Game *game, float dt) {
 }
 
 void gameplayDestroy(Game *game) {
+    ecsClearSpace();
 }

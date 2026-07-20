@@ -66,6 +66,7 @@ typedef struct {
 typedef enum {
     SOUND_SHOOT,
     SOUND_EXPLOSION,
+    SOUND_PLAYER_DEATH,
     SOUND_COUNT
 } SoundIndex;
 
@@ -89,10 +90,22 @@ typedef enum {
 } FontIndex;
 
 typedef struct {
+    struct {
+        Shader shader;
+        int colorLoc;
+        int strengthLoc;
+    } damageFlash;
+} ShadersMap;
+
+
+typedef struct {
     Font fonts[FONT_COUNT];
     Texture sprites[SPRITE_COUNT];
     Sound sounds[SOUND_COUNT];
     Music music[MUSIC_COUNT];
+    ShadersMap shaders;
+    int flashColorLoc;
+    int flashStrengthLoc;
 } ResourceMap;
 
 typedef struct {

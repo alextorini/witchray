@@ -45,17 +45,21 @@ void smeEndTextureMode() {
 }
 
 void smeRenderVirtualScreen(RenderTexture *virtualScreen, Rectangle *sourceRec, Rectangle *destRec) {
-
     if (IsKeyPressed(KEY_F)) {
         ToggleFullscreen();
-        destRec->width = (float)GetScreenWidth();
-        destRec->height = (float)GetScreenHeight();
     }
+
+    destRec->width = (float)GetScreenWidth();
+    destRec->height = (float)GetScreenHeight();
 
     DrawTexturePro(virtualScreen->texture, *sourceRec, *destRec,
                    CLITERAL(Vector2){0, 0}, 0.0f, WHITE);
 
     EndDrawing();
+}
+
+Shader smeLoadShader(const char *filename) {
+    return LoadShader(0, filename);
 }
 
 float smeGetFrameTime() {

@@ -7,9 +7,8 @@
 #include "witch_fire.h"
 #include "witch_game.h"
 #include "witch_resources.h"
-#include "witch_save.h"
 
-#define SPAWN_COOLDOWN 0.6f
+#define SPAWN_COOLDOWN 1.0f
 #define ENEMY_SPEED 50.0f
 #define MAX_ENEMIES_COUNT 10000
 #define ENEMY_WIDTH 32
@@ -19,7 +18,7 @@
 #define ENEMY_IDLE_FRAME_TIME 0.5f
 #define ENEMY_DYING_FRAME_TIME 0.05f
 
-#define ENEMY_MAX_HEALTH 3.0f
+#define ENEMY_MAX_HEALTH 2.0f
 
 #define ENEMY_FIREBALL_SPEED 150.0f
 
@@ -152,10 +151,13 @@ void systemCollideEnemies(Game *game) {
     uint32_t playerFrameIndex = 0;
     if (playerAnim) playerFrameIndex = playerAnim->currentFrame;
 
+    EntityState *playerState = (EntityState *)
+        ecsGetEntityComponent(game->components[CMP_ENTITY_STATE], game->player.handle);
+
     EcsEntityHandle enemyHandle;
     while ((enemyHandle = ecsGetNextEntity(&iterator)) != INVALID_HANDLE) {
         EntityState *enemyState = (EntityState *)ecsGetEntityComponent(game->components[CMP_ENTITY_STATE], enemyHandle);
-        if (enemyState->id != ENTITY_STATE_IDLE) {
+        if (enemyState->id != ENTITY_STATE_IDLE || playerState->id != ENTITY_STATE_IDLE) {
             continue;
         }
 
@@ -172,8 +174,13 @@ void systemCollideEnemies(Game *game) {
             &game->player.collisions, playerFrameIndex, playerPosition->x, playerPosition->y,
             &game->enemies.collisions, enemyFrameIndex, enemyPosition->x, enemyPosition->y
         )) {
-            saveGame(game);
-            game->shouldClose = 1;
+
+            Health *playerHealth = (Health *)
+                ecsGetEntityComponent(game->components[CMP_HEALTH], game->player.handle);
+
+            playerState->id = ENTITY_STATE_DYING;
+            playerState->cooldown = 1.0f;
+            PlaySound(game->resources.sounds[SOUND_PLAYER_DEATH]);
 
             return;
         }

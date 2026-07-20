@@ -3,7 +3,7 @@
 #include "witch_game.h"
 #include "witch_input_read.h"
 
-void initStartScreen(Game *game);
+void startScreenInit(Game *game);
 
 void startScreenUpdate(InputState *input, Game *game, float dt);
 

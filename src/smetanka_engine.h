@@ -36,6 +36,8 @@ void smeEndTextureMode();
 
 void smeRenderVirtualScreen(RenderTexture *virtualScreen, Rectangle *sourceRec, Rectangle *destRec);
 
+Shader smeLoadShader(const char *filename);
+
 float smeGetFrameTime();
 
 void smeDrawTextureRec(Texture texture, Rectangle source, Vector2 position, Color tint);

@@ -6,7 +6,6 @@
 #include "witch_components.h"
 #include "witch_game.h"
 #include "witch_resources.h"
-#include "witch_save.h"
 
 #define FIREBALL_DEFAULT_FRAME {0.0f, 0.0f, 5.0f, 5.0f}
 #define FIREBALL_CAST_POSITION {38.0f, 18.0f}
@@ -33,6 +32,9 @@ void createFireball(Position *position, Velocity *velocity, Caster caster, Game 
 
     EntityState state = {.id = ENTITY_STATE_IDLE, .cooldown = 0.0f};
     ecsAddComponent(handle, game->components[CMP_ENTITY_STATE], &state);
+
+    SetSoundVolume(game->resources.sounds[SOUND_SHOOT], 0.25f);
+    PlaySound(game->resources.sounds[SOUND_SHOOT]);
 }
 
 void castFireballs(Game *game, float dt) {
@@ -80,14 +82,34 @@ void systemFireballsCollide(Game *game) {
         if (fireballAnim) fireballFrameIndex = fireballAnim->currentFrame;
 
         if (fireball->caster == CASTER_ENEMY) {
-            Animation *playerAnim = (Animation *)ecsGetEntityComponent(game->components[CMP_ANIMATION], game->player.handle);
-            Position *playerPos = (Position *)ecsGetEntityComponent(game->components[CMP_POSITION], game->player.handle);
+            Animation *playerAnim = (Animation *)
+                ecsGetEntityComponent(game->components[CMP_ANIMATION], game->player.handle);
+            Position *playerPos = (Position *)
+                ecsGetEntityComponent(game->components[CMP_POSITION], game->player.handle);
             if(checkCollision(
                 &game->fireballs.collisions, fireballFrameIndex, fireballPosition->x, fireballPosition->y,
                 &game->player.collisions, playerAnim->currentFrame, playerPos->x, playerPos->y
             )) {
-                saveGame(game);
-                game->shouldClose = 1;
+                Health *playerHealth = (Health *)
+                    ecsGetEntityComponent(game->components[CMP_HEALTH], game->player.handle);
+                playerHealth->current -= fireball->damage;
+                fireballState->id = ENTITY_STATE_DIE;
+
+                EntityState *playerState = (EntityState *)
+                    ecsGetEntityComponent(game->components[CMP_ENTITY_STATE], game->player.handle);
+
+                playerState->cooldown = 0.1f;
+
+                SetSoundVolume(game->resources.sounds[SOUND_SHOOT], 0.5f);
+                PlaySound(game->resources.sounds[SOUND_SHOOT]);
+
+                if (playerHealth->current <= 0) {
+                    playerState->id = ENTITY_STATE_DYING;
+                    playerState->cooldown = 1.0f;
+                    PlaySound(game->resources.sounds[SOUND_PLAYER_DEATH]);
+                    // saveGame(game);
+                    // game->shouldClose = 1;
+                }
 
                 return;
             }
@@ -116,16 +138,28 @@ void systemFireballsCollide(Game *game) {
                 &game->fireballs.collisions, fireballFrameIndex, fireballPosition->x, fireballPosition->y,
                 &game->enemies.collisions, enemyFrameIndex, enemyPosition->x, enemyPosition->y
             )) {
-                enemyState->id = ENTITY_STATE_DYING;
-                enemyState->cooldown = game->enemies.deathCooldown;
-
-                enemyAnim->currentClip = 1;
-                enemyAnim->currentFrame = 5;
-                enemyAnim->timer = 0.0;
-
+                Health *enemyHealth = (Health *)ecsGetEntityComponent(game->components[CMP_HEALTH], enemyHandle);
+                enemyHealth->current -= fireball->damage;
+                enemyState->cooldown = 0.1f;
                 fireballState->id = ENTITY_STATE_DIE;
 
-                game->enemiesKilled++;
+                SetSoundVolume(game->resources.sounds[SOUND_SHOOT], 0.5f);
+                PlaySound(game->resources.sounds[SOUND_SHOOT]);
+
+                if (enemyHealth->current <= 0) {
+                    enemyState->id = ENTITY_STATE_DYING;
+                    enemyState->cooldown = game->enemies.deathCooldown;
+
+                    enemyAnim->currentClip = 1;
+                    enemyAnim->currentFrame = 5;
+                    enemyAnim->timer = 0.0;
+
+                    PlaySound(game->resources.sounds[SOUND_EXPLOSION]);
+
+                    game->enemiesKilled++;
+                }
+
+
 
                 break;
             }

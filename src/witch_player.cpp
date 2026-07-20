@@ -8,8 +8,8 @@
 #include "witch_resources.h"
 
 #define PLAYER_MAX_VELOCITY 200.0
-#define PLAYER_ACCELERATION 500.0
-#define PLAYER_BRAKING  250.0
+#define PLAYER_ACCELERATION 1000.0
+#define PLAYER_BRAKING  500.0
 
 static AnimationClip idleAnimation;
 static AnimationSet animationSet;
@@ -24,7 +24,10 @@ EcsEntityHandle initPlayer(Game *game) {
     ecsAddComponent(handle, game->components[CMP_VELOCITY], &velocity);
 
     Health health = {.current = PLAYER_MAX_HEALTH, .max = PLAYER_MAX_HEALTH};
-    ecsAddComponent(handle, game->components[CMP_HEALTH], &handle);
+    ecsAddComponent(handle, game->components[CMP_HEALTH], &health);
+
+    EntityState state = {.id = ENTITY_STATE_IDLE, .cooldown = 0};
+    ecsAddComponent(handle, game->components[CMP_ENTITY_STATE], &state);
 
     Render render = {&game->resources.sprites[SPRITESHEET_PLAYER], PLAYER_DEFAULT_FRAME};
     ecsAddComponent(handle, game->components[CMP_RENDER], &render);

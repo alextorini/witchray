@@ -20,7 +20,7 @@ void init(Game *game) {
 
     loadGame(game);
 
-    initStartScreen(game);
+    startScreenInit(game);
 }
 
 void updateAndRender(Game *game, RenderTexture *screen, float deltaTime) {

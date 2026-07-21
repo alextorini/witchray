@@ -81,6 +81,7 @@ typedef struct {
 } TextRender;
 
 typedef enum {
+    CMP_EVENT,
     CMP_POSITION,
     CMP_VELOCITY,
     CMP_RENDER,

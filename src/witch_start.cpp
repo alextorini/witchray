@@ -29,11 +29,12 @@ void startScreenInit(Game *game) {
 
     game->score = 0;
     game->state = STATE_START_SCREEN;
+    game->requestedState = game->state;
 }
 
 static void startScreenInputProcess(InputState *input, Game *game) {
     if (input->anyKey) {
-        stateChange(game, STATE_GAMEPLAY);
+        stateRequestChange(game, STATE_GAMEPLAY);
     }
 }
 
@@ -42,6 +43,6 @@ void startScreenUpdate(InputState *input, Game *game, float dt) {
 }
 
 
-void destroyStartScreen() {
+void startScreenDestroy() {
     ecsClearSpace();
 }

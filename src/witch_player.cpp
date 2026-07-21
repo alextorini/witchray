@@ -53,3 +53,4 @@ EcsEntityHandle initPlayer(Game *game) {
 
     return handle;
 }
+

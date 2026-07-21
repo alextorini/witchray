@@ -29,7 +29,7 @@ void smeInit(SmeInitData *data);
 bool smeShouldClose();
 void smeClose();
 
-RenderTexture SmeLoadRenderTexture(int width, int height);
+RenderTexture smeLoadRenderTexture(int width, int height);
 
 void smeBeginTextureMode(RenderTexture texture);
 void smeEndTextureMode();
@@ -66,6 +66,9 @@ void smeUnloadTexture(Texture2D texture);
 
 Sound smeLoadSound(const char *filename);
 void smeUnloadSound(Sound sound);
+
+void smePlaySound(Sound sound);
+void smeSetSoundVolume(Sound sound, float volume);
 
 Music smeLoadMusicStream(const char *filename);
 void smeUnloadMusicStream(Music music);

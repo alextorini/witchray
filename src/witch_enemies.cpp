@@ -4,6 +4,7 @@
 #include "witch_collisions.h"
 #include "witch_components.h"
 #include "witch_enemies.h"
+#include "witch_event.h"
 #include "witch_fire.h"
 #include "witch_game.h"
 #include "witch_resources.h"
@@ -175,12 +176,7 @@ void systemCollideEnemies(Game *game) {
             &game->enemies.collisions, enemyFrameIndex, enemyPosition->x, enemyPosition->y
         )) {
 
-            Health *playerHealth = (Health *)
-                ecsGetEntityComponent(game->components[CMP_HEALTH], game->player.handle);
-
-            playerState->id = ENTITY_STATE_DYING;
-            playerState->cooldown = 1.0f;
-            PlaySound(game->resources.sounds[SOUND_PLAYER_DEATH]);
+            eventCreate(playerHandle, EVENT_DEATH, game);
 
             return;
         }

@@ -46,7 +46,6 @@ void gameplayUpdate(InputState *input, Game *game, float dt) {
     );
 
     systemProcessEntityStates(game->components[CMP_ENTITY_STATE], game);
-    if (game->state == STATE_START_SCREEN) return;
 
     game->secondsAlive += dt;
 

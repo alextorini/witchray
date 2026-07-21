@@ -1,11 +1,12 @@
-#include "ext/raylib.h"
 #include "smetanka_engine.h"
+#include "witch_event.h"
 #include "witch_game.h"
 #include "witch_game_update.h"
 #include "witch_render.h"
 #include "witch_resources.h"
 #include "witch_save.h"
 #include "witch_start.h"
+#include "witch_state.h"
 
 void init(Game *game) {
     game->shouldClose = 0;
@@ -27,6 +28,11 @@ void updateAndRender(Game *game, RenderTexture *screen, float deltaTime) {
     InputState input = inputRead();
 
     gameUpdate(&input, game, deltaTime);
+
+    eventProcess(game);
+
+    stateUpdate(game);
+
 
     render(game, screen);
 }

@@ -7,4 +7,4 @@ void startScreenInit(Game *game);
 
 void startScreenUpdate(InputState *input, Game *game, float dt);
 
-void destroyStartScreen();
+void startScreenDestroy();

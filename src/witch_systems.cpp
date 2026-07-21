@@ -99,7 +99,7 @@ void systemRenderEntities(EcsComponentId positionId, EcsComponentId renderId, Ec
             SHADER_UNIFORM_VEC4
         );
 
-        float flashStrength = (entityState)  ? entityState->cooldown * 3 : 0.0f;
+        float flashStrength = (entityState)  ? entityState->cooldown * 4 : 0.0f;
         SetShaderValue(
             resources->shaders.damageFlash.shader,
             resources->shaders.damageFlash.strengthLoc,
@@ -153,7 +153,7 @@ void systemProcessEntityStates(EcsComponentId entityStateComponentId, Game *game
         if (entityState->id == ENTITY_STATE_DIE) {
             if (entityHandle == game->player.handle) {
                 saveGame(game);
-                stateChange(game, STATE_START_SCREEN);
+                stateRequestChange(game, STATE_START_SCREEN);
                 return;
             }
 

@@ -3,6 +3,25 @@
 #include "ext/raylib.h"
 #include <stdio.h>
 
+#if defined(PLATFORM_WEB)
+#include <emscripten/emscripten.h>
+#include <emscripten/html5.h>
+
+static EM_BOOL OnCanvasResize(int eventType, const EmscriptenUiEvent *uiEvent, void *userData) {
+    double w, h;
+    emscripten_get_element_css_size("canvas", &w, &h);
+    SetWindowSize((int)w, (int)h);
+    return EM_TRUE;
+}
+
+static EM_BOOL OnFullscreenChange(int eventType, const EmscriptenFullscreenChangeEvent *fsEvent, void *userData) {
+    double w, h;
+    emscripten_get_element_css_size("canvas", &w, &h);
+    SetWindowSize((int)w, (int)h);
+    return EM_TRUE;
+}
+#endif
+
 typedef struct {
     RenderTexture virtualScreen;
     Rectangle sourceRec;
@@ -18,6 +37,11 @@ void smeInit(SmeInitData *initData) {
 
     InitWindow(initData->windowWidth, initData->windowHeight, initData->windowName);
 
+#if defined(PLATFORM_WEB)
+    emscripten_set_resize_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, NULL, EM_TRUE, OnCanvasResize);
+    emscripten_set_fullscreenchange_callback(EMSCRIPTEN_EVENT_TARGET_DOCUMENT, NULL, EM_TRUE, OnFullscreenChange);
+#endif
+
     InitAudioDevice();
 
     SearchAndSetResourceDir(initData->resourceDir);
@@ -32,7 +56,7 @@ void smeClose() {
     CloseWindow();
 }
 
-RenderTexture SmeLoadRenderTexture(int width, int height) {
+RenderTexture smeLoadRenderTexture(int width, int height) {
    return LoadRenderTexture(width, height);
 }
 
@@ -142,6 +166,14 @@ Sound smeLoadSound(const char *filename) {
 
 void smeUnloadSound(Sound sound) {
     UnloadSound(sound);
+}
+
+void smePlaySound(Sound sound) {
+    PlaySound(sound);
+}
+
+void smeSetSoundVolume(Sound sound, float volume) {
+    SetSoundVolume(sound, volume);
 }
 
 Music smeLoadMusicStream(const char *filename) {

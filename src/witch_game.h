@@ -117,6 +117,7 @@ typedef struct {
     ResourceMap resources;
     EcsComponentId components[CMP_COUNT];
     int state;
+    int requestedState;
     float secondsAlive;
     uint64_t enemiesKilled;
     uint64_t score;

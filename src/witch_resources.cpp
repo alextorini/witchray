@@ -20,7 +20,11 @@ void resourcesInit(Game *game) {
     game->resources.music[MUSIC_MAIN] = smeLoadMusicStream("music/music2.wav");
     game->resources.music[MUSIC_MAIN].looping = true;
 
+    #if defined(PLATFORM_WEB)
+    game->resources.shaders.damageFlash.shader = smeLoadShader("shaders/web/damage_flash.glsl");
+    #else
     game->resources.shaders.damageFlash.shader = smeLoadShader("shaders/damage_flash.glsl");
+    #endif
 
     game->resources.shaders.damageFlash.colorLoc  =
         GetShaderLocation(game->resources.shaders.damageFlash.shader, "flashColor");

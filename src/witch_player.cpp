@@ -11,7 +11,11 @@
 #define PLAYER_ACCELERATION 1000.0
 #define PLAYER_BRAKING  500.0
 
+#define PLAYER_DEATH_COOLDOWN 1.0f
+
 static AnimationClip idleAnimation;
+static AnimationClip deathAnimation;
+
 static AnimationSet animationSet;
 
 EcsEntityHandle initPlayer(Game *game) {
@@ -37,9 +41,15 @@ EcsEntityHandle initPlayer(Game *game) {
     idleAnimation.frameTime = PLAYER_IDLE_ANIM_SPEED;
     idleAnimation.loop = 1;
 
+    deathAnimation.startFrame = 4;
+    deathAnimation.endFrame = 5;
+    deathAnimation.frameTime = 0.25f;
+    deathAnimation.loop = 1;
+
     animationSet.clips = WR_MALLOC_TYPE(AnimationClip);
-    animationSet.count = 1;
+    animationSet.count = 2;
     animationSet.clips[0] = idleAnimation;
+    animationSet.clips[1] = deathAnimation;
 
     Animation animation;
     animation.set = &animationSet;
@@ -50,6 +60,8 @@ EcsEntityHandle initPlayer(Game *game) {
 
     initCollisionMap(PLAYER_IMAGE_PATH, render.frame, 6, &game->player.collisions);
     initFireballs(game);
+
+    game->player.deathCooldown = PLAYER_DEATH_COOLDOWN;
 
     return handle;
 }

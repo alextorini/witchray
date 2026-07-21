@@ -69,9 +69,13 @@ void smeEndTextureMode() {
 }
 
 void smeRenderVirtualScreen(RenderTexture *virtualScreen, Rectangle *sourceRec, Rectangle *destRec) {
+
+#if defined(PLATFORM_WEB)
+#else
     if (IsKeyPressed(KEY_F)) {
         ToggleFullscreen();
     }
+#endif
 
     destRec->width = (float)GetScreenWidth();
     destRec->height = (float)GetScreenHeight();

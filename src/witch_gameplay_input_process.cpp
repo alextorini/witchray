@@ -1,4 +1,5 @@
 #include "witch_gameplay_input_process.h"
+#include "witch_components.h"
 #include "witch_input_read.h"
 
 #define PLAYER_MAX_VELOCITY 200.0
@@ -6,6 +7,11 @@
 #define PLAYER_BRAKING  250.0
 
 void gameplayInputProcess(InputState *input, Game *game, float dt) {
+    EntityState *state = (EntityState *)ecsGetEntityComponent(game->components[CMP_ENTITY_STATE], game->player.handle);
+    if (!state || state->id == ENTITY_STATE_DIE || state->id == ENTITY_STATE_DYING) {
+        return;
+    }
+
     // TODO: Get rid of all this components dependencies.
     // Maybe this function should only generate something like forces,
     // which will applied to the player in some other system

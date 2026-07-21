@@ -80,6 +80,11 @@ void eventProcess(Game *game) {
                     smePlaySound(game->resources.sounds[SOUND_PLAYER_DEATH]);
 
                     entityState->cooldown = game->player.deathCooldown;
+
+                    Animation *animation = (Animation *)ecsGetEntityComponent(game->components[CMP_ANIMATION], event->entityHandle);
+                    animation->currentClip = 1;
+                    animation->currentFrame = 4;
+                    animation->timer = 0.0f;
                 }
 
                 break;

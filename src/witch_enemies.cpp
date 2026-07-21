@@ -51,10 +51,8 @@ void initEnemyFactory(Game *game) {
     deathAnimation.frameTime = ENEMY_DYING_FRAME_TIME;
     deathAnimation.loop = 0;
 
-    animationSet.count = 2;
-    animationSet.clips = ENM_MALLOC_ARR(AnimationClip, animationSet.count);
-    animationSet.clips[0] = idleAnimation;
-    animationSet.clips[1] = deathAnimation;
+    animationSet.clips[ANIMATION_IDLE] = idleAnimation;
+    animationSet.clips[ANIMATION_DYING] = deathAnimation;
 
     game->enemies.deathCooldown = (deathAnimation.endFrame - deathAnimation.startFrame + 1) * ENEMY_DYING_FRAME_TIME;
 

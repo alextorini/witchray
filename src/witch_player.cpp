@@ -47,10 +47,8 @@ EcsEntityHandle initPlayer(Game *game) {
     deathAnimation.frameTime = 0.25f;
     deathAnimation.loop = 1;
 
-    animationSet.clips = WR_MALLOC_TYPE(AnimationClip);
-    animationSet.count = 2;
-    animationSet.clips[0] = idleAnimation;
-    animationSet.clips[1] = deathAnimation;
+    animationSet.clips[ANIMATION_IDLE] = idleAnimation;
+    animationSet.clips[ANIMATION_DYING] = deathAnimation;
 
     Animation animation;
     animation.set = &animationSet;

@@ -60,8 +60,7 @@ typedef struct {
 } AnimationClip;
 
 typedef struct {
-    AnimationClip *clips;
-    uint32_t count;
+    AnimationClip clips[2];
 } AnimationSet;
 
 typedef struct {

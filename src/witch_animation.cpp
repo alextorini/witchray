@@ -2,7 +2,7 @@
 #include "witch_components.h"
 
 void switchAnimation(Animation *animation, AnimationIndex newState) {
-    if (newState >= animation->set->count) {
+    if (newState >= ANIMATION_COUNT) {
         return;
     }
 

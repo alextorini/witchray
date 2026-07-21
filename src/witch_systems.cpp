@@ -154,10 +154,7 @@ void systemProcessEntityStates(EcsComponentId entityStateComponentId, Game *game
             if (entityHandle == game->player.handle) {
                 saveGame(game);
                 stateRequestChange(game, STATE_START_SCREEN);
-                return;
             }
-
-            ecsDestroyEntity(entityHandle);
         }
     }
 }

@@ -20,12 +20,13 @@ void eventProcess(Game *game) {
         EntityState *entityState = (EntityState *)ecsGetEntityComponent(entityStateId, event->entityHandle);
 
         switch (event->type) {
-            case EVENT_FIREBALL_CAST:
+            case EVENT_FIREBALL_CAST: {
                 smeSetSoundVolume(game->resources.sounds[SOUND_SHOOT], 0.25f);
                 smePlaySound(game->resources.sounds[SOUND_SHOOT]);
 
                 break;
-            case EVENT_FIREBALL_HIT:
+            }
+            case EVENT_FIREBALL_HIT: {
                 if (!entityState) {
                     break;
                 }
@@ -36,7 +37,8 @@ void eventProcess(Game *game) {
                 entityState->id = ENTITY_STATE_DIE;
 
                 break;
-            case EVENT_DAMAGE_TAKEN:
+            }
+            case EVENT_DAMAGE_TAKEN: {
                 if (!entityState) {
                     break;
                 }
@@ -46,7 +48,8 @@ void eventProcess(Game *game) {
                 entityState->cooldown = 0.15f;
 
                 break;
-            case EVENT_DEATH:
+            }
+            case EVENT_DEATH: {
                 if (!entityState) {
                     break;
                 }
@@ -80,8 +83,11 @@ void eventProcess(Game *game) {
                 }
 
                 break;
+            }
         }
 
-        ecsDestroyEntity(eventHandle);
+        ecsAddToDestroyQueue(eventHandle);
     }
+
+    ecsFlushDestroyQueue();
 }

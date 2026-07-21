@@ -15,6 +15,8 @@
 #define ECS_REALLOC_ARR(ptr, type, count) ((type *)realloc((ptr), (sizeof(type) * (count))))
 #define ECS_FREE free
 
+#define INITIAL_DESTROY_QUEUE_CAPACITY 16
+
 typedef uint32_t EcsEntityId;
 typedef uint32_t EcsEntityGen;
 
@@ -41,6 +43,12 @@ typedef struct {
 } EntityFreeSlotPool;
 
 typedef struct {
+    EcsEntityHandle *handleList;
+    uint32_t count;
+    uint32_t capacity;
+} EntityDestroyQueue;
+
+typedef struct {
     EcsEntityId nextEntityId;
     uint32_t currentEntitiesCapacity;
     EcsComponentId currentComponentId;
@@ -48,6 +56,7 @@ typedef struct {
     EcsEntity *entityList;
     EcsComponent *componentList;
     EntityFreeSlotPool entityFreeSlotsPool;
+    EntityDestroyQueue destroyQueue;
 } EcsSpace;
 
 static EcsSpace *space;
@@ -92,6 +101,18 @@ void ecsCreateSpace() {
 
     for (int i = 0; i < space->entityFreeSlotsPool.capacity; i++) {
         space->entityFreeSlotsPool.idList[i] = INVALID_ID;
+    }
+
+    space->destroyQueue.capacity = INITIAL_DESTROY_QUEUE_CAPACITY;
+    space->destroyQueue.count = 0;
+    space->destroyQueue.handleList = ECS_MALLOC_ARR(EcsEntityHandle, space->destroyQueue.capacity);
+    if (!space->destroyQueue.handleList) {
+        ECS_FREE(space->componentList);
+        ECS_FREE(space->entityList);
+        ECS_FREE(space->entityFreeSlotsPool.idList);
+        ECS_FREE(space);
+
+        ABORT();
     }
 }
 
@@ -464,6 +485,31 @@ void ecsDestroyEntity(EcsEntityHandle entityHandle) {
     }
 
     space->entityFreeSlotsPool.idList[space->entityFreeSlotsPool.count++] = entityId;
+}
+
+void ecsAddToDestroyQueue(EcsEntityHandle entityHandle) {
+    EntityDestroyQueue *queue = &space->destroyQueue;
+
+    if (queue->count >= queue->capacity) {
+        queue->capacity *= 2;
+        EcsEntityHandle *handleList = ECS_REALLOC_ARR(queue->handleList, EcsEntityHandle, queue->capacity);
+        if (!handleList) {
+            ABORT();
+        }
+        queue->handleList = handleList;
+    }
+
+    queue->handleList[queue->count++] = entityHandle;
+}
+
+void ecsFlushDestroyQueue() {
+    EntityDestroyQueue *queue = &space->destroyQueue;
+
+    for (uint32_t i = 0; i < queue->count; i++) {
+        ecsDestroyEntity(queue->handleList[i]);
+    }
+
+    queue->count = 0;
 }
 
 void ecsClearSpace() {

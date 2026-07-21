@@ -42,6 +42,10 @@ EcsEntityHandle ecsGetNextEntity(EcsEntityIterator *iterator);
 
 void ecsDestroyEntity(EcsEntityHandle entityHandle);
 
+void ecsAddToDestroyQueue(EcsEntityHandle entityHandle);
+
+void ecsFlushDestroyQueue();
+
 void ecsClearSpace();
 
 void ecsDestroySpace();

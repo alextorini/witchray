@@ -132,9 +132,11 @@ void systemCleanEnemies(Game *game) {
         Position *position = (Position *)ecsGetEntityComponent(positionId, entityHandle);
 
         if (position->x < -ENEMY_WIDTH) {
-            ecsDestroyEntity(entityHandle);
+            ecsAddToDestroyQueue(entityHandle);
         }
     }
+
+    ecsFlushDestroyQueue();
 }
 
 void systemCollideEnemies(Game *game) {

@@ -1,5 +1,6 @@
 #include "smetanka_ecs.h"
 #include "witch_event.h"
+#include "witch_animation.h"
 #include "witch_game.h"
 
 void eventCreate(EcsEntityHandle entityHandle, EventType eventType, Game *game) {
@@ -66,10 +67,9 @@ void eventProcess(Game *game) {
 
                     entityState->cooldown = game->enemies.deathCooldown;
 
-                    Animation *animation = (Animation *)ecsGetEntityComponent(game->components[CMP_ANIMATION], event->entityHandle);
-                    animation->currentClip = 1;
-                    animation->currentFrame = 5;
-                    animation->timer = 0.0f;
+                    Animation *animation = (Animation *)
+                        ecsGetEntityComponent(game->components[CMP_ANIMATION], event->entityHandle);
+                    switchAnimation(animation, ANIMATION_DYING);
 
                     game->enemiesKilled++;
 
@@ -81,10 +81,9 @@ void eventProcess(Game *game) {
 
                     entityState->cooldown = game->player.deathCooldown;
 
-                    Animation *animation = (Animation *)ecsGetEntityComponent(game->components[CMP_ANIMATION], event->entityHandle);
-                    animation->currentClip = 1;
-                    animation->currentFrame = 4;
-                    animation->timer = 0.0f;
+                    Animation *animation = (Animation *)
+                        ecsGetEntityComponent(game->components[CMP_ANIMATION], event->entityHandle);
+                    switchAnimation(animation, ANIMATION_DYING);
                 }
 
                 break;

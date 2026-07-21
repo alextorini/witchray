@@ -1,6 +1,7 @@
 #include <stdint.h>
 
 #include "smetanka_ecs.h"
+#include "witch_animation.h"
 #include "witch_components.h"
 #include "witch_fire.h"
 #include "witch_game.h"
@@ -53,9 +54,7 @@ EcsEntityHandle initPlayer(Game *game) {
 
     Animation animation;
     animation.set = &animationSet;
-    animation.currentClip = 0;
-    animation.currentFrame = 0;
-    animation.timer = 0.0;
+    switchAnimation(&animation, ANIMATION_IDLE);
     ecsAddComponent(handle, game->components[CMP_ANIMATION], &animation);
 
     initCollisionMap(PLAYER_IMAGE_PATH, render.frame, 6, &game->player.collisions);

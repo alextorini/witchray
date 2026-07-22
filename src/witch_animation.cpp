@@ -6,9 +6,7 @@ void switchAnimation(Animation *animation, AnimationIndex newState) {
         return;
     }
 
-    if (animation->currentClip != newState) {
-        animation->currentClip = newState;
-        animation->currentFrame = animation->set->clips[newState].startFrame;
-        animation->timer = 0.0f;
-    }
+    animation->currentClip = newState;
+    animation->currentFrame = animation->set->clips[newState].startFrame;
+    animation->timer = 0.0f;
 }

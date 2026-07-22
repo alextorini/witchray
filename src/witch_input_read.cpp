@@ -1,14 +1,22 @@
 #include <cmath>
 #include "witch_input_read.h"
+#include "ext/raylib.h"
 
 #define GAMEPAD_DEADZONE 0.1f
 
 InputState inputRead() {
     InputState inputState;
-    inputState.anyKey = (GetKeyPressed() != 0 ||
-        IsMouseButtonPressed(MOUSE_BUTTON_LEFT) ||
-        IsMouseButtonPressed(MOUSE_BUTTON_RIGHT) ||
-        GetGamepadButtonPressed() != 0);
+
+    inputState.activate = (
+        IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_ENTER) ||
+        IsGamepadButtonPressed(0, GAMEPAD_BUTTON_RIGHT_FACE_DOWN)
+    );
+
+    inputState.pause = (
+        IsKeyPressed(KEY_P) ||
+        IsGamepadButtonPressed(0, GAMEPAD_BUTTON_MIDDLE_RIGHT)
+    );
+
 
     inputState.fullscreenToggle = IsKeyPressed(KEY_F);
 

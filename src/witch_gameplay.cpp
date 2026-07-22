@@ -13,12 +13,18 @@ void gameplayInit(Game *game) {
     game->player.handle = initPlayer(game);
     game->player_handle = game->player.handle;
     initEnemyFactory(game);
-    game->secondsAlive = 0.0f;
+    game->timer = 0.0f;
     game->enemiesKilled = 0;
+    game->enemySpawnCooldown = 1.5f;
+    game->skyColor = SKY_COLOR_1;
 }
 
 void gameplayUpdate(InputState *input, Game *game, float dt) {
     gameplayInputProcess(input, game, dt);
+
+    if (game->pause) {
+        return;
+    }
 
     systemSpawnEnemies(game, dt);
     systemEnemiesFire(game, dt);
@@ -46,10 +52,13 @@ void gameplayUpdate(InputState *input, Game *game, float dt) {
     );
 
     systemProcessEntityStates(game->components[CMP_ENTITY_STATE], game);
+    if (game->timer > 30.0f) {
+        game->skyColor = SKY_COLOR_2;
+    }
 
-    game->secondsAlive += dt;
+    game->timer += dt;
 
-    game->score = (uint64_t)(game->secondsAlive) + game->enemiesKilled * 10;
+    game->score = (uint64_t)(game->timer) + game->enemiesKilled * 10;
 
     if (game->score > game->highscore) game->highscore = game->score;
 }

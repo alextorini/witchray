@@ -4,8 +4,8 @@
 #include "witch_animation.h"
 #include "witch_collisions.h"
 #include "witch_components.h"
+#include "witch_damage.h"
 #include "witch_enemies.h"
-#include "witch_event.h"
 #include "witch_fire.h"
 #include "witch_game.h"
 #include "witch_resources.h"
@@ -99,6 +99,18 @@ static EcsEntityHandle createEnemy(Position *pos, Game *game) {
 }
 
 void systemSpawnEnemies(Game *game, float dt) {
+    if (game->timer < 5.0f) {
+        return;
+    }
+
+    if (game->timer > 120.0f) {
+        game->enemySpawnCooldown = 0.5f;
+    } else if (game->timer > 60.0f) {
+        game->enemySpawnCooldown = 1.0f;
+    } else if (game->timer > 30.0f) {
+        game->enemySpawnCooldown = 1.25f;
+    }
+
     if (spawnCooldown >= 0) {
         spawnCooldown -= dt;
 
@@ -115,7 +127,7 @@ void systemSpawnEnemies(Game *game, float dt) {
 
     createEnemy(&pos, game);
 
-    spawnCooldown = SPAWN_COOLDOWN;
+    spawnCooldown = game->enemySpawnCooldown;
 }
 
 void systemCleanEnemies(Game *game) {
@@ -175,7 +187,7 @@ void systemCollideEnemies(Game *game) {
             &game->enemies.collisions, enemyFrameIndex, enemyPosition->x, enemyPosition->y
         )) {
 
-            eventCreate(playerHandle, EVENT_DEATH, game);
+            damage(playerHandle, 1000000.0f, game);
 
             return;
         }

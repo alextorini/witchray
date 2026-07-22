@@ -17,6 +17,9 @@ void resourcesInit(Game *game) {
     game->resources.sounds[SOUND_PLAYER_DEATH] = smeLoadSound("sounds/player_death.wav");
     SetSoundVolume(game->resources.sounds[SOUND_PLAYER_DEATH], 0.5f);
 
+    game->resources.sounds[SOUND_PAUSE] = smeLoadSound("sounds/pause.wav");
+    SetSoundVolume(game->resources.sounds[SOUND_PAUSE], 0.5f);
+
     game->resources.music[MUSIC_MAIN] = smeLoadMusicStream("music/music2.wav");
     game->resources.music[MUSIC_MAIN].looping = true;
 

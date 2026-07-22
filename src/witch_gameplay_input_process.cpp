@@ -1,5 +1,6 @@
 #include "witch_gameplay_input_process.h"
 #include "witch_components.h"
+#include "witch_event.h"
 #include "witch_input_read.h"
 
 #define PLAYER_MAX_VELOCITY 200.0
@@ -12,6 +13,16 @@ void gameplayInputProcess(InputState *input, Game *game, float dt) {
         return;
     }
 
+
+    if (input->pause) {
+        game->pause = (game->pause == 1) ? 0 : 1;
+        eventCreate(game->player.handle, EVENT_PAUSE_TOGGLE, game);
+    }
+
+    if (game->pause) {
+        return;
+    }
+
     // TODO: Get rid of all this components dependencies.
     // Maybe this function should only generate something like forces,
     // which will applied to the player in some other system
@@ -20,7 +31,7 @@ void gameplayInputProcess(InputState *input, Game *game, float dt) {
     Render *render = (Render *)ecsGetEntityComponent(game->components[CMP_RENDER], game->player.handle);
 
     float moveMagnitude;
-    if ( input->move.x != 0 || input->move.y != 0) {
+    if (input->move.x != 0 || input->move.y != 0) {
         velocity->x += input->move.x * dt * PLAYER_ACCELERATION;
         velocity->y += input->move.y * dt * PLAYER_ACCELERATION;
 

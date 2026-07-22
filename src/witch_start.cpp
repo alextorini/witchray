@@ -6,9 +6,9 @@
 #define MAX_TEXT_LENGTH 128
 #define START_SCREEN_TEXT_COLOR WHITE
 #define START_SCREEN_TEXT_FONT game->resources.fonts[FONT_MAIN]
-#define START_SCREEN_TEXT_FONT_SIZE 36
+#define START_SCREEN_TEXT_FONT_SIZE 31
 #define START_SCREEN_TEXT_FONT_SPACING 1
-#define START_SCREEN_TEXT "Press Any Key To Start"
+#define START_SCREEN_TEXT "Press Space/Enter To Start"
 
 void startScreenInit(Game *game) {
     EcsEntityHandle startLabelHandle = ecsCreateEntity();
@@ -30,10 +30,11 @@ void startScreenInit(Game *game) {
     game->score = 0;
     game->state = STATE_START_SCREEN;
     game->requestedState = game->state;
+    game->skyColor = SKY_COLOR_1;
 }
 
 static void startScreenInputProcess(InputState *input, Game *game) {
-    if (input->anyKey) {
+    if (input->activate) {
         stateRequestChange(game, STATE_GAMEPLAY);
     }
 }

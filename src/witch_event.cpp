@@ -21,6 +21,11 @@ void eventProcess(Game *game) {
         EntityState *entityState = (EntityState *)ecsGetEntityComponent(entityStateId, event->entityHandle);
 
         switch (event->type) {
+            case EVENT_PAUSE_TOGGLE: {
+                smePlaySound(game->resources.sounds[SOUND_PAUSE]);
+
+                break;
+            }
             case EVENT_FIREBALL_CAST: {
                 smeSetSoundVolume(game->resources.sounds[SOUND_SHOOT], 0.25f);
                 smePlaySound(game->resources.sounds[SOUND_SHOOT]);

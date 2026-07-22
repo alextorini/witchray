@@ -28,7 +28,8 @@ constexpr int VIRTUAL_WIDTH = 640;
 #define STATE_GAMEOVER_INIT 4
 #define STATE_GAMEOVER 5
 
-#define SKY_COLOR CLITERAL(Color){255, 128, 156, 255}
+#define SKY_COLOR_1 CLITERAL(Color){99, 155, 255, 255}
+#define SKY_COLOR_2 CLITERAL(Color){255, 128, 156, 255}
 
 #define BG_LAYER_1_SPEED 25.0f
 #define BG_LAYER_2_SPEED 75.0f
@@ -67,6 +68,7 @@ typedef enum {
     SOUND_SHOOT,
     SOUND_EXPLOSION,
     SOUND_PLAYER_DEATH,
+    SOUND_PAUSE,
     SOUND_COUNT
 } SoundIndex;
 
@@ -118,10 +120,13 @@ typedef struct {
     EcsComponentId components[CMP_COUNT];
     int state;
     int requestedState;
-    float secondsAlive;
+    float timer;
+    float enemySpawnCooldown;
+    Color skyColor;
     uint64_t enemiesKilled;
     uint64_t score;
     uint64_t highscore;
+    uint8_t pause;
     uint8_t shouldClose;
 } Game;
 

@@ -5,15 +5,18 @@
 #include "witch_game.h"
 #include "witch_systems.h"
 
+#define UI_HEALTH_COLOR {172, 50, 50, 196}
+
 static void renderUI(Game *game) {
     Health *health = (Health *)ecsGetEntityComponent(game->components[CMP_HEALTH], game->player.handle);
 
-    if (health) {
-        smeDrawTextF(
-            game->resources.fonts[FONT_MAIN],
-            CLITERAL(Position){3, 3},
-            9, 1, DARKGREEN, "HEALTH: %d/%d", (int)health->current, (int)health->max
-        );
+    if (health && health->current > 0.0f) {
+        DrawRectangle(9, 1, 9 + (int)(100 * (health->current / health->max)), 11 , UI_HEALTH_COLOR);
+        // smeDrawTextF(
+        //     game->resources.fonts[FONT_MAIN],
+        //     CLITERAL(Position){3, 3},
+        //     9, 1, DARKGREEN, "HEALTH: %d/%d", (int)health->current, (int)health->max
+        // );
     }
 
     smeDrawTextF(
@@ -39,7 +42,7 @@ static void renderDebug(Game *game) {
 void render(Game *game, RenderTexture *screen) {
     smeBeginTextureMode(*screen);
 
-    ClearBackground(SKY_COLOR);
+    ClearBackground(game->skyColor);
 
     systemRenderEntities(
         game->components[CMP_POSITION],

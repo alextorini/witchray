@@ -8,6 +8,7 @@ typedef enum {
     EVENT_FIREBALL_HIT,
     EVENT_DAMAGE_TAKEN,
     EVENT_DEATH,
+    EVENT_PAUSE_TOGGLE,
 } EventType;
 
 typedef struct {

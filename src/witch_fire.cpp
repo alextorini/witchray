@@ -38,6 +38,10 @@ void createFireball(Position *position, Velocity *velocity, Caster caster, Game 
 }
 
 void castFireballs(Game *game, float dt) {
+    if (game->timer < 5.0f) {
+        return;
+    }
+
     Position *playerPosition = (Position *)ecsGetEntityComponent(game->components[CMP_POSITION], game->player.handle);
     if (fireballCooldown <= 0) {
         Position fireballPosition = Vector2Add(*playerPosition, (Position)FIREBALL_CAST_POSITION);

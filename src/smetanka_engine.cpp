@@ -94,6 +94,10 @@ float smeGetFrameTime() {
     return GetFrameTime();
 }
 
+void clearBackground(Color color) {
+    ClearBackground(color);
+}
+
 void smeDrawTextureRec(Texture2D texture, Rectangle source, Vector2 position, Color tint) {
     DrawTextureRec(texture, source, position, tint);
 }
@@ -190,6 +194,10 @@ void smeUnloadMusicStream(Music music) {
 
 void smePlayMusicStream(Music music) {
     PlayMusicStream(music);
+}
+
+void smeUpdateMusicStream(Music music) {
+    UpdateMusicStream(music);
 }
 
 void smeStopMusicStream(Music music) {

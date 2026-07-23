@@ -1,22 +1,15 @@
 #pragma once
 
-#include "smetanka_ecs.h"
 #include "witch_game.h"
 
-void systemMoveEntities(EcsComponentId positionId, EcsComponentId velocityId, float dt);
+void systemMoveEntities(float dt);
 
-void systemMoveParallax(EcsComponentId parallaxId, EcsComponentId positionId, EcsComponentId renderId);
+void systemMoveParallax();
 
-void systemAnimateEntities(
-    EcsComponentId animation_id,
-    EcsComponentId render_id,
-    EcsComponentId entityStateComponentId,
-    float delta_time
-);
+void systemAnimateEntities(float dt);
 
-void systemRenderEntities(EcsComponentId positionId, EcsComponentId renderId,
-                          EcsComponentId entityStateComponentId, ResourceMap *resources);
+void systemRenderEntities(ResourceMap *resources);
 
-void systemRenderText(EcsComponentId positionId, EcsComponentId textRenderId);
+void systemRenderText();
 
-void systemProcessEntityStates(EcsComponentId entityStateComponentId, Game *game);
+void systemProcessEntityStates(Game *game);

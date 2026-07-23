@@ -40,6 +40,8 @@ Shader smeLoadShader(const char *filename);
 
 float smeGetFrameTime();
 
+void clearBackground(Color color);
+
 void smeDrawTextureRec(Texture texture, Rectangle source, Vector2 position, Color tint);
 void smeDrawText(Font font, const char *text, Vector2 position, float fontSize, float spacing, Color tint);
 void smeDrawTextF(
@@ -74,6 +76,7 @@ Music smeLoadMusicStream(const char *filename);
 void smeUnloadMusicStream(Music music);
 
 void smePlayMusicStream(Music music);
+void smeUpdateMusicStream(Music music);
 void smeStopMusicStream(Music music);
 
 unsigned char *smeLoadFileData(const char *filename, int *dataSize);

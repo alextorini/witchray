@@ -8,7 +8,7 @@
 #define PLAYER_BRAKING  250.0
 
 void gameplayInputProcess(InputState *input, Game *game, float dt) {
-    EntityState *state = (EntityState *)ecsGetEntityComponent(game->components[CMP_ENTITY_STATE], game->player.handle);
+    EntityState *state = getEntityState(game->player.handle);
     if (!state || state->id == ENTITY_STATE_DIE || state->id == ENTITY_STATE_DYING) {
         return;
     }
@@ -26,9 +26,9 @@ void gameplayInputProcess(InputState *input, Game *game, float dt) {
     // TODO: Get rid of all this components dependencies.
     // Maybe this function should only generate something like forces,
     // which will applied to the player in some other system
-    Velocity *velocity = (Velocity *)ecsGetEntityComponent(game->components[CMP_VELOCITY], game->player.handle);
-    Position *position = (Position *)ecsGetEntityComponent(game->components[CMP_POSITION], game->player.handle);
-    Render *render = (Render *)ecsGetEntityComponent(game->components[CMP_RENDER], game->player.handle);
+    Velocity *velocity = getVelocity(game->player.handle);
+    Position *position = getPosition(game->player.handle);
+    Render *render = getRender(game->player.handle);
 
     float moveMagnitude;
     if (input->move.x != 0 || input->move.y != 0) {

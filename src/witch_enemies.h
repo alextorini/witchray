@@ -6,7 +6,7 @@ void initEnemyFactory(Game *game);
 
 void systemSpawnEnemies(Game *game, float dt);
 
-void systemCleanEnemies(Game *game);
+void systemCleanEnemies();
 
 void systemCollideEnemies(Game *game);
 

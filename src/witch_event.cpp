@@ -1,24 +1,25 @@
 #include "smetanka_ecs.h"
 #include "witch_event.h"
 #include "witch_animation.h"
+#include "witch_components.h"
 #include "witch_game.h"
 
 void eventCreate(EcsEntityHandle entityHandle, EventType eventType, Game *game) {
     EcsEntityHandle eventHandle = ecsCreateEntity();
 
     Event event = {.type = eventType, .entityHandle = entityHandle};
-    ecsAddComponent(eventHandle, game->components[CMP_EVENT], &event);
+    addComponent(eventHandle, &event);
 }
 
 void eventProcess(Game *game) {
-    EcsComponentId eventId = game->components[CMP_EVENT];
-    EcsComponentId entityStateId = game->components[CMP_ENTITY_STATE];
+    EcsComponentId eventId = COMPONENT_ID(Event);
+    EcsComponentId entityStateId = COMPONENT_ID(EntityState);
 
     EcsEntityIterator iterator = ecsGetEntityIterator(&eventId, 1);
     EcsEntityHandle eventHandle;
     while ((eventHandle = ecsGetNextEntity(&iterator)) != INVALID_HANDLE) {
-        Event *event = (Event *)ecsGetEntityComponent(eventId, eventHandle);
-        EntityState *entityState = (EntityState *)ecsGetEntityComponent(entityStateId, event->entityHandle);
+        Event *event = getEvent(eventHandle);
+        EntityState *entityState = getEntityState(event->entityHandle);
 
         switch (event->type) {
             case EVENT_PAUSE_TOGGLE: {
@@ -66,14 +67,13 @@ void eventProcess(Game *game) {
 
                 entityState->id = ENTITY_STATE_DYING;
 
-                IsEnemy *isEnemy = (IsEnemy *)ecsGetEntityComponent(game->components[CMP_ENEMY], event->entityHandle);
-                if (isEnemy) {
+                Enemy *enemy = getEnemy(event->entityHandle);
+                if (enemy) {
                     smePlaySound(game->resources.sounds[SOUND_EXPLOSION]);
 
                     entityState->cooldown = game->enemies.deathCooldown;
 
-                    Animation *animation = (Animation *)
-                        ecsGetEntityComponent(game->components[CMP_ANIMATION], event->entityHandle);
+                    Animation *animation = getAnimation(event->entityHandle);
                     switchAnimation(animation, ANIMATION_DYING);
 
                     game->enemiesKilled++;
@@ -86,8 +86,7 @@ void eventProcess(Game *game) {
 
                     entityState->cooldown = game->player.deathCooldown;
 
-                    Animation *animation = (Animation *)
-                        ecsGetEntityComponent(game->components[CMP_ANIMATION], event->entityHandle);
+                    Animation *animation = getAnimation(event->entityHandle);
                     switchAnimation(animation, ANIMATION_DYING);
                 }
 

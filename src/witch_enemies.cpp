@@ -6,7 +6,7 @@
 #include "witch_components.h"
 #include "witch_damage.h"
 #include "witch_enemies.h"
-#include "witch_fire.h"
+#include "witch_spells.h"
 #include "witch_game.h"
 #include "witch_resources.h"
 
@@ -62,21 +62,22 @@ void initEnemyFactory(Game *game) {
 static EcsEntityHandle createEnemy(Position *pos, Game *game) {
     EcsEntityHandle handle = ecsCreateEntity();
 
-    ecsAddComponent(handle, game->components[CMP_POSITION], pos);
+    addComponent(handle, pos);
+
     Render rndr = {&game->resources.sprites[SPRITESHEET_ENEMY], ENEMY_DEFAULT_FRAME};
-    ecsAddComponent(handle, game->components[CMP_RENDER], &rndr);
+    addComponent(handle, &rndr);
 
     Velocity vel = {-ENEMY_SPEED, 0};
-    ecsAddComponent(handle, game->components[CMP_VELOCITY], &vel);
+    addComponent(handle, &vel);
 
-    IsEnemy enmy = true;
-    ecsAddComponent(handle, game->components[CMP_ENEMY], &enmy);
+    Enemy enmy = {1};
+    addComponent(handle, &enmy);
 
     Health health = {.current = ENEMY_MAX_HEALTH, .max = ENEMY_MAX_HEALTH};
-    ecsAddComponent(handle, game->components[CMP_HEALTH], &health);
+    addComponent(handle, &health);
 
     EntityState state = {.id = ENTITY_STATE_IDLE, .cooldown = 0};
-    ecsAddComponent(handle, game->components[CMP_ENTITY_STATE], &state);
+    addComponent(handle, &state);
 
     EnemyWeaponList weaponList;
 
@@ -88,12 +89,12 @@ static EcsEntityHandle createEnemy(Position *pos, Game *game) {
 
     weaponList.weapons[1] = {0};
     weaponList.weapons[2] = {0};
-    ecsAddComponent(handle, game->components[CMP_ENEMY_WEAPON_LIST], &weaponList);
+    addComponent(handle, &weaponList);
 
     Animation animation;
     animation.set = &animationSet;
     switchAnimation(&animation, ANIMATION_IDLE);
-    ecsAddComponent(handle, game->components[CMP_ANIMATION], &animation);
+    addComponent(handle, &animation);
 
     return handle;
 }
@@ -130,16 +131,12 @@ void systemSpawnEnemies(Game *game, float dt) {
     spawnCooldown = game->enemySpawnCooldown;
 }
 
-void systemCleanEnemies(Game *game) {
-    EcsComponentId enemyId = game->components[CMP_ENEMY];
-    EcsComponentId positionId = game->components[CMP_POSITION];
-
-    EcsComponentId componentIdList[] = {enemyId, positionId};
+void systemCleanEnemies() {
+    EcsComponentId componentIdList[] = {COMPONENT_ID(Enemy), COMPONENT_ID(Position)};
     EcsEntityIterator iterator = ecsGetEntityIterator(componentIdList, 2);
     EcsEntityHandle entityHandle;
     while ((entityHandle = ecsGetNextEntity(&iterator)) != INVALID_HANDLE) {
-        Position *position = (Position *)ecsGetEntityComponent(positionId, entityHandle);
-
+        Position *position = getPosition(entityHandle);
         if (position->x < -ENEMY_WIDTH) {
             ecsAddToDestroyQueue(entityHandle);
         }
@@ -150,37 +147,29 @@ void systemCleanEnemies(Game *game) {
 
 void systemCollideEnemies(Game *game) {
     EcsEntityHandle playerHandle = game->player.handle;
-    EcsComponentId enemyId = game->components[CMP_ENEMY];
-    EcsComponentId positionId = game->components[CMP_POSITION];
-    EcsComponentId renderId = game->components[CMP_RENDER];
 
-    EcsComponentId componentIdList[] = {enemyId, positionId, renderId};
+    EcsComponentId componentIdList[] = {COMPONENT_ID(Enemy), COMPONENT_ID(Position), COMPONENT_ID(Render)};
     EcsEntityIterator iterator = ecsGetEntityIterator(componentIdList, 3);
 
-    Position *playerPosition = (Position *)ecsGetEntityComponent(positionId, playerHandle);
-    Render *playerRender = (Render *)ecsGetEntityComponent(renderId, playerHandle);
-    Animation *playerAnim = (Animation *)ecsGetEntityComponent(game->components[CMP_ANIMATION], playerHandle);
-    uint32_t playerFrameIndex = 0;
-    if (playerAnim) playerFrameIndex = playerAnim->currentFrame;
+    Position *playerPosition = getPosition(playerHandle);
+    Render *playerRender = getRender(playerHandle);
+    Animation *playerAnim = getAnimation(playerHandle);
 
-    EntityState *playerState = (EntityState *)
-        ecsGetEntityComponent(game->components[CMP_ENTITY_STATE], game->player.handle);
+    uint32_t playerFrameIndex = playerAnim ? playerAnim->currentFrame : 0;
 
+    EntityState *playerState = getEntityState(playerHandle);
     EcsEntityHandle enemyHandle;
     while ((enemyHandle = ecsGetNextEntity(&iterator)) != INVALID_HANDLE) {
-        EntityState *enemyState = (EntityState *)ecsGetEntityComponent(game->components[CMP_ENTITY_STATE], enemyHandle);
+        EntityState *enemyState = getEntityState(enemyHandle);
         if (enemyState->id != ENTITY_STATE_IDLE || playerState->id != ENTITY_STATE_IDLE) {
             continue;
         }
 
-        Position *enemyPosition = (Position *)ecsGetEntityComponent(positionId, enemyHandle);
-        Render *enemyRender = (Render *)ecsGetEntityComponent(renderId, enemyHandle);
-        Animation *enemyAnim = (Animation *)ecsGetEntityComponent(game->components[CMP_ANIMATION], enemyHandle);
+        Position *enemyPosition = getPosition(enemyHandle);
+        Render *enemyRender = getRender(enemyHandle);
+        Animation *enemyAnim = getAnimation(enemyHandle);
 
-        uint32_t enemyFrameIndex = 0;
-        if (enemyAnim) {
-            enemyFrameIndex = enemyAnim->currentFrame;
-        }
+        uint32_t enemyFrameIndex = enemyAnim ? enemyAnim->currentFrame : 0;
 
         if (checkCollision(
             &game->player.collisions, playerFrameIndex, playerPosition->x, playerPosition->y,
@@ -196,28 +185,28 @@ void systemCollideEnemies(Game *game) {
 
 void systemEnemiesFire(Game *game, float dt) {
     EcsEntityHandle playerHandle = game->player.handle;
-    EcsComponentId enemyId = game->components[CMP_ENEMY];
-    EcsComponentId positionId = game->components[CMP_POSITION];
-    EcsComponentId renderId = game->components[CMP_RENDER];
-    EcsComponentId eWeaponListId = game->components[CMP_ENEMY_WEAPON_LIST];
 
-    EcsComponentId componentIdList[] = {enemyId, positionId, renderId, eWeaponListId};
+    EcsComponentId componentIdList[] = {
+        COMPONENT_ID(Enemy),
+        COMPONENT_ID(Position),
+        COMPONENT_ID(Render),
+        COMPONENT_ID(EnemyWeaponList)
+    };
     EcsEntityIterator iterator = ecsGetEntityIterator(componentIdList, 4);
 
-    Position *playerPosition = (Position *)ecsGetEntityComponent(positionId, playerHandle);
+    Position *playerPosition = getPosition(playerHandle);
 
     EcsEntityHandle enemyHandle;
     while ((enemyHandle = ecsGetNextEntity(&iterator)) != INVALID_HANDLE) {
-        EntityState *enemyState = (EntityState *)ecsGetEntityComponent(game->components[CMP_ENTITY_STATE], enemyHandle);
+        EntityState *enemyState = getEntityState(enemyHandle);
         if (enemyState->id != ENTITY_STATE_IDLE) {
             continue;
         }
 
-        Position *enemyPosition = (Position *)ecsGetEntityComponent(positionId, enemyHandle);
-        Render *enemyRender = (Render *)ecsGetEntityComponent(renderId, enemyHandle);
-        Animation *enemyAnim = (Animation *)ecsGetEntityComponent(game->components[CMP_ANIMATION], enemyHandle);
-        EnemyWeaponList *eWeaponList =
-            (EnemyWeaponList *)ecsGetEntityComponent(game->components[CMP_ENEMY_WEAPON_LIST], enemyHandle);
+        Position *enemyPosition = getPosition(enemyHandle);
+        Render *enemyRender = getRender(enemyHandle);
+        Animation *enemyAnim = getAnimation(enemyHandle);
+        EnemyWeaponList *eWeaponList = getEnemyWeaponList(enemyHandle);
 
         for (int i = 0; i < 3; i++) {
             if (eWeaponList->weapons[i].type == 0) {

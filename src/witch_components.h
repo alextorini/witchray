@@ -1,15 +1,55 @@
 #pragma once
 
 #include <stdint.h>
-#include "smetanka_ecs.h"
+#include "ext/raylib.h"
 #include "smetanka_engine.h"
 #include "witch_game.h"
 #include "witch_event.h"
 
-typedef Vector2 Position;
-typedef Vector2 Velocity;
-typedef uint8_t IsParallax;
-typedef uint8_t IsEnemy;
+#define COMPONENT_ID(T) (getComponentId<T>())
+
+typedef struct {
+    float x;
+    float y;
+} Position;
+
+
+typedef struct {
+    float x;
+    float y;
+} Velocity;
+
+inline Velocity toVelocity(Position pos) {
+    return (Velocity){pos.x, pos.y};
+}
+
+inline Velocity toVelocity(Vector2 vec) {
+    return (Velocity){vec.x, vec.y};
+}
+
+inline Position toPosition(Velocity vel) {
+    return (Position){vel.x, vel.y};
+}
+
+inline Position toPosition(Vector2 vec) {
+    return (Position){vec.x, vec.y};
+}
+
+inline Vector2 toVector2(Position pos) {
+    return (Vector2){pos.x, pos.y};
+}
+
+inline Vector2 toVector2(Velocity vel) {
+    return (Vector2){vel.x, vel.y};
+}
+
+typedef struct {
+    uint8_t value;
+} Parallax;
+
+typedef struct {
+    uint8_t value;
+} Enemy;
 
 typedef enum {
     CASTER_PLAYER,
@@ -112,58 +152,49 @@ typedef enum {
 
 void initComponents(Game *game);
 
-inline Animation *getEntityAnimation(EcsEntityHandle handle, Game *game) {
-    return (Animation *)ecsGetEntityComponent(game->components[CMP_ANIMATION], handle);
-}
+Animation *getAnimation(EcsEntityHandle handle);
+Enemy *getEnemy(EcsEntityHandle handle);
+Event *getEvent(EcsEntityHandle handle);
+Fireball *getFireball(EcsEntityHandle handle);
+Parallax *getParallax(EcsEntityHandle handle);
+Position *getPosition(EcsEntityHandle handle);
+Render *getRender(EcsEntityHandle handle);
+TextRender *getTextRender(EcsEntityHandle handle);
+Velocity *getVelocity(EcsEntityHandle handle);
+OrbitMovement *getOrbitMovement(EcsEntityHandle handle);
+EnemyWeaponList *getEnemyWeaponList(EcsEntityHandle handle);
+PlayerWeaponList *getPlayerWeaponList(EcsEntityHandle handle);
+EntityState *getEntityState(EcsEntityHandle handle);
+Health *getHealth(EcsEntityHandle handle);
 
-inline IsEnemy *getEntityIsEnemy(EcsEntityHandle handle, Game *game) {
-    return (IsEnemy *)ecsGetEntityComponent(game->components[CMP_ENEMY], handle);
-}
+void *addComponent(EcsEntityHandle handle, Animation *animation);
+void *addComponent(EcsEntityHandle handle, Enemy *isEnemy);
+void *addComponent(EcsEntityHandle handle, Event *event);
+void *addComponent(EcsEntityHandle handle, Fireball *fireball);
+void *addComponent(EcsEntityHandle handle, Parallax *isParallax);
+void *addComponent(EcsEntityHandle handle, Position *position);
+void *addComponent(EcsEntityHandle handle, Render *render);
+void *addComponent(EcsEntityHandle handle, TextRender *textRender);
+void *addComponent(EcsEntityHandle handle, Velocity *velocity);
+void *addComponent(EcsEntityHandle handle, OrbitMovement *orbitMovement);
+void *addComponent(EcsEntityHandle handle, EnemyWeaponList *enemyWeaponList);
+void *addComponent(EcsEntityHandle handle, PlayerWeaponList *playerWeaponList);
+void *addComponent(EcsEntityHandle handle, EntityState *entityState);
+void *addComponent(EcsEntityHandle handle, Health *health);
 
-inline Event *getEntityEvent(EcsEntityHandle handle, Game *game) {
-    return (Event *)ecsGetEntityComponent(game->components[CMP_EVENT], handle);
-}
-
-inline Fireball *getEntityFireball(EcsEntityHandle handle, Game *game) {
-    return (Fireball *)ecsGetEntityComponent(game->components[CMP_FIREBALL], handle);
-}
-
-inline IsParallax *getEntityIsParallax(EcsEntityHandle handle, Game *game) {
-    return (IsParallax *)ecsGetEntityComponent(game->components[CMP_PARALLAX], handle);
-}
-
-inline Position *getEntityPosition(EcsEntityHandle handle, Game *game) {
-    return (Position *)ecsGetEntityComponent(game->components[CMP_POSITION], handle);
-}
-
-inline Render *getEntityRender(EcsEntityHandle handle, Game *game) {
-    return (Render *)ecsGetEntityComponent(game->components[CMP_RENDER], handle);
-}
-
-inline TextRender *getEntityTextRender(EcsEntityHandle handle, Game *game) {
-    return (TextRender *)ecsGetEntityComponent(game->components[CMP_TEXT_RENDER], handle);
-}
-
-inline Velocity *getEntityVelocity(EcsEntityHandle handle, Game *game) {
-    return (Velocity *)ecsGetEntityComponent(game->components[CMP_VELOCITY], handle);
-}
-
-inline OrbitMovement *getEntityOrbitMovement(EcsEntityHandle handle, Game *game) {
-    return (OrbitMovement *)ecsGetEntityComponent(game->components[CMP_ORBIT_MOVEMENT], handle);
-}
-
-inline EnemyWeaponList *getEntityEnemyWeaponList(EcsEntityHandle handle, Game *game) {
-    return (EnemyWeaponList *)ecsGetEntityComponent(game->components[CMP_ENEMY_WEAPON_LIST], handle);
-}
-
-inline PlayerWeaponList *getEntityPlayerWeaponList(EcsEntityHandle handle, Game *game) {
-    return (PlayerWeaponList *)ecsGetEntityComponent(game->components[CMP_PLAYER_WEAPON_LIST], handle);
-}
-
-inline EntityState *getEntityState(EcsEntityHandle handle, Game *game) {
-    return (EntityState *)ecsGetEntityComponent(game->components[CMP_ENTITY_STATE], handle);
-}
-
-inline Health *getEntityHealth(EcsEntityHandle handle, Game *game) {
-    return (Health *)ecsGetEntityComponent(game->components[CMP_HEALTH], handle);
-}
+template<typename T>
+EcsComponentId getComponentId();
+template<> EcsComponentId getComponentId<Animation>();
+template<> EcsComponentId getComponentId<Enemy>();
+template<> EcsComponentId getComponentId<Event>();
+template<> EcsComponentId getComponentId<Fireball>();
+template<> EcsComponentId getComponentId<Parallax>();
+template<> EcsComponentId getComponentId<Position>();
+template<> EcsComponentId getComponentId<Render>();
+template<> EcsComponentId getComponentId<TextRender>();
+template<> EcsComponentId getComponentId<Velocity>();
+template<> EcsComponentId getComponentId<OrbitMovement>();
+template<> EcsComponentId getComponentId<EnemyWeaponList>();
+template<> EcsComponentId getComponentId<PlayerWeaponList>();
+template<> EcsComponentId getComponentId<EntityState>();
+template<> EcsComponentId getComponentId<Health>();

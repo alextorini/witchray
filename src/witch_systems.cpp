@@ -10,27 +10,36 @@
 #include "witch_save.h"
 #include "witch_state.h"
 
-void systemMoveEntities(EcsComponentId positionId, EcsComponentId velocityId, float dt) {
-    EcsComponentId componentIdList[] = {positionId, velocityId};
+void systemMoveEntities(float dt) {
+    static EcsComponentId componentIdList[] = {COMPONENT_ID(Position), COMPONENT_ID(Velocity)};
     EcsEntityIterator iterator = ecsGetEntityIterator(componentIdList, 2);
 
     EcsEntityHandle entityHandle;
     while ((entityHandle = ecsGetNextEntity(&iterator)) != INVALID_HANDLE) {
-        Position *position = (Position *)ecsGetEntityComponent(positionId, entityHandle);
-        Velocity *velocity = (Velocity *)ecsGetEntityComponent(velocityId, entityHandle);
+        Position *position = getPosition(entityHandle);
+        Velocity *velocity =  getVelocity(entityHandle);
 
-        *position = vector2Sum(*position, vector2Scale(*velocity, dt));
+        *position = toPosition(
+            vector2Sum(
+                toVector2(*position),
+                vector2Scale(toVector2(*velocity), dt)
+            )
+        );
     }
 }
 
-void systemMoveParallax(EcsComponentId parallaxId, EcsComponentId positionId, EcsComponentId renderId) {
-    EcsComponentId componentIdList[] = {parallaxId, positionId, renderId};
+void systemMoveParallax() {
+    static EcsComponentId componentIdList[] = {
+        COMPONENT_ID(Parallax),
+        COMPONENT_ID(Position),
+        COMPONENT_ID(Render)
+    };
     EcsEntityIterator iterator = ecsGetEntityIterator(componentIdList, 3);
 
     EcsEntityHandle entityHandle;
     while ((entityHandle = ecsGetNextEntity(&iterator)) != INVALID_HANDLE) {
-        Position *position = (Position *)ecsGetEntityComponent(positionId, entityHandle);
-        Render *render = (Render *)ecsGetEntityComponent(renderId, entityHandle);
+        Position *position = getPosition(entityHandle);
+        Render *render = getRender(entityHandle);
 
         if (position->x + render->frame.width < 0) {
             position->x += render->frame.width * 2.0f;
@@ -38,27 +47,22 @@ void systemMoveParallax(EcsComponentId parallaxId, EcsComponentId positionId, Ec
     }
 }
 
-void systemAnimateEntities(
-    EcsComponentId animation_id,
-    EcsComponentId render_id,
-    EcsComponentId entityStateComponentId,
-    float delta_time
-) {
-    EcsComponentId componentIdList[] = {animation_id, render_id};
+void systemAnimateEntities(float dt) {
+    EcsComponentId componentIdList[] = {COMPONENT_ID(Animation), COMPONENT_ID(Render)};
     EcsEntityIterator iterator = ecsGetEntityIterator(componentIdList, 2);
 
     EcsEntityHandle entityHandle;
     while ((entityHandle = ecsGetNextEntity(&iterator)) != INVALID_HANDLE) {
-        EntityState *entityState = (EntityState *)ecsGetEntityComponent(entityStateComponentId, entityHandle);
+        EntityState *entityState = getEntityState(entityHandle);
         if (entityState && entityState->id == ENTITY_STATE_DIE) {
             continue;
         }
 
-        Animation *animation = (Animation*)ecsGetEntityComponent(animation_id, entityHandle);
-        Render *render = (Render *)ecsGetEntityComponent(render_id, entityHandle);
+        Animation *animation = getAnimation(entityHandle);
+        Render *render = getRender(entityHandle);
 
         AnimationClip *currentClip = &animation->set->clips[animation->currentClip];
-        animation->timer += delta_time;
+        animation->timer += dt;
 
         if (currentClip->frameTime <= 0.00001f) return;
 
@@ -77,19 +81,19 @@ void systemAnimateEntities(
     }
 }
 
-void systemRenderEntities(EcsComponentId positionId, EcsComponentId renderId, EcsComponentId entityStateComponentId, ResourceMap *resources) {
-    EcsComponentId componentIdList[] = {positionId, renderId};
+void systemRenderEntities(ResourceMap *resources) {
+    EcsComponentId componentIdList[] = {COMPONENT_ID(Position), COMPONENT_ID(Render)};
     EcsEntityIterator iterator = ecsGetEntityIterator(componentIdList, 2);
 
     EcsEntityHandle entityHandle;
     while ((entityHandle = ecsGetNextEntity(&iterator)) != INVALID_HANDLE) {
-        EntityState *entityState = (EntityState *)ecsGetEntityComponent(entityStateComponentId, entityHandle);
+        EntityState *entityState = getEntityState(entityHandle);
         if (entityState && entityState->id == ENTITY_STATE_DIE) {
             continue;
         }
 
-        Position *position = (Position*)ecsGetEntityComponent(positionId, entityHandle);
-        Render *render = (Render *)ecsGetEntityComponent(renderId, entityHandle);
+        Position *position = getPosition(entityHandle);
+        Render *render = getRender(entityHandle);
 
         float flashColor[4] = {1.0f, 1.0f, 1.0f, 1.0f};
         SetShaderValue(
@@ -107,24 +111,24 @@ void systemRenderEntities(EcsComponentId positionId, EcsComponentId renderId, Ec
             SHADER_UNIFORM_FLOAT
         );
         BeginShaderMode(resources->shaders.damageFlash.shader);
-        smeDrawTextureRec(*render->spritesheet, render->frame, *position, WHITE);
+        smeDrawTextureRec(*render->spritesheet, render->frame, toVector2(*position), WHITE);
         EndShaderMode();
     }
 }
 
-void systemRenderText(EcsComponentId positionId, EcsComponentId textRenderId) {
-    EcsComponentId componentIdList[] = {positionId, textRenderId};
+void systemRenderText() {
+    EcsComponentId componentIdList[] = {COMPONENT_ID(Position), COMPONENT_ID(TextRender)};
     EcsEntityIterator iterator = ecsGetEntityIterator(componentIdList, 2);
 
     EcsEntityHandle entityHandle;
     while ((entityHandle = ecsGetNextEntity(&iterator)) != INVALID_HANDLE) {
-        Position *position = (Position*)ecsGetEntityComponent(positionId, entityHandle);
-        TextRender *textRender = (TextRender *)ecsGetEntityComponent(textRenderId, entityHandle);
+        Position *position = getPosition(entityHandle);
+        TextRender *textRender = getTextRender(entityHandle);
 
         smeDrawText(
             textRender->font,
             textRender->text,
-            vector2Sum(*position, textRender->offset),
+            vector2Sum(toVector2(*position), toVector2(textRender->offset)),
             textRender->fontSize,
             textRender->spacing,
             textRender->color
@@ -132,13 +136,13 @@ void systemRenderText(EcsComponentId positionId, EcsComponentId textRenderId) {
     }
 }
 
-void systemProcessEntityStates(EcsComponentId entityStateComponentId, Game *game) {
-    EcsComponentId componentIdList[] = {entityStateComponentId};
+void systemProcessEntityStates(Game *game) {
+    EcsComponentId componentIdList[] = {COMPONENT_ID(EntityState)};
     EcsEntityIterator iterator = ecsGetEntityIterator(componentIdList, 1);
 
     EcsEntityHandle entityHandle;
     while ((entityHandle = ecsGetNextEntity(&iterator)) != INVALID_HANDLE) {
-        EntityState *entityState = (EntityState *)ecsGetEntityComponent(entityStateComponentId, entityHandle);
+        EntityState *entityState = getEntityState(entityHandle);
         entityState->cooldown -= smeGetFrameTime();
         if (entityState->cooldown < 0.0f) {
             entityState->cooldown = 0.0f;

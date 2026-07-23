@@ -1,4 +1,4 @@
-#include "witch_fire.h"
+#include "witch_spells.h"
 #include "smetanka_ecs.h"
 #include "witch_collisions.h"
 #include "witch_components.h"
@@ -19,20 +19,23 @@ void initFireballs(Game *game) {
 
 void createFireball(Position *position, Velocity *velocity, Caster caster, Game *game) {
     EcsEntityHandle handle = ecsCreateEntity();
-    ecsAddComponent(handle, game->components[CMP_POSITION], position);
-    ecsAddComponent(handle, game->components[CMP_VELOCITY], velocity);
+    addComponent(handle, position);
+    addComponent(handle, velocity);
 
     Fireball fireball = {.damage = 1, .caster = caster};
-    ecsAddComponent(handle, game->components[CMP_FIREBALL], &fireball);
+    addComponent(handle, &fireball);
 
     Render rndr = {&game->resources.sprites[SPRITESHEET_FIREBALL], FIREBALL_DEFAULT_FRAME};
-    ecsAddComponent(handle, game->components[CMP_RENDER], &rndr);
+    addComponent(handle, &rndr);
 
     EntityState state = {.id = ENTITY_STATE_IDLE, .cooldown = 0.0f};
-    ecsAddComponent(handle, game->components[CMP_ENTITY_STATE], &state);
+    addComponent(handle, &state);
 
-    SetSoundVolume(game->resources.sounds[SOUND_SHOOT], 0.25f);
-    PlaySound(game->resources.sounds[SOUND_SHOOT]);
+    eventCreate(handle, EVENT_FIREBALL_CAST, game);
+}
+
+void createIceball(EcsEntityHandle casterHandle, float damage, float angle, Game *game) {
+    EcsEntityHandle handle = ecsCreateEntity();
 }
 
 void castPlayerSpells(Game *game, float dt) {
@@ -40,14 +43,19 @@ void castPlayerSpells(Game *game, float dt) {
         return;
     }
 
-    Position *playerPosition = (Position *)ecsGetEntityComponent(game->components[CMP_POSITION], game->player.handle);
-    PlayerWeaponList *weaponList = getEntityPlayerWeaponList(game->player.handle, game);
+    Position *playerPosition = getPosition(game->player.handle);
+    PlayerWeaponList *weaponList = getPlayerWeaponList(game->player.handle);
     WeaponSlot *weaponSlot;
     for (int i = 0; i < 5; i++) {
         weaponSlot = &weaponList->weapons[i];
         if (weaponSlot->type == PLAYER_WEAPON_FIREBALL) {
             if (weaponSlot->cooldown <= 0) {
-                Position fireballPosition = Vector2Add(*playerPosition, (Position)FIREBALL_CAST_POSITION);
+                Position fireballPosition = toPosition(
+                    vector2Sum(
+                        toVector2(*playerPosition),
+                        (Vector2)FIREBALL_CAST_POSITION
+                    )
+                );
                 Velocity fireballVelocity = {FIREBALL_SPEED, 0};
 
                 createFireball(&fireballPosition, &fireballVelocity, CASTER_PLAYER, game);
@@ -61,21 +69,17 @@ void castPlayerSpells(Game *game, float dt) {
 
         if (weaponSlot->type == PLAYER_WEAPON_ICEBALL) {
 
+
             continue;
         }
     }
 }
 
 void systemFireballsCollide(Game *game) {
-    EcsComponentId fireballId = game->components[CMP_FIREBALL];
-    EcsComponentId enemyId = game->components[CMP_ENEMY];
-    EcsComponentId positionId = game->components[CMP_POSITION];
-    EcsComponentId renderId = game->components[CMP_RENDER];
-
-    EcsComponentId enemyComponentIdList[] = {enemyId, positionId, renderId};
+    EcsComponentId enemyComponentIdList[] = {COMPONENT_ID(Enemy), COMPONENT_ID(Position), COMPONENT_ID(Render)};
     EcsEntityIterator enemyIterator = ecsGetEntityIterator(enemyComponentIdList, 3);
 
-    EcsComponentId fireballComponentIdList[] = {fireballId, positionId, renderId};
+    EcsComponentId fireballComponentIdList[] = {COMPONENT_ID(Fireball), COMPONENT_ID(Position), COMPONENT_ID(Render)};
     EcsEntityIterator fireballIterator = ecsGetEntityIterator(fireballComponentIdList, 3);
 
     EcsEntityHandle fireballHandle;
@@ -87,20 +91,17 @@ void systemFireballsCollide(Game *game) {
             continue;
         }
 
-        Fireball *fireball = (Fireball *)ecsGetEntityComponent(fireballId, fireballHandle);
+        Fireball *fireball = getFireball(fireballHandle);
 
-        Position *fireballPosition = (Position *)ecsGetEntityComponent(positionId, fireballHandle);
-        Render *fireballRender = (Render *)ecsGetEntityComponent(renderId, fireballHandle);
-        Animation *fireballAnim =
-            (Animation *)ecsGetEntityComponent(game->components[CMP_ANIMATION], fireballHandle);
-        uint32_t fireballFrameIndex = 0;
-        if (fireballAnim) fireballFrameIndex = fireballAnim->currentFrame;
+        Position *fireballPosition = getPosition(fireballHandle);
+        Render *fireballRender = getRender(fireballHandle);
+        Animation *fireballAnim = getAnimation(fireballHandle);
+
+        uint32_t fireballFrameIndex = fireballAnim ? fireballAnim->currentFrame : 0;
 
         if (fireball->caster == CASTER_ENEMY) {
-            Animation *playerAnim = (Animation *)
-                ecsGetEntityComponent(game->components[CMP_ANIMATION], game->player.handle);
-            Position *playerPos = (Position *)
-                ecsGetEntityComponent(game->components[CMP_POSITION], game->player.handle);
+            Animation *playerAnim = getAnimation(game->player.handle);
+            Position *playerPos = getPosition(game->player.handle);
             if(checkCollision(
                 &game->fireballs.collisions, fireballFrameIndex, fireballPosition->x, fireballPosition->y,
                 &game->player.collisions, playerAnim->currentFrame, playerPos->x, playerPos->y
@@ -114,15 +115,14 @@ void systemFireballsCollide(Game *game) {
 
         EcsEntityIterator enemyIterator = ecsGetEntityIterator(enemyComponentIdList, 3);
         while ((enemyHandle = ecsGetNextEntity(&enemyIterator)) != INVALID_HANDLE) {
-            EntityState *enemyState =
-                (EntityState *)ecsGetEntityComponent(game->components[CMP_ENTITY_STATE], enemyHandle);
+            EntityState *enemyState = getEntityState(enemyHandle);
             if (enemyState->id != ENTITY_STATE_IDLE) {
                 continue;
             }
 
-            Position *enemyPosition = (Position *)ecsGetEntityComponent(positionId, enemyHandle);
-            Render *enemyRender = (Render *)ecsGetEntityComponent(renderId, enemyHandle);
-            Animation *enemyAnim = (Animation *)ecsGetEntityComponent(game->components[CMP_ANIMATION], enemyHandle);
+            Position *enemyPosition = getPosition(enemyHandle);
+            Render *enemyRender = getRender(enemyHandle);
+            Animation *enemyAnim = getAnimation(enemyHandle);
 
             uint32_t enemyFrameIndex = 0;
             if (enemyAnim) {
@@ -142,17 +142,17 @@ void systemFireballsCollide(Game *game) {
     }
 }
 
-void systemCleanFireballs(EcsComponentId fireballId, EcsComponentId positionId, EcsComponentId entityStateComponentId) {
-    EcsComponentId componentIdList[] = {fireballId, positionId};
+void systemCleanFireballs() {
+    EcsComponentId componentIdList[] = {COMPONENT_ID(Fireball), COMPONENT_ID(Position)};
     EcsEntityIterator iterator = ecsGetEntityIterator(componentIdList, 2);
     EcsEntityHandle entityHandle;
     while ((entityHandle = ecsGetNextEntity(&iterator)) != INVALID_HANDLE) {
-        EntityState *fireballState = (EntityState *)ecsGetEntityComponent(entityStateComponentId, entityHandle);
+        EntityState *fireballState = getEntityState(entityHandle);
         if (fireballState->id == ENTITY_STATE_DIE) {
             continue;
         }
 
-        Position *position = (Position *)ecsGetEntityComponent(positionId, entityHandle);
+        Position *position = getPosition(entityHandle);
 
         if (position->x > PLAYSCREEN_WIDTH || position->x < -(Rectangle)FIREBALL_DEFAULT_FRAME.width
             || position->y > PLAYSCREEN_HEIGHT || position->y < -(Rectangle)FIREBALL_DEFAULT_FRAME.height

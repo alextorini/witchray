@@ -1,6 +1,5 @@
 #pragma once
 
-#include "smetanka_ecs.h"
 #include "witch_components.h"
 #include "witch_game.h"
 
@@ -12,4 +11,4 @@ void castPlayerSpells(Game *game, float dt);
 
 void systemFireballsCollide(Game *game);
 
-void systemCleanFireballs(EcsComponentId fireballId, EcsComponentId positionId, EcsComponentId entityStateComponentId);
+void systemCleanFireballs();

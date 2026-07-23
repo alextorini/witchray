@@ -38,6 +38,7 @@ build-mingw:
 		$(INCLUDES) \
 		$(SRC_DIR)/*.cpp \
 		lib/debug/libraylib.a \
+		-static-libgcc -static-libstdc++ -static -lwinpthread \
 		-lopengl32 \
 		-lgdi32 \
 		-lwinmm \

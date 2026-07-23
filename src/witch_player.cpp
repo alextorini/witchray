@@ -3,7 +3,7 @@
 #include "smetanka_ecs.h"
 #include "witch_animation.h"
 #include "witch_components.h"
-#include "witch_fire.h"
+#include "witch_spells.h"
 #include "witch_game.h"
 #include "witch_player.h"
 #include "witch_resources.h"
@@ -17,13 +17,13 @@ EcsEntityHandle initPlayer(Game *game) {
     EcsEntityHandle handle = ecsCreateEntity();
 
     Position position = PLAYER_START_POS;
-    ecsAddComponent(handle, game->components[CMP_POSITION], &position);
+    addComponent(handle, &position);
 
     Velocity velocity = {0.0, 0.0};
-    ecsAddComponent(handle, game->components[CMP_VELOCITY], &velocity);
+    addComponent(handle, &velocity);
 
     Health health = {.current = PLAYER_MAX_HEALTH, .max = PLAYER_MAX_HEALTH};
-    ecsAddComponent(handle, game->components[CMP_HEALTH], &health);
+    addComponent(handle, &health);
 
     PlayerWeaponList weaponList;
 
@@ -32,13 +32,13 @@ EcsEntityHandle initPlayer(Game *game) {
     weaponList.weapons[2] = {0};
     weaponList.weapons[3] = {0};
     weaponList.weapons[4] = {0};
-    ecsAddComponent(handle, game->components[CMP_PLAYER_WEAPON_LIST], &weaponList);
+    addComponent(handle, &weaponList);
 
     EntityState state = {.id = ENTITY_STATE_IDLE, .cooldown = 0};
-    ecsAddComponent(handle, game->components[CMP_ENTITY_STATE], &state);
+    addComponent(handle, &state);
 
     Render render = {&game->resources.sprites[SPRITESHEET_PLAYER], PLAYER_DEFAULT_FRAME};
-    ecsAddComponent(handle, game->components[CMP_RENDER], &render);
+    addComponent(handle, &render);
 
     idleAnimation.startFrame = 0;
     idleAnimation.endFrame = 1;
@@ -56,7 +56,7 @@ EcsEntityHandle initPlayer(Game *game) {
     Animation animation;
     animation.set = &animationSet;
     switchAnimation(&animation, ANIMATION_IDLE);
-    ecsAddComponent(handle, game->components[CMP_ANIMATION], &animation);
+    addComponent(handle, &animation);
 
     initCollisionMap(PLAYER_IMAGE_PATH, render.frame, 6, &game->player.collisions);
     initFireballs(game);

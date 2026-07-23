@@ -22,6 +22,13 @@ static inline float xyMagnitude(float x, float y) {
     return sqrt(x * x + y * y);
 }
 
+static inline Vector2 vector2Sum(float x1, float y1, float x2, float y2) {
+    return (Vector2){
+        .x = x1 + x1,
+        .y = y1 + y2
+    };
+}
+
 static inline Vector2 vector2Sum(Vector2 a, Vector2 b) {
     return (Vector2){
         .x = a.x + b.x,

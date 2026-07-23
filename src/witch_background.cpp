@@ -6,14 +6,14 @@
 static EcsEntityHandle createLayerInstance(Texture *texture, Position position, Velocity velocity, Game *game) {
     EcsEntityHandle layerId = ecsCreateEntity();
 
-    ecsAddComponent(layerId, game->components[CMP_POSITION], &position);
-    ecsAddComponent(layerId, game->components[CMP_VELOCITY], &velocity);
+    addComponent(layerId, &position);
+    addComponent(layerId, &velocity);
 
     Render render = {texture, {0.0f, 0.0f, 1.0f * texture->width, 1.0f * texture->height}};
-    ecsAddComponent(layerId, game->components[CMP_RENDER], &render);
+    addComponent(layerId, &render);
 
-    IsParallax isParallax = true;
-    ecsAddComponent(layerId, game->components[CMP_PARALLAX], &isParallax);
+    Parallax parallax = {1};
+    addComponent(layerId, &parallax);
 
     return layerId;
 }

@@ -4,14 +4,14 @@
 #include "witch_game.h"
 
 void damage(EcsEntityHandle entityHandle, float damage, Game *game) {
-    EntityState *state = (EntityState *)ecsGetEntityComponent(game->components[CMP_ENTITY_STATE], entityHandle);
+    EntityState *state = getEntityState(entityHandle);
     if (!state || state->id == ENTITY_STATE_DIE || state->id == ENTITY_STATE_DYING) {
         return;
     }
 
     eventCreate(entityHandle, EVENT_DAMAGE_TAKEN, game);
 
-    Health *health = (Health *)ecsGetEntityComponent(game->components[CMP_HEALTH], entityHandle);
+    Health *health = getHealth(entityHandle);
     health->current -= damage;
 
     if (health->current <= 0) {

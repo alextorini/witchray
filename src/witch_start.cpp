@@ -15,7 +15,7 @@ void startScreenInit(Game *game) {
     EcsEntityHandle startLabelHandle = ecsCreateEntity();
 
     Position startLabelPosition = {.x = 40, .y = 150};
-    ecsAddComponent(startLabelHandle, game->components[CMP_POSITION], &startLabelPosition);
+    addComponent(startLabelHandle, &startLabelPosition);
 
     TextRender start_label_text_render = {
         .offset = {0, 0},
@@ -26,7 +26,7 @@ void startScreenInit(Game *game) {
         .text = START_SCREEN_TEXT
     };
 
-    ecsAddComponent(startLabelHandle, game->components[CMP_TEXT_RENDER], &start_label_text_render);
+    addComponent(startLabelHandle, &start_label_text_render);
 
     game->score = 0;
     game->state = STATE_START_SCREEN;

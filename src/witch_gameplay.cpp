@@ -1,7 +1,6 @@
-#include "witch_components.h"
 #include "witch_enemies.h"
 #include "witch_gameplay.h"
-#include "witch_fire.h"
+#include "witch_spells.h"
 #include "witch_gameplay_input_process.h"
 #include "witch_background.h"
 #include "witch_player.h"
@@ -27,31 +26,27 @@ void gameplayUpdate(InputState *input, Game *game, float dt) {
     }
 
     systemSpawnEnemies(game, dt);
+
     systemEnemiesFire(game, dt);
-    systemCleanEnemies(game);
+
+    systemCleanEnemies();
+
     castPlayerSpells(game, dt);
 
-    systemMoveEntities(game->components[CMP_POSITION], game->components[CMP_VELOCITY], dt);
+    systemMoveEntities(dt);
 
-    systemAnimateEntities(
-        game->components[CMP_ANIMATION],
-        game->components[CMP_RENDER],
-        game->components[CMP_RENDER],
-        dt
-    );
+    systemAnimateEntities(dt);
 
-    systemMoveParallax(game->components[CMP_PARALLAX], game->components[CMP_POSITION], game->components[CMP_RENDER]);
+    systemMoveParallax();
 
     systemCollideEnemies(game);
 
     systemFireballsCollide(game);
-    systemCleanFireballs(
-        game->components[CMP_FIREBALL],
-        game->components[CMP_POSITION],
-        game->components[CMP_ENTITY_STATE]
-    );
 
-    systemProcessEntityStates(game->components[CMP_ENTITY_STATE], game);
+    systemCleanFireballs();
+
+    systemProcessEntityStates(game);
+
     if (game->timer > 30.0f) {
         game->skyColor = SKY_COLOR_2;
     }

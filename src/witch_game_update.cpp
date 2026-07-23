@@ -1,11 +1,12 @@
 
+#include "smetanka_engine.h"
 #include "smetanka_misc.h"
 #include "witch_game_update.h"
 #include "witch_start.h"
 #include "witch_gameplay.h"
 
 void gameUpdate(InputState *input, Game *game, float dt) {
-    UpdateMusicStream(game->resources.music[MUSIC_MAIN]);
+    smeUpdateMusicStream(game->resources.music[MUSIC_MAIN]);
 
     switch (game->state) {
         case STATE_START_SCREEN:

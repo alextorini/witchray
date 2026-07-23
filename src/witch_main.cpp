@@ -14,24 +14,24 @@ int main() {
     };
     smeInit(&initData);
 
-    Game *game = WR_MALLOC_TYPE(Game);
+    Game game;
 
-    init(game);
+    init(&game);
 
     RenderTexture virtualScreen = smeLoadRenderTexture(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
     Rectangle virtualScreenRec = (Rectangle)
         {0.0f, 0.0f, (float)virtualScreen.texture.width, (float)-virtualScreen.texture.height};
     Rectangle windowRec = (Rectangle){0.0f, 0.0f, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT};
 
-    while (!smeShouldClose() && !game->shouldClose) {
+    while (!smeShouldClose() && !game.shouldClose) {
         smeBeginTextureMode(virtualScreen);
 
-        updateAndRender(game, &virtualScreen, smeGetFrameTime());
+        updateAndRender(&game, &virtualScreen, smeGetFrameTime());
 
         smeRenderVirtualScreen(&virtualScreen, &virtualScreenRec, &windowRec);
     }
 
-    unload(game);
+    unload(&game);
 
     return 0;
 }

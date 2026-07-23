@@ -9,10 +9,8 @@
 
 #define FIREBALL_DEFAULT_FRAME {0.0f, 0.0f, 5.0f, 5.0f}
 #define FIREBALL_CAST_POSITION {38.0f, 18.0f}
-#define FIREBALL_COOLDOWN 0.4
-#define FIREBALL_SPEED 300.0
-
-static float fireballCooldown = 0.0;
+#define FIREBALL_COOLDOWN 0.4f
+#define FIREBALL_SPEED 300.0f
 
 void initFireballs(Game *game) {
     game->fireballs.deathCooldown = 0.0f;
@@ -37,22 +35,35 @@ void createFireball(Position *position, Velocity *velocity, Caster caster, Game 
     PlaySound(game->resources.sounds[SOUND_SHOOT]);
 }
 
-void castFireballs(Game *game, float dt) {
+void castPlayerSpells(Game *game, float dt) {
     if (game->timer < 5.0f) {
         return;
     }
 
     Position *playerPosition = (Position *)ecsGetEntityComponent(game->components[CMP_POSITION], game->player.handle);
-    if (fireballCooldown <= 0) {
-        Position fireballPosition = Vector2Add(*playerPosition, (Position)FIREBALL_CAST_POSITION);
-        Velocity fireballVelocity = {FIREBALL_SPEED, 0};
-        createFireball(&fireballPosition, &fireballVelocity, CASTER_PLAYER, game);
-        fireballCooldown = FIREBALL_COOLDOWN;
+    PlayerWeaponList *weaponList = getEntityPlayerWeaponList(game->player.handle, game);
+    WeaponSlot *weaponSlot;
+    for (int i = 0; i < 5; i++) {
+        weaponSlot = &weaponList->weapons[i];
+        if (weaponSlot->type == PLAYER_WEAPON_FIREBALL) {
+            if (weaponSlot->cooldown <= 0) {
+                Position fireballPosition = Vector2Add(*playerPosition, (Position)FIREBALL_CAST_POSITION);
+                Velocity fireballVelocity = {FIREBALL_SPEED, 0};
 
-        return;
+                createFireball(&fireballPosition, &fireballVelocity, CASTER_PLAYER, game);
+                weaponSlot->cooldown = PLAYER_FIREBALL_COOLDOWN;
+            }
+
+            weaponSlot->cooldown -= dt;
+
+            continue;
+        }
+
+        if (weaponSlot->type == PLAYER_WEAPON_ICEBALL) {
+
+            continue;
+        }
     }
-
-    fireballCooldown -= dt;
 }
 
 void systemFireballsCollide(Game *game) {

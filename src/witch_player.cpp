@@ -8,12 +8,6 @@
 #include "witch_player.h"
 #include "witch_resources.h"
 
-#define PLAYER_MAX_VELOCITY 200.0
-#define PLAYER_ACCELERATION 1000.0
-#define PLAYER_BRAKING  500.0
-
-#define PLAYER_DEATH_COOLDOWN 1.0f
-
 static AnimationClip idleAnimation;
 static AnimationClip deathAnimation;
 
@@ -30,6 +24,15 @@ EcsEntityHandle initPlayer(Game *game) {
 
     Health health = {.current = PLAYER_MAX_HEALTH, .max = PLAYER_MAX_HEALTH};
     ecsAddComponent(handle, game->components[CMP_HEALTH], &health);
+
+    PlayerWeaponList weaponList;
+
+    weaponList.weapons[0] = {.type = PLAYER_WEAPON_FIREBALL, .damage = 1, .cooldown = PLAYER_FIREBALL_COOLDOWN};
+    weaponList.weapons[1] = {.type = PLAYER_WEAPON_ICEBALL, .damage = 2, .cooldown = PLAYER_ICEBALL_COOLDOWN};
+    weaponList.weapons[2] = {0};
+    weaponList.weapons[3] = {0};
+    weaponList.weapons[4] = {0};
+    ecsAddComponent(handle, game->components[CMP_PLAYER_WEAPON_LIST], &weaponList);
 
     EntityState state = {.id = ENTITY_STATE_IDLE, .cooldown = 0};
     ecsAddComponent(handle, game->components[CMP_ENTITY_STATE], &state);

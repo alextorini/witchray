@@ -1,4 +1,5 @@
 #include "smetanka_engine.h"
+#include "witch_components.h"
 #include "witch_event.h"
 #include "witch_game.h"
 #include "witch_game_update.h"
@@ -10,6 +11,8 @@
 
 void init(Game *game) {
     game->shouldClose = 0;
+    game->pause = 0;
+    game->highscore = 0;
 
     resourcesInit(game);
 
@@ -17,7 +20,7 @@ void init(Game *game) {
 
     ecsCreateSpace();
 
-    initComponents(&game->components);
+    initComponents(game);
 
     loadGame(game);
 
@@ -32,7 +35,6 @@ void updateAndRender(Game *game, RenderTexture *screen, float deltaTime) {
     eventProcess(game);
 
     stateUpdate(game);
-
 
     render(game, screen);
 }

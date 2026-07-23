@@ -132,7 +132,7 @@ void systemSpawnEnemies(Game *game, float dt) {
 
 void systemCleanEnemies(Game *game) {
     EcsComponentId enemyId = game->components[CMP_ENEMY];
-    EcsComponentId positionId =game->components[CMP_POSITION];
+    EcsComponentId positionId = game->components[CMP_POSITION];
 
     EcsComponentId componentIdList[] = {enemyId, positionId};
     EcsEntityIterator iterator = ecsGetEntityIterator(componentIdList, 2);

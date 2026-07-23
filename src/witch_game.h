@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include "smetanka_ecs.h"
 #include "witch_collisions.h"
-#include "witch_components.h"
 
 #define GAME_VERSION 0
 
@@ -40,6 +39,14 @@ constexpr int VIRTUAL_WIDTH = 640;
 #define PLAYER_IDLE_ANIM_SPEED 0.25f
 
 #define PLAYER_MAX_HEALTH 10.0f
+
+#define PLAYER_FIREBALL_COOLDOWN 0.5f
+#define PLAYER_ICEBALL_COOLDOWN 1.0f
+
+#define PLAYER_WEAPON_FIREBALL 1
+#define PLAYER_WEAPON_ICEBALL 2
+
+#define PLAYER_DEATH_COOLDOWN 1.0f
 
 #define WR_MALLOC malloc
 #define WR_MALLOC_TYPE(type) ((type *)malloc(sizeof(type)))
@@ -83,6 +90,7 @@ typedef enum {
     BACKGROUND_URBAN,
     BACKGROUND_CLOUDS,
     SPRITESHEET_FIREBALL,
+    SPRITESHEET_ICEBALL,
     SPRITE_COUNT
 } SpriteIndex;
 
@@ -117,7 +125,7 @@ typedef struct {
     Fireballs fireballs;
     EcsEntityHandle backgrounds[2][2];
     ResourceMap resources;
-    EcsComponentId components[CMP_COUNT];
+    EcsComponentId *components;
     int state;
     int requestedState;
     float timer;

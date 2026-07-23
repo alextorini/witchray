@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include "ext/raymath.h"
 
+#define PI 3.14159265358979323846f
+
 typedef Vector2 Vector2;
 
 static inline uint8_t aabbIntersect(

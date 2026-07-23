@@ -29,7 +29,7 @@ void gameplayUpdate(InputState *input, Game *game, float dt) {
     systemSpawnEnemies(game, dt);
     systemEnemiesFire(game, dt);
     systemCleanEnemies(game);
-    castFireballs(game, dt);
+    castPlayerSpells(game, dt);
 
     systemMoveEntities(game->components[CMP_POSITION], game->components[CMP_VELOCITY], dt);
 

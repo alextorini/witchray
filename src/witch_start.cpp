@@ -1,3 +1,4 @@
+#include "witch_components.h"
 #include "witch_game.h"
 #include "witch_input_read.h"
 #include "witch_start.h"

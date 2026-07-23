@@ -1,6 +1,7 @@
 #include <stdlib.h>
 
 #include "witch_background.h"
+#include "witch_components.h"
 
 static EcsEntityHandle createLayerInstance(Texture *texture, Position position, Velocity velocity, Game *game) {
     EcsEntityHandle layerId = ecsCreateEntity();

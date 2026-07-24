@@ -19,7 +19,7 @@ void eventProcess(Game *game) {
     EcsEntityHandle eventHandle;
     while ((eventHandle = ecsGetNextEntity(&iterator)) != INVALID_HANDLE) {
         Event *event = getEvent(eventHandle);
-        EntityState *entityState = getEntityState(event->entityHandle);
+        EntityState *entityState = ecsDoesEntityExist(event->entityHandle) ? getEntityState(event->entityHandle) : NULL;
 
         switch (event->type) {
             case EVENT_PAUSE_TOGGLE: {

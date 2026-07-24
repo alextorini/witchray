@@ -159,6 +159,10 @@ void systemProcessEntityStates(Game *game) {
                 saveGame(game);
                 stateRequestChange(game, STATE_START_SCREEN);
             }
+
+            ecsAddToDestroyQueue(entityHandle);
         }
+
+        ecsFlushDestroyQueue();
     }
 }

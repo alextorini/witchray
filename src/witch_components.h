@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include "ext/raylib.h"
+#include "smetanka_ecs.h"
 #include "smetanka_engine.h"
 #include "witch_game.h"
 #include "witch_event.h"
@@ -51,18 +52,18 @@ typedef struct {
     uint8_t value;
 } Enemy;
 
-typedef enum {
-    CASTER_PLAYER,
-    CASTER_ENEMY,
-} Caster;
+typedef struct {
+    EcsEntityHandle caster;
+    float damage;
+} Spell;
 
 typedef struct {
-    int32_t damage;
-    Caster caster;
-} Fireball;
+    EcsEntityHandle caster;
+    float damage;
+} Iceball;
 
 typedef struct {
-    Position center;
+    EcsEntityHandle center;
     float radius;
     float angle;
     float angularSpeed;
@@ -143,6 +144,7 @@ typedef enum {
     CMP_ENEMY,
     CMP_TEXT_RENDER,
     CMP_FIREBALL,
+    CMP_ICEBALL,
     CMP_ENEMY_WEAPON_LIST,
     CMP_PLAYER_WEAPON_LIST,
     CMP_ENTITY_STATE,
@@ -155,7 +157,7 @@ void initComponents(Game *game);
 Animation *getAnimation(EcsEntityHandle handle);
 Enemy *getEnemy(EcsEntityHandle handle);
 Event *getEvent(EcsEntityHandle handle);
-Fireball *getFireball(EcsEntityHandle handle);
+Spell *getFireball(EcsEntityHandle handle);
 Parallax *getParallax(EcsEntityHandle handle);
 Position *getPosition(EcsEntityHandle handle);
 Render *getRender(EcsEntityHandle handle);
@@ -170,7 +172,8 @@ Health *getHealth(EcsEntityHandle handle);
 void *addComponent(EcsEntityHandle handle, Animation *animation);
 void *addComponent(EcsEntityHandle handle, Enemy *isEnemy);
 void *addComponent(EcsEntityHandle handle, Event *event);
-void *addComponent(EcsEntityHandle handle, Fireball *fireball);
+void *addComponent(EcsEntityHandle handle, Spell *fireball);
+void *addComponent(EcsEntityHandle handle, Iceball *iceball);
 void *addComponent(EcsEntityHandle handle, Parallax *isParallax);
 void *addComponent(EcsEntityHandle handle, Position *position);
 void *addComponent(EcsEntityHandle handle, Render *render);
@@ -187,7 +190,8 @@ EcsComponentId getComponentId();
 template<> EcsComponentId getComponentId<Animation>();
 template<> EcsComponentId getComponentId<Enemy>();
 template<> EcsComponentId getComponentId<Event>();
-template<> EcsComponentId getComponentId<Fireball>();
+template<> EcsComponentId getComponentId<Spell>();
+template<> EcsComponentId getComponentId<Iceball>();
 template<> EcsComponentId getComponentId<Parallax>();
 template<> EcsComponentId getComponentId<Position>();
 template<> EcsComponentId getComponentId<Render>();

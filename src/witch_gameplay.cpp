@@ -5,7 +5,7 @@
 #include "witch_background.h"
 #include "witch_player.h"
 #include "witch_systems.h"
-
+#include "witch_system_movement.h"
 
 void gameplayInit(Game *game) {
     initGameBackground(game);
@@ -35,13 +35,15 @@ void gameplayUpdate(InputState *input, Game *game, float dt) {
 
     systemMoveEntities(dt);
 
+    systemMoveOrbit(dt);
+
     systemAnimateEntities(dt);
 
     systemMoveParallax();
 
     systemCollideEnemies(game);
 
-    systemFireballsCollide(game);
+    systemCollideSpells(game);
 
     systemCleanFireballs();
 

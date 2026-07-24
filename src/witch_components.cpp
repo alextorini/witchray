@@ -9,7 +9,8 @@ void initComponents(Game *game) {
     components[CMP_ANIMATION] = ecsRegisterComponent((char *)"Animation", sizeof(Animation));
     components[CMP_ENEMY] = ecsRegisterComponent((char *)"Enemy", sizeof(Enemy));
     components[CMP_EVENT] = ecsRegisterComponent((char *)"Event", sizeof(Event));
-    components[CMP_FIREBALL] = ecsRegisterComponent((char *)"Fireball", sizeof(Fireball));
+    components[CMP_FIREBALL] = ecsRegisterComponent((char *)"Fireball", sizeof(Spell));
+    components[CMP_ICEBALL] = ecsRegisterComponent((char *)"Iceball", sizeof(Iceball));
     components[CMP_PARALLAX] = ecsRegisterComponent((char *)"Parallax", sizeof(Parallax));
     components[CMP_POSITION] = ecsRegisterComponent((char *)"Position", sizeof(Position));
     components[CMP_RENDER] = ecsRegisterComponent((char *)"Render", sizeof(Render));
@@ -36,8 +37,12 @@ Event *getEvent(EcsEntityHandle handle) {
     return (Event *)ecsGetEntityComponent(components[CMP_EVENT], handle);
 }
 
-Fireball *getFireball(EcsEntityHandle handle) {
-    return (Fireball *)ecsGetEntityComponent(components[CMP_FIREBALL], handle);
+Spell *getFireball(EcsEntityHandle handle) {
+    return (Spell *)ecsGetEntityComponent(components[CMP_FIREBALL], handle);
+}
+
+Iceball *getIceball(EcsEntityHandle handle) {
+    return (Iceball *)ecsGetEntityComponent(components[CMP_ICEBALL], handle);
 }
 
 Parallax *getParallax(EcsEntityHandle handle) {
@@ -92,8 +97,12 @@ void *addComponent(EcsEntityHandle handle, Event *event) {
     return ecsAddComponent(handle, components[CMP_EVENT], event);
 }
 
-void *addComponent(EcsEntityHandle handle, Fireball *fireball) {
+void *addComponent(EcsEntityHandle handle, Spell *fireball) {
     return ecsAddComponent(handle, components[CMP_FIREBALL], fireball);
+}
+
+void *addComponent(EcsEntityHandle handle, Iceball *iceball) {
+    return ecsAddComponent(handle, components[CMP_ICEBALL], iceball);
 }
 
 void *addComponent(EcsEntityHandle handle, Parallax *isParallax) {
@@ -151,8 +160,12 @@ template<> EcsComponentId getComponentId<Event>() {
     return components[CMP_EVENT];
 }
 
-template<> EcsComponentId getComponentId<Fireball>() {
+template<> EcsComponentId getComponentId<Spell>() {
     return components[CMP_FIREBALL];
+}
+
+template<> EcsComponentId getComponentId<Iceball>() {
+    return components[CMP_ICEBALL];
 }
 
 template<> EcsComponentId getComponentId<Parallax>() {

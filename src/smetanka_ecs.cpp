@@ -282,6 +282,19 @@ void *ecsAddComponent(EcsEntityHandle entityHandle, EcsComponentId componentId, 
     return newData;
 }
 
+uint8_t ecsDoesEntityExist(EcsEntityHandle entityHandle) {
+    EcsEntityId entityId = getHandleId(entityHandle);
+    if (!space->entityList[entityId].active) {
+        return 0;
+    }
+
+    if (getHandleGen(space->entityList[entityId].handle) != getHandleGen(entityHandle)) {
+        return 0;
+    }
+
+    return 1;
+}
+
 void *ecsGetEntityComponent(EcsComponentId componentId, EcsEntityHandle entityHandle) {
     EcsComponent *component = &space->componentList[componentId];
     EcsEntityId entityId = getHandleId(entityHandle);

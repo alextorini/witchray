@@ -30,6 +30,8 @@ EcsEntityHandle ecsCreateEntity();
 
 void *ecsAddComponent(EcsEntityHandle entityHandle, EcsComponentId componentId, void *componentData);
 
+uint8_t ecsDoesEntityExist(EcsEntityHandle entityHandle);
+
 void *ecsGetEntityComponent(EcsComponentId componentId, EcsEntityHandle entityHandle);
 
 uint32_t ecsGetComponentCount(EcsComponentId cmpId);

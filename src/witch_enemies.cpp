@@ -100,9 +100,9 @@ static EcsEntityHandle createEnemy(Position *pos, Game *game) {
 }
 
 void systemSpawnEnemies(Game *game, float dt) {
-    if (game->timer < 5.0f) {
-        return;
-    }
+    // if (game->timer < 5.0f) {
+    //     return;
+    // }
 
     if (game->timer > 120.0f) {
         game->enemySpawnCooldown = 0.5f;
@@ -224,7 +224,7 @@ void systemEnemiesFire(Game *game, float dt) {
 
             Velocity velocity = {x / distance * ENEMY_FIREBALL_SPEED, y / distance * ENEMY_FIREBALL_SPEED};
 
-            createFireball(enemyPosition, &velocity, CASTER_ENEMY, game);
+            createFireball(enemyPosition, &velocity, enemyHandle, game);
             eWeaponList->weapons[i].cooldown = 3;
         }
 

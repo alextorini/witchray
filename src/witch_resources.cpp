@@ -8,6 +8,7 @@ void resourcesInit(Game *game) {
     game->resources.sprites[SPRITESHEET_ENEMY] = smeLoadPixelTexture(ENEMY_IMAGE_PATH);
     game->resources.sprites[SPRITESHEET_FIREBALL] = smeLoadPixelTexture(FIREBALL_IMAGE_PATH);
     game->resources.sprites[SPRITESHEET_ICEBALL] = smeLoadPixelTexture(ICEBALL_IMAGE_PATH);
+    game->resources.sprites[SPRITESHEET_STARBALL] = smeLoadPixelTexture("images/starball.png");
     game->resources.sprites[BACKGROUND_URBAN] = smeLoadPixelTexture("images/background_urban.png");
     game->resources.sprites[BACKGROUND_CLOUDS] = smeLoadPixelTexture("images/background_clouds.png");
 

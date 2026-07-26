@@ -35,6 +35,8 @@ void gameplayUpdate(InputState *input, Game *game, float dt) {
 
     systemMoveEntities(dt);
 
+    systemHomingVelocityUpdate();
+
     systemMoveOrbit(dt);
 
     systemAnimateEntities(dt);

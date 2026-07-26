@@ -224,7 +224,7 @@ void systemEnemiesFire(Game *game, float dt) {
 
             Velocity velocity = {x / distance * ENEMY_FIREBALL_SPEED, y / distance * ENEMY_FIREBALL_SPEED};
 
-            createFireball(enemyPosition, &velocity, enemyHandle, game);
+            createFireball(enemyPosition, &velocity, enemyHandle, eWeaponList->weapons[i].damage, game);
             eWeaponList->weapons[i].cooldown = 3;
         }
 

@@ -1,6 +1,7 @@
 #include "witch_spells.h"
 #include "ext/raylib.h"
 #include "smetanka_ecs.h"
+#include "smetanka_math.h"
 #include "witch_collisions.h"
 #include "witch_components.h"
 #include "witch_damage.h"
@@ -9,21 +10,25 @@
 #include "witch_resources.h"
 
 #define FIREBALL_DEFAULT_FRAME {0.0f, 0.0f, 5.0f, 5.0f}
-#define FIREBALL_CAST_POSITION {38.0f, 18.0f}
+#define PLAYER_CAST_POSITION {38.0f, 18.0f}
 #define FIREBALL_COOLDOWN 0.4f
 #define FIREBALL_SPEED 300.0f
+#define STARBALL_DEFAULT_SPEED 150.0f
 
 void initFireballs(Game *game) {
     game->fireballs.deathCooldown = 0.0f;
     initCollisionMap(FIREBALL_IMAGE_PATH, (Rectangle)FIREBALL_DEFAULT_FRAME, 10, &game->fireballs.collisions);
 }
 
-void createFireball(Position *position, Velocity *velocity, EcsEntityHandle caster, Game *game) {
+void createFireball(Position *position, Velocity *velocity, EcsEntityHandle caster, float damage, Game *game) {
     EcsEntityHandle handle = ecsCreateEntity();
     addComponent(handle, position);
     addComponent(handle, velocity);
 
-    Spell fireball = {.caster = caster, .damage = 1};
+    Spell spell = {.caster = caster, .damage = damage};
+    addComponent(handle, &spell);
+
+    Fireball fireball = {.caster = caster};
     addComponent(handle, &fireball);
 
     Render rndr = {&game->resources.sprites[SPRITESHEET_FIREBALL], FIREBALL_DEFAULT_FRAME};
@@ -48,12 +53,10 @@ void createIceball(EcsEntityHandle casterHandle, float damage, float angle, Game
         .y = casterPosition->y + casterFrame.height / 2.0f - orbit.radius};
     addComponent(handle, &position);
 
-    Spell spell = {.caster = casterHandle, .damage = damage};
+    Spell spell = {.caster = casterHandle, .type = COMPONENT_ID(Iceball), .damage = damage};
     addComponent(handle, &spell);
 
-    // This Iceball component is temporary solution
-    // TODO: Need to find scalable solution to distinguish between spells
-    Iceball iceball = {.caster = casterHandle, . damage = damage};
+    Iceball iceball = {.max = 2};
     addComponent(handle, &iceball);
 
     EntityState entityState = {.id = ENTITY_STATE_IDLE, .cooldown = 0.0f};
@@ -63,6 +66,87 @@ void createIceball(EcsEntityHandle casterHandle, float damage, float angle, Game
     addComponent(handle, &render);
 
     // TODO: Add animation for iceball
+}
+
+EcsEntityHandle findNearest(Position position, EcsComponentId componentId) {
+    EcsEntityHandle nearest = INVALID_HANDLE;
+    float minDistance = 999999.9f;
+
+    EcsComponentId componentIdList[] = {componentId};
+    EcsEntityIterator iterator = ecsGetEntityIterator(componentIdList, 1);
+    EcsEntityHandle handle;
+    while((handle = ecsGetNextEntity(&iterator)) != INVALID_HANDLE) {
+        Position *enemyPosition = getPosition(handle);
+        Rectangle enemyFrame = getRender(handle)->frame;
+
+        Position centeredEnemyPosition =
+            {.x = enemyPosition->x + enemyFrame.x / 2.0f, .y = enemyPosition->y + enemyFrame.y / 2.0f};
+
+        float distance = xyMagnitude(centeredEnemyPosition.x - position.x, centeredEnemyPosition.y - position.y);
+        if (distance < minDistance) {
+            nearest = handle;
+            minDistance = distance;
+        }
+    }
+
+    return nearest;
+}
+
+
+void createStarball(Position position, EcsEntityHandle casterHandle, float damage, Game *game) {
+    EcsEntityHandle target = findNearest(position, COMPONENT_ID(Enemy));
+    if (target == INVALID_HANDLE) {
+        return;
+    }
+
+    EcsEntityHandle starballHandle = ecsCreateEntity();
+    addComponent(starballHandle, &position);
+
+    Velocity velocity  = {0};
+    addComponent(starballHandle, &velocity);
+
+    Spell spell = {.caster = casterHandle, .type = COMPONENT_ID(Homing), .damage = damage};
+    addComponent(starballHandle, &spell);
+
+    EntityState entityState = {.id = ENTITY_STATE_IDLE, .cooldown = 0.0f};
+    addComponent(starballHandle, &entityState);
+
+    Homing homing = {.target = target, .speed = STARBALL_DEFAULT_SPEED};
+    addComponent(starballHandle, &homing);
+
+    Render render = {.spritesheet = &game->resources.sprites[SPRITESHEET_STARBALL], .frame = Rectangle{0, 0, 9, 9}};
+    addComponent(starballHandle, &render);
+}
+
+void systemHomingVelocityUpdate() {
+    EcsComponentId componentIdList[] = {COMPONENT_ID(Homing)};
+
+    EcsEntityIterator iterator = ecsGetEntityIterator(componentIdList, 1);
+    EcsEntityHandle handle;
+    while((handle = ecsGetNextEntity(&iterator)) != INVALID_HANDLE) {
+        if (getEntityState(handle)->id != ENTITY_STATE_IDLE) {
+            continue;
+        }
+
+
+        Homing *homing= getHoming(handle);
+        Position *homingPosition = getPosition(handle);
+        Velocity *velocity = getVelocity(handle);
+        if (!ecsDoesEntityExist(homing->target)) {
+            homing->target = findNearest(*homingPosition, COMPONENT_ID(Enemy));
+            if (homing->target == INVALID_HANDLE) {
+                *velocity = {0.0f, 0.0f};
+
+                continue;
+            }
+        }
+
+        Position *targetPosition = getPosition(getHoming(handle)->target);
+
+        Vector2 direction = xyNormalize(targetPosition->x - homingPosition->x, targetPosition->y - homingPosition->y);
+
+        *velocity = toVelocity(vector2Scale(direction, getHoming(handle)->speed));
+    }
 }
 
 void castPlayerSpells(Game *game, float dt) {
@@ -75,17 +159,17 @@ void castPlayerSpells(Game *game, float dt) {
     WeaponSlot *weaponSlot;
     for (int i = 0; i < 5; i++) {
         weaponSlot = &weaponList->weapons[i];
+        Position weaponPosition = toPosition(
+            vector2Sum(
+                toVector2(*playerPosition),
+                (Vector2)PLAYER_CAST_POSITION
+            )
+        );
         if (weaponSlot->type == PLAYER_WEAPON_FIREBALL) {
             if (weaponSlot->cooldown <= 0) {
-                Position fireballPosition = toPosition(
-                    vector2Sum(
-                        toVector2(*playerPosition),
-                        (Vector2)FIREBALL_CAST_POSITION
-                    )
-                );
                 Velocity fireballVelocity = {FIREBALL_SPEED, 0};
 
-                createFireball(&fireballPosition, &fireballVelocity, game->player_handle, game);
+                createFireball(&weaponPosition, &fireballVelocity, game->player.handle, weaponSlot->damage, game);
                 weaponSlot->cooldown = PLAYER_FIREBALL_COOLDOWN;
             }
 
@@ -107,6 +191,23 @@ void castPlayerSpells(Game *game, float dt) {
             // TODO: add cooldown after iceball destroyed
             float angle = iceballHandle != INVALID_HANDLE ? getOrbitMovement(iceballHandle)->angle + PI : 0.0f;
             createIceball(game->player_handle, weaponSlot->damage, angle, game);
+
+            continue;
+        }
+
+        if (weaponSlot->type == PLAYER_WEAPON_STARBALL) {
+            if (weaponSlot->cooldown <= 0) {
+                if (ecsGetComponentCount(COMPONENT_ID(Enemy)) == 0) {
+                    continue;
+                }
+                createStarball(weaponPosition, game->player_handle, weaponSlot->damage, game);
+
+                weaponSlot->cooldown = PLAYER_STARBALL_COOLDOWN;
+            }
+
+            weaponSlot->cooldown -= dt;
+
+            continue;
         }
     }
 }
@@ -127,7 +228,7 @@ void systemCollideSpells(Game *game) {
             continue;
         }
 
-        Spell *fireball = getFireball(fireballHandle);
+        Spell *fireball = getSpell(fireballHandle);
 
         Position *fireballPosition = getPosition(fireballHandle);
         Render *fireballRender = getRender(fireballHandle);

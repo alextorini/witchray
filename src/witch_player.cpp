@@ -29,7 +29,7 @@ EcsEntityHandle initPlayer(Game *game) {
 
     weaponList.weapons[0] = {.type = PLAYER_WEAPON_FIREBALL, .damage = 1, .cooldown = PLAYER_FIREBALL_COOLDOWN};
     weaponList.weapons[1] = {.type = PLAYER_WEAPON_ICEBALL, .damage = 2, .cooldown = PLAYER_ICEBALL_COOLDOWN};
-    weaponList.weapons[2] = {0};
+    weaponList.weapons[2] = {.type = PLAYER_WEAPON_STARBALL, .damage = 1, .cooldown = PLAYER_STARBALL_COOLDOWN};
     weaponList.weapons[3] = {0};
     weaponList.weapons[4] = {0};
     addComponent(handle, &weaponList);

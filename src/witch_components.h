@@ -54,13 +54,22 @@ typedef struct {
 
 typedef struct {
     EcsEntityHandle caster;
+    EcsComponentId type;
     float damage;
 } Spell;
 
 typedef struct {
     EcsEntityHandle caster;
-    float damage;
+} Fireball;
+
+typedef struct {
+    uint16_t max;
 } Iceball;
+
+typedef struct {
+    EcsEntityHandle target;
+    float speed;
+} Homing;
 
 typedef struct {
     EcsEntityHandle center;
@@ -143,8 +152,10 @@ typedef enum {
     CMP_PARALLAX,
     CMP_ENEMY,
     CMP_TEXT_RENDER,
+    CMP_SPELL,
     CMP_FIREBALL,
     CMP_ICEBALL,
+    CMP_HOMING,
     CMP_ENEMY_WEAPON_LIST,
     CMP_PLAYER_WEAPON_LIST,
     CMP_ENTITY_STATE,
@@ -157,7 +168,10 @@ void initComponents(Game *game);
 Animation *getAnimation(EcsEntityHandle handle);
 Enemy *getEnemy(EcsEntityHandle handle);
 Event *getEvent(EcsEntityHandle handle);
-Spell *getFireball(EcsEntityHandle handle);
+Spell *getSpell(EcsEntityHandle handle);
+Fireball *getFireball(EcsEntityHandle handle);
+Iceball *getIceball(EcsEntityHandle handle);
+Homing *getHoming(EcsEntityHandle handle);
 Parallax *getParallax(EcsEntityHandle handle);
 Position *getPosition(EcsEntityHandle handle);
 Render *getRender(EcsEntityHandle handle);
@@ -172,8 +186,10 @@ Health *getHealth(EcsEntityHandle handle);
 void *addComponent(EcsEntityHandle handle, Animation *animation);
 void *addComponent(EcsEntityHandle handle, Enemy *isEnemy);
 void *addComponent(EcsEntityHandle handle, Event *event);
-void *addComponent(EcsEntityHandle handle, Spell *fireball);
+void *addComponent(EcsEntityHandle handle, Spell *spell);
+void *addComponent(EcsEntityHandle handle, Fireball *fireball);
 void *addComponent(EcsEntityHandle handle, Iceball *iceball);
+void *addComponent(EcsEntityHandle handle, Homing *starball);
 void *addComponent(EcsEntityHandle handle, Parallax *isParallax);
 void *addComponent(EcsEntityHandle handle, Position *position);
 void *addComponent(EcsEntityHandle handle, Render *render);
@@ -191,7 +207,9 @@ template<> EcsComponentId getComponentId<Animation>();
 template<> EcsComponentId getComponentId<Enemy>();
 template<> EcsComponentId getComponentId<Event>();
 template<> EcsComponentId getComponentId<Spell>();
+template<> EcsComponentId getComponentId<Fireball>();
 template<> EcsComponentId getComponentId<Iceball>();
+template<> EcsComponentId getComponentId<Homing>();
 template<> EcsComponentId getComponentId<Parallax>();
 template<> EcsComponentId getComponentId<Position>();
 template<> EcsComponentId getComponentId<Render>();

@@ -283,6 +283,10 @@ void *ecsAddComponent(EcsEntityHandle entityHandle, EcsComponentId componentId, 
 }
 
 uint8_t ecsDoesEntityExist(EcsEntityHandle entityHandle) {
+    if (entityHandle == INVALID_HANDLE) {
+        return 0;
+    }
+
     EcsEntityId entityId = getHandleId(entityHandle);
     if (!space->entityList[entityId].active) {
         return 0;
@@ -537,6 +541,26 @@ void ecsClearSpace() {
     }
 
     space->entityFreeSlotsPool.count = 0;
+
+    if (space->entityFreeSlotsPool.capacity < space->nextEntityId) {
+        uint32_t newCapacity = space->entityFreeSlotsPool.capacity;
+        while (newCapacity < space->nextEntityId) {
+            newCapacity *= 2;
+        }
+
+        EcsEntityId *ids = ECS_REALLOC_ARR(
+            space->entityFreeSlotsPool.idList,
+            EcsEntityId,
+            newCapacity
+        );
+
+        if (!ids) {
+            ABORT();
+        }
+
+        space->entityFreeSlotsPool.idList = ids;
+        space->entityFreeSlotsPool.capacity = newCapacity;
+    }
 
     for (EcsEntityId id = 0; id < space->nextEntityId; id++) {
         EcsEntity *entity = &space->entityList[id];

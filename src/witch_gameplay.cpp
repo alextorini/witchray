@@ -3,6 +3,7 @@
 #include "witch_spells.h"
 #include "witch_gameplay_input_process.h"
 #include "witch_background.h"
+#include "witch_pickupable.h"
 #include "witch_player.h"
 #include "witch_systems.h"
 #include "witch_system_movement.h"
@@ -14,8 +15,12 @@ void gameplayInit(Game *game) {
     initEnemyFactory(game);
     game->timer = 0.0f;
     game->enemiesKilled = 0;
-    game->enemySpawnCooldown = 1.5f;
+    game->enemySpawnCooldown = SPAWN_COOLDOWN;
     game->skyColor = SKY_COLOR_1;
+
+    game->pickups.speed = PICKAPABLE_SPEED;
+
+    pickupableInit(game);
 }
 
 void gameplayUpdate(InputState *input, Game *game, float dt) {
@@ -46,6 +51,8 @@ void gameplayUpdate(InputState *input, Game *game, float dt) {
     systemCollideEnemies(game);
 
     systemCollideSpells(game);
+
+    systemPickupablePickup(game);
 
     systemCleanFireballs();
 

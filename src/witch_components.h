@@ -49,6 +49,12 @@ typedef struct {
 } Parallax;
 
 typedef struct {
+    EcsComponentId componentId;
+    uint16_t type;
+    float value;
+} Pickapable;
+
+typedef struct {
     uint8_t value;
 } Enemy;
 
@@ -160,6 +166,7 @@ typedef enum {
     CMP_PLAYER_WEAPON_LIST,
     CMP_ENTITY_STATE,
     CMP_HEALTH,
+    CMP_PICKAPABLE,
     CMP_COUNT
 } ComponentIndex;
 
@@ -182,6 +189,7 @@ EnemyWeaponList *getEnemyWeaponList(EcsEntityHandle handle);
 PlayerWeaponList *getPlayerWeaponList(EcsEntityHandle handle);
 EntityState *getEntityState(EcsEntityHandle handle);
 Health *getHealth(EcsEntityHandle handle);
+Pickapable *getPickapable(EcsEntityHandle handle);
 
 void *addComponent(EcsEntityHandle handle, Animation *animation);
 void *addComponent(EcsEntityHandle handle, Enemy *isEnemy);
@@ -200,6 +208,7 @@ void *addComponent(EcsEntityHandle handle, EnemyWeaponList *enemyWeaponList);
 void *addComponent(EcsEntityHandle handle, PlayerWeaponList *playerWeaponList);
 void *addComponent(EcsEntityHandle handle, EntityState *entityState);
 void *addComponent(EcsEntityHandle handle, Health *health);
+void *addComponent(EcsEntityHandle handle, Pickapable *pickapable);
 
 template<typename T>
 EcsComponentId getComponentId();
@@ -220,3 +229,4 @@ template<> EcsComponentId getComponentId<EnemyWeaponList>();
 template<> EcsComponentId getComponentId<PlayerWeaponList>();
 template<> EcsComponentId getComponentId<EntityState>();
 template<> EcsComponentId getComponentId<Health>();
+template<> EcsComponentId getComponentId<Pickapable>();

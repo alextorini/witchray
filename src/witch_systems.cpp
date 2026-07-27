@@ -7,6 +7,7 @@
 #include "smetanka_math.h"
 #include "witch_components.h"
 #include "witch_game.h"
+#include "witch_pickupable.h"
 #include "witch_save.h"
 #include "witch_state.h"
 
@@ -158,6 +159,11 @@ void systemProcessEntityStates(Game *game) {
             if (entityHandle == game->player.handle) {
                 saveGame(game);
                 stateRequestChange(game, STATE_START_SCREEN);
+            }
+
+            if (getEnemy(entityHandle)) {
+                Position *position = getPosition(entityHandle);
+                pickupableSpawn({.x = position->x + 9, .y = position->y + 9}, game);
             }
 
             ecsAddToDestroyQueue(entityHandle);

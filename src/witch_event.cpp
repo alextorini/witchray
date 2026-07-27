@@ -1,5 +1,6 @@
 #include "smetanka_ecs.h"
 #include "witch_event.h"
+#include "smetanka_engine.h"
 #include "witch_animation.h"
 #include "witch_components.h"
 #include "witch_game.h"
@@ -53,6 +54,16 @@ void eventProcess(Game *game) {
                 // This variable is used for different purposes in different entity states
                 // In idle state, it is used to show damage flash effect on the entity
                 entityState->cooldown = 0.15f;
+
+                break;
+            }
+            case EVENT_PICKUP_EXP: {
+                smePlaySound(game->resources.sounds[SOUND_PICKUP_EXP]);
+
+                break;
+            }
+            case EVENT_PICKUP_HP: {
+                smePlaySound(game->resources.sounds[SOUND_PICKUP_HP]);
 
                 break;
             }

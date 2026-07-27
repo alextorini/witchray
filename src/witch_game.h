@@ -33,6 +33,8 @@ constexpr int VIRTUAL_WIDTH = 640;
 #define BG_LAYER_1_SPEED 25.0f
 #define BG_LAYER_2_SPEED 75.0f
 
+#define PICKAPABLE_SPEED 50.0f
+
 #define PLAYER_START_POS {50, 50}
 #define PLAYER_DEFAULT_FRAME {0.0f, 0.0f, 41.0f, 27.0f}
 #define PLAYER_SPEED 3.0f
@@ -49,6 +51,8 @@ constexpr int VIRTUAL_WIDTH = 640;
 #define PLAYER_WEAPON_STARBALL 3
 
 #define PLAYER_DEATH_COOLDOWN 1.0f
+
+#define SPAWN_COOLDOWN 1.0f
 
 #define WR_MALLOC malloc
 #define WR_MALLOC_TYPE(type) ((type *)malloc(sizeof(type)))
@@ -70,12 +74,16 @@ typedef struct {
 typedef struct {
     EcsEntityHandle handle;
     FrameCollisionMap collisions;
+    uint64_t level;
+    float exp;
     float deathCooldown;
 } Player;
 
 typedef enum {
     SOUND_SHOOT,
     SOUND_EXPLOSION,
+    SOUND_PICKUP_EXP,
+    SOUND_PICKUP_HP,
     SOUND_PLAYER_DEATH,
     SOUND_PAUSE,
     SOUND_COUNT
@@ -94,6 +102,8 @@ typedef enum {
     SPRITESHEET_FIREBALL,
     SPRITESHEET_ICEBALL,
     SPRITESHEET_STARBALL,
+    SPRITESHEET_EXP_CRYSTAL,
+    SPRITESHEET_HEALTH_CRYSTAL,
     SPRITE_COUNT
 } SpriteIndex;
 
@@ -122,10 +132,16 @@ typedef struct {
 } ResourceMap;
 
 typedef struct {
+    float speed;
+    FrameCollisionMap collisions;
+} PickapableMap;
+
+typedef struct {
     EcsEntityHandle player_handle;
     Player player;
     Enemies enemies;
     Fireballs fireballs;
+    PickapableMap pickups;
     EcsEntityHandle backgrounds[2][2];
     ResourceMap resources;
     EcsComponentId *components;

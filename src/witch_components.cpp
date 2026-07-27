@@ -8,22 +8,22 @@ void initComponents(Game *game) {
     components = WR_MALLOC_ARR(EcsComponentId, CMP_COUNT);
     components[CMP_ANIMATION] = ecsRegisterComponent((char *)"Animation", sizeof(Animation));
     components[CMP_ENEMY] = ecsRegisterComponent((char *)"Enemy", sizeof(Enemy));
+    components[CMP_ENEMY_WEAPON_LIST] = ecsRegisterComponent((char *)"EnemyWeaponList", sizeof(EnemyWeaponList));
+    components[CMP_ENTITY_STATE] = ecsRegisterComponent((char *)"EntityState", sizeof(EntityState));
     components[CMP_EVENT] = ecsRegisterComponent((char *)"Event", sizeof(Event));
-    components[CMP_SPELL] = ecsRegisterComponent((char *)"Spell", sizeof(Spell));
     components[CMP_FIREBALL] = ecsRegisterComponent((char *)"Fireball", sizeof(Fireball));
-    components[CMP_ICEBALL] = ecsRegisterComponent((char *)"Iceball", sizeof(Iceball));
+    components[CMP_HEALTH] = ecsRegisterComponent((char *)"Health", sizeof(Health));
     components[CMP_HOMING] = ecsRegisterComponent((char *)"Homing", sizeof(Homing));
+    components[CMP_ICEBALL] = ecsRegisterComponent((char *)"Iceball", sizeof(Iceball));
+    components[CMP_ORBIT_MOVEMENT] = ecsRegisterComponent((char *)"OrbitMovement", sizeof(OrbitMovement));
     components[CMP_PARALLAX] = ecsRegisterComponent((char *)"Parallax", sizeof(Parallax));
+    components[CMP_PLAYER_WEAPON_LIST] = ecsRegisterComponent((char *)"PlayerWeaponList", sizeof(PlayerWeaponList));
     components[CMP_POSITION] = ecsRegisterComponent((char *)"Position", sizeof(Position));
     components[CMP_RENDER] = ecsRegisterComponent((char *)"Render", sizeof(Render));
+    components[CMP_SPELL] = ecsRegisterComponent((char *)"Spell", sizeof(Spell));
     components[CMP_TEXT_RENDER] = ecsRegisterComponent((char *)"Text", sizeof(TextRender));
     components[CMP_VELOCITY] = ecsRegisterComponent((char *)"Velocity", sizeof(Velocity));
-    components[CMP_ORBIT_MOVEMENT] = ecsRegisterComponent((char *)"OrbitMovement", sizeof(OrbitMovement));
-    components[CMP_ENEMY_WEAPON_LIST] = ecsRegisterComponent((char *)"EnemyWeaponList", sizeof(EnemyWeaponList));
-    components[CMP_PLAYER_WEAPON_LIST] = ecsRegisterComponent((char *)"PlayerWeaponList", sizeof(PlayerWeaponList));
-    components[CMP_ENTITY_STATE] = ecsRegisterComponent((char *)"EntityState", sizeof(EntityState));
-    components[CMP_HEALTH] = ecsRegisterComponent((char *)"Health", sizeof(Health));
-
+    components[CMP_PICKAPABLE] = ecsRegisterComponent((char *)"Pickapable", sizeof(Pickapable));
     game->components = components;
 }
 
@@ -95,6 +95,11 @@ Health *getHealth(EcsEntityHandle handle) {
     return (Health *)ecsGetEntityComponent(components[CMP_HEALTH], handle);
 }
 
+Pickapable *getPickapable(EcsEntityHandle handle) {
+    return (Pickapable *)ecsGetEntityComponent(components[CMP_PICKAPABLE], handle);
+}
+
+
 void *addComponent(EcsEntityHandle handle, Animation *animation) {
     return ecsAddComponent(handle, components[CMP_ANIMATION], animation);
 }
@@ -162,6 +167,11 @@ void *addComponent(EcsEntityHandle handle, EntityState *entityState) {
 void *addComponent(EcsEntityHandle handle, Health *health) {
     return ecsAddComponent(handle, components[CMP_HEALTH], health);
 }
+
+void *addComponent(EcsEntityHandle handle, Pickapable *pickapable) {
+    return ecsAddComponent(handle, components[CMP_PICKAPABLE], pickapable);
+}
+
 
 template<typename T>
 EcsComponentId getComponentId();
@@ -232,4 +242,8 @@ template<> EcsComponentId getComponentId<EntityState>() {
 
 template<> EcsComponentId getComponentId<Health>() {
     return components[CMP_HEALTH];
+}
+
+template<> EcsComponentId getComponentId<Pickapable>() {
+    return components[CMP_PICKAPABLE];
 }

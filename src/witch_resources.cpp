@@ -1,3 +1,4 @@
+#include "ext/raylib.h"
 #include "smetanka_engine.h"
 #include "witch_game.h"
 #include "witch_resources.h"
@@ -9,6 +10,8 @@ void resourcesInit(Game *game) {
     game->resources.sprites[SPRITESHEET_FIREBALL] = smeLoadPixelTexture(FIREBALL_IMAGE_PATH);
     game->resources.sprites[SPRITESHEET_ICEBALL] = smeLoadPixelTexture(ICEBALL_IMAGE_PATH);
     game->resources.sprites[SPRITESHEET_STARBALL] = smeLoadPixelTexture("images/starball.png");
+    game->resources.sprites[SPRITESHEET_EXP_CRYSTAL] = smeLoadPixelTexture(EXP_CRYSTAL_PATH );
+    game->resources.sprites[SPRITESHEET_HEALTH_CRYSTAL] = smeLoadPixelTexture("images/health_crystal.png");
     game->resources.sprites[BACKGROUND_URBAN] = smeLoadPixelTexture("images/background_urban.png");
     game->resources.sprites[BACKGROUND_CLOUDS] = smeLoadPixelTexture("images/background_clouds.png");
 
@@ -18,6 +21,11 @@ void resourcesInit(Game *game) {
     SetSoundVolume(game->resources.sounds[SOUND_EXPLOSION], 0.3f);
     game->resources.sounds[SOUND_PLAYER_DEATH] = smeLoadSound("sounds/player_death.wav");
     SetSoundVolume(game->resources.sounds[SOUND_PLAYER_DEATH], 0.5f);
+
+    game->resources.sounds[SOUND_PICKUP_EXP] = smeLoadSound("sounds/pickup_exp.wav");
+    SetSoundVolume(game->resources.sounds[SOUND_PICKUP_EXP], 0.2f);
+    game->resources.sounds[SOUND_PICKUP_HP] = smeLoadSound("sounds/pickup_health.wav");
+    SetSoundVolume(game->resources.sounds[SOUND_PICKUP_HP], 0.5f);
 
     game->resources.sounds[SOUND_PAUSE] = smeLoadSound("sounds/pause.wav");
     SetSoundVolume(game->resources.sounds[SOUND_PAUSE], 0.5f);

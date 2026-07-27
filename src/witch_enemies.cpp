@@ -10,7 +10,6 @@
 #include "witch_game.h"
 #include "witch_resources.h"
 
-#define SPAWN_COOLDOWN 1.0f
 #define ENEMY_SPEED 50.0f
 #define MAX_ENEMIES_COUNT 10000
 #define ENEMY_WIDTH 32
@@ -104,12 +103,12 @@ void systemSpawnEnemies(Game *game, float dt) {
     //     return;
     // }
 
-    if (game->timer > 120.0f) {
-        game->enemySpawnCooldown = 0.5f;
+    if (game->timer > 90.0f) {
+        game->enemySpawnCooldown = SPAWN_COOLDOWN * 0.25f;
     } else if (game->timer > 60.0f) {
-        game->enemySpawnCooldown = 1.0f;
+        game->enemySpawnCooldown = SPAWN_COOLDOWN * 0.5f;
     } else if (game->timer > 30.0f) {
-        game->enemySpawnCooldown = 1.25f;
+        game->enemySpawnCooldown = SPAWN_COOLDOWN * 0.75f;
     }
 
     if (spawnCooldown >= 0) {

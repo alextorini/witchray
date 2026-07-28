@@ -150,9 +150,9 @@ void systemHomingVelocityUpdate() {
 }
 
 void castPlayerSpells(Game *game, float dt) {
-    // if (game->timer < 5.0f) {
-    //     return;
-    // }
+    if (game->timer < 5.0f || game->win) {
+        return;
+    }
 
     Position *playerPosition = getPosition(game->player.handle);
     PlayerWeaponList *weaponList = getPlayerWeaponList(game->player.handle);

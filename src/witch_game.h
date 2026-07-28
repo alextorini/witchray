@@ -154,7 +154,9 @@ typedef struct {
     uint64_t enemiesKilled;
     uint64_t score;
     uint64_t highscore;
-    int win;
+    float winCooldown;
+    uint8_t win;
+    uint8_t spawnEnemies;
     uint8_t pause;
     uint8_t shouldClose;
 } Game;

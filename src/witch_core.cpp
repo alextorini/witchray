@@ -13,7 +13,7 @@ void init(Game *game) {
     game->shouldClose = 0;
     game->pause = 0;
     game->highscore = 0;
-    game->win = -1;
+    game->win = 0;
 
     resourcesInit(game);
 

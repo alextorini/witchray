@@ -1,3 +1,5 @@
+#include "ext/raylib.h"
+#include "witch_components.h"
 #include "witch_enemies.h"
 #include "witch_gameplay.h"
 #include "witch_game.h"
@@ -9,6 +11,13 @@
 #include "witch_state.h"
 #include "witch_systems.h"
 #include "witch_system_movement.h"
+#include "witch_win.h"
+
+#define INTRO_TEXT_COLOR WHITE
+#define INTRO_TEXT_FONT game->resources.fonts[FONT_MAIN]
+#define INTRO_TEXT_FONT_SIZE 18
+#define INTRO_TEXT_FONT_SPACING 1
+#define INTRO_TEXT "SURVIVE for 3 min to get closer to THE TRUTH!"
 
 void gameplayInit(Game *game) {
     initGameBackground(game);
@@ -19,8 +28,30 @@ void gameplayInit(Game *game) {
     game->enemiesKilled = 0;
     game->enemySpawnCooldown = SPAWN_COOLDOWN;
     game->skyColor = SKY_COLOR_1;
+    game->win = 0;
+    game->spawnEnemies = 1;
 
     game->pickups.speed = PICKAPABLE_SPEED;
+
+
+    EcsEntityHandle introLabelHandle = ecsCreateEntity();
+
+    Position introLabelPosition = {.x = 30, .y = 320};
+    addComponent(introLabelHandle, &introLabelPosition);
+
+    TextRender introLabelTextRender = {
+        .offset = {0, 0},
+        .color = WHITE,
+        .font = INTRO_TEXT_FONT,
+        .fontSize = INTRO_TEXT_FONT_SIZE,
+        .spacing = INTRO_TEXT_FONT_SPACING,
+        .text = INTRO_TEXT,
+    };
+
+    addComponent(introLabelHandle, &introLabelTextRender);
+
+    EntityState entityState = {.id = ENTITY_STATE_DYING, .cooldown = 5.0f};
+    addComponent(introLabelHandle, &entityState);
 
     pickupableInit(game);
 }
@@ -32,8 +63,11 @@ void gameplayUpdate(InputState *input, Game *game, float dt) {
         return;
     }
 
-    if (game->timer >= 180.0f) {
-        game->win = 1;
+    if (game->timer >= 180.0f && !game->win) {
+        win(game);
+    }
+
+    if (game->timer >= 200.0f && game->win) {
         stateRequestChange(game, STATE_START_SCREEN);
     }
 
@@ -71,7 +105,7 @@ void gameplayUpdate(InputState *input, Game *game, float dt) {
 
     game->timer += dt;
 
-    game->score = (uint64_t)(game->timer) + game->enemiesKilled * 10;
+    game->score = game->enemiesKilled * 10;
 
     if (game->score > game->highscore) game->highscore = game->score;
 }

@@ -99,9 +99,13 @@ static EcsEntityHandle createEnemy(Position *pos, Game *game) {
 }
 
 void systemSpawnEnemies(Game *game, float dt) {
-    // if (game->timer < 5.0f) {
-    //     return;
-    // }
+    if (!game->spawnEnemies) {
+        return;
+    }
+
+    if (game->timer < 3.0f) {
+        return;
+    }
 
     if (game->timer > 90.0f) {
         game->enemySpawnCooldown = SPAWN_COOLDOWN * 0.70f;

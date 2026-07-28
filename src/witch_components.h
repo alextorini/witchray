@@ -129,7 +129,7 @@ typedef struct {
 } AnimationClip;
 
 typedef struct {
-    AnimationClip clips[2];
+    AnimationClip clips[3];
 } AnimationSet;
 
 typedef struct {

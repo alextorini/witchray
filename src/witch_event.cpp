@@ -72,18 +72,18 @@ void eventProcess(Game *game) {
                 game->player.exp -= game->player.max_exp;
                 game->player.max_exp *= 1.1;
 
-                if (game->player.level == 3) {
+                Health *health = getHealth(game->player.handle);
+                if (game->player.level == 2) {
                     PlayerWeaponList *weaponList = getPlayerWeaponList(game->player.handle);
                     weaponList->weapons[1] = {.type = PLAYER_WEAPON_ICEBALL, .damage = 2, .cooldown = PLAYER_ICEBALL_COOLDOWN};
-                } else if (game->player.level == 5) {
+                } else if (game->player.level == 3) {
                     PlayerWeaponList *weaponList = getPlayerWeaponList(game->player.handle);
                     weaponList->weapons[2] = {.type = PLAYER_WEAPON_STARBALL, .damage = 1, .cooldown = PLAYER_STARBALL_COOLDOWN};
                 } else {
-                    Health *health = getHealth(game->player.handle);
                     health->max += 1;
-                    health->current = health->max;
                 }
 
+                health->current = health->max;
                 if (game->player.exp >= game->player.max_exp) {
                     eventCreate(game->player.handle, EVENT_LEVEL_UP, game);
                 }

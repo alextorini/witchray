@@ -10,6 +10,7 @@
 
 static AnimationClip idleAnimation;
 static AnimationClip deathAnimation;
+static AnimationClip winAnimation;
 
 static AnimationSet animationSet;
 
@@ -50,8 +51,14 @@ EcsEntityHandle initPlayer(Game *game) {
     deathAnimation.frameTime = 0.25f;
     deathAnimation.loop = 1;
 
+    winAnimation.startFrame = 6;
+    winAnimation.endFrame = 7;
+    winAnimation.frameTime = 0.5f;
+    deathAnimation.loop = 1;
+
     animationSet.clips[ANIMATION_IDLE] = idleAnimation;
     animationSet.clips[ANIMATION_DYING] = deathAnimation;
+    animationSet.clips[ANIMATION_WIN] = winAnimation;
 
     Animation animation;
     animation.set = &animationSet;

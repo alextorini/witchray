@@ -157,6 +157,7 @@ void systemProcessEntityStates(Game *game) {
 
         if (entityState->id == ENTITY_STATE_DIE) {
             if (entityHandle == game->player.handle) {
+                game->win = 0;
                 saveGame(game);
                 stateRequestChange(game, STATE_START_SCREEN);
             }

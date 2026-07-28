@@ -76,6 +76,7 @@ typedef struct {
     FrameCollisionMap collisions;
     uint64_t level;
     float exp;
+    float max_exp;
     float deathCooldown;
 } Player;
 
@@ -153,6 +154,7 @@ typedef struct {
     uint64_t enemiesKilled;
     uint64_t score;
     uint64_t highscore;
+    int win;
     uint8_t pause;
     uint8_t shouldClose;
 } Game;

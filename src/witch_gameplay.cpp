@@ -1,10 +1,12 @@
 #include "witch_enemies.h"
 #include "witch_gameplay.h"
+#include "witch_game.h"
 #include "witch_spells.h"
 #include "witch_gameplay_input_process.h"
 #include "witch_background.h"
 #include "witch_pickupable.h"
 #include "witch_player.h"
+#include "witch_state.h"
 #include "witch_systems.h"
 #include "witch_system_movement.h"
 
@@ -28,6 +30,11 @@ void gameplayUpdate(InputState *input, Game *game, float dt) {
 
     if (game->pause) {
         return;
+    }
+
+    if (game->timer >= 180.0f) {
+        game->win = 1;
+        stateRequestChange(game, STATE_START_SCREEN);
     }
 
     systemSpawnEnemies(game, dt);

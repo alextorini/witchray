@@ -9,6 +9,7 @@ typedef enum {
     EVENT_DAMAGE_TAKEN,
     EVENT_PICKUP_EXP,
     EVENT_PICKUP_HP,
+    EVENT_LEVEL_UP,
     EVENT_DEATH,
     EVENT_PAUSE_TOGGLE,
 } EventType;

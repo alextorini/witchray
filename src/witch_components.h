@@ -145,7 +145,7 @@ typedef struct {
     Font font;
     float fontSize;
     float spacing;
-    char text[128];
+    const char *text;
 } TextRender;
 
 typedef enum {

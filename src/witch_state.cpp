@@ -50,6 +50,7 @@ void stateUpdate(Game *game) {
                 ABORT();
             }
 
+
             gameplayDestroy(game);
 
             startScreenInit(game);

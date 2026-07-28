@@ -48,7 +48,7 @@ void pickupableSpawn(Position position, Game *game) {
             {.spritesheet = &game->resources.sprites[SPRITESHEET_HEALTH_CRYSTAL], .frame = {0.0f, 0.0f, 13.0f, 13.0f}};
     } else {
         pickapable.type = PICKUPABLE_EXP;
-        pickapable.value = 100;
+        pickapable.value = 200;
         render =
             {.spritesheet = &game->resources.sprites[SPRITESHEET_EXP_CRYSTAL], .frame = {0.0f, 0.0f, 13.0f, 13.0f}};
     }
@@ -68,13 +68,16 @@ void pickupablePickup(EcsEntityHandle handle, Game *game) {
         game->player.exp += pickupable->value;
 
         eventCreate(game->player.handle, EVENT_PICKUP_EXP, game);
+
+        if (game->player.exp >= game->player.max_exp) {
+            eventCreate(game->player_handle, EVENT_LEVEL_UP, game);
+        }
     } else if (pickupable->type == PICKAPABLE_HEALTH) {
         Health *playerHealth = getHealth(game->player.handle);
         playerHealth->current += pickupable->value;
         if (playerHealth->current > playerHealth->max) {
             playerHealth->current = playerHealth->max;
         }
-
 
         eventCreate(game->player.handle, EVENT_PICKUP_HP, game);
     }

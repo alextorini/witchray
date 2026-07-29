@@ -11,19 +11,14 @@
 
 void init(Game *game) {
     game->shouldClose = 0;
-    game->pause = 0;
-    game->highscore = 0;
-    game->win = 0;
 
-    resourcesInit(game);
-
-    smePlayMusicStream(game->resources.music[MUSIC_MAIN]);
+    resourcesInit(&game->resources);
 
     ecsCreateSpace();
 
-    initComponents(game);
+    initComponents();
 
-    loadGame(game);
+    game->highscore = loadHighscore();
 
     startScreenInit(game);
 }

@@ -82,7 +82,7 @@ void systemAnimateEntities(float dt) {
     }
 }
 
-void systemRenderEntities(ResourceMap *resources) {
+void systemRenderEntities(ResourceRegistry *resources) {
     EcsComponentId componentIdList[] = {COMPONENT_ID(Position), COMPONENT_ID(Render)};
     EcsEntityIterator iterator = ecsGetEntityIterator(componentIdList, 2);
 
@@ -158,7 +158,7 @@ void systemProcessEntityStates(Game *game) {
         if (entityState->id == ENTITY_STATE_DIE) {
             if (entityHandle == game->player.handle) {
                 game->win = 0;
-                saveGame(game);
+                saveHighscore(game->highscore);
                 stateRequestChange(game, STATE_START_SCREEN);
             }
 

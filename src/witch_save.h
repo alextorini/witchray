@@ -1,6 +1,6 @@
 #pragma once
 
-#include "witch_game.h"
+#include <cstdint>
 
-void saveGame(Game *game);
-void loadGame(Game *game);
+void saveHighscore(uint64_t highscore);
+uint64_t loadHighscore();

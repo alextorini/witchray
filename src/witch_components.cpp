@@ -1,11 +1,9 @@
 #include "witch_components.h"
 #include "smetanka_ecs.h"
-#include "witch_game.h"
 
-static EcsComponentId *components;
+static EcsComponentId components[CMP_COUNT];
 
-void initComponents(Game *game) {
-    components = WR_MALLOC_ARR(EcsComponentId, CMP_COUNT);
+void initComponents() {
     components[CMP_ANIMATION] = ecsRegisterComponent((char *)"Animation", sizeof(Animation));
     components[CMP_ENEMY] = ecsRegisterComponent((char *)"Enemy", sizeof(Enemy));
     components[CMP_ENEMY_WEAPON_LIST] = ecsRegisterComponent((char *)"EnemyWeaponList", sizeof(EnemyWeaponList));
@@ -24,7 +22,6 @@ void initComponents(Game *game) {
     components[CMP_TEXT_RENDER] = ecsRegisterComponent((char *)"Text", sizeof(TextRender));
     components[CMP_VELOCITY] = ecsRegisterComponent((char *)"Velocity", sizeof(Velocity));
     components[CMP_PICKAPABLE] = ecsRegisterComponent((char *)"Pickapable", sizeof(Pickapable));
-    game->components = components;
 }
 
 Animation *getAnimation(EcsEntityHandle handle) {

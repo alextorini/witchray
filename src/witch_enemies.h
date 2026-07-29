@@ -4,10 +4,10 @@
 
 void initEnemyFactory(Game *game);
 
-void systemSpawnEnemies(Game *game, float dt);
+void systemEnemiesSpawn(Game *game, float dt);
 
-void systemCleanEnemies();
+void systemEnemiesClean();
 
-void systemCollideEnemies(Game *game);
+void systemEnemiesCollide(Game *game);
 
 void systemEnemiesFire(Game *game, float dt);

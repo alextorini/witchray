@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <stdint.h>
 #include "smetanka_engine.h"
 #include "witch_game.h"
@@ -7,26 +8,26 @@ typedef struct {
     uint64_t highscore;
 } Save;
 
-void saveGame(Game *game) {
+void saveHighscore(uint64_t highscore) {
     Save save = {
         .gameVersion = GAME_VERSION,
-        .highscore = game->highscore
+        .highscore = highscore
     };
 
     smeSaveFileData("save.dat", (unsigned char *)&save, sizeof(save));
 }
 
-void loadGame(Game *game) {
+uint64_t loadHighscore() {
     int bytesRead;
     unsigned char *data = smeLoadFileData("save.dat", &bytesRead);
 
     if (bytesRead != sizeof(Save)) {
-        return;
+        return 0;
     }
 
     Save save = *(Save *)data;
 
-    game->highscore = save.highscore;
-
     smeUnloadFileData(data);
+
+    return save.highscore;
 }

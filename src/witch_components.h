@@ -4,7 +4,6 @@
 #include "ext/raylib.h"
 #include "smetanka_ecs.h"
 #include "smetanka_engine.h"
-#include "witch_game.h"
 #include "witch_event.h"
 
 #define COMPONENT_ID(T) (getComponentId<T>())
@@ -170,7 +169,7 @@ typedef enum {
     CMP_COUNT
 } ComponentIndex;
 
-void initComponents(Game *game);
+void initComponents();
 
 Animation *getAnimation(EcsEntityHandle handle);
 Enemy *getEnemy(EcsEntityHandle handle);

@@ -70,7 +70,7 @@ void pickupablePickup(EcsEntityHandle handle, Game *game) {
         eventCreate(game->player.handle, EVENT_PICKUP_EXP, game);
 
         if (game->player.exp >= game->player.max_exp) {
-            eventCreate(game->player_handle, EVENT_LEVEL_UP, game);
+            eventCreate(game->player.handle, EVENT_LEVEL_UP, game);
         }
     } else if (pickupable->type == PICKAPABLE_HEALTH) {
         Health *playerHealth = getHealth(game->player.handle);

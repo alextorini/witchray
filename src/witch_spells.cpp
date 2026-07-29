@@ -10,14 +10,18 @@
 #include "witch_resources.h"
 
 #define FIREBALL_DEFAULT_FRAME {0.0f, 0.0f, 5.0f, 5.0f}
+#define ICEBALL_DEFAULT_FRAME {0.0f, 0.0f, 9.0f, 9.0f}
+#define STARBALL_DEFAULT_FRAME {0.0f, 0.0f, 13.0f, 13.0f}
 #define PLAYER_CAST_POSITION {38.0f, 18.0f}
 #define FIREBALL_COOLDOWN 0.4f
 #define FIREBALL_SPEED 300.0f
 #define STARBALL_DEFAULT_SPEED 150.0f
 
 void initFireballs(Game *game) {
-    game->fireballs.deathCooldown = 0.0f;
-    initCollisionMap(FIREBALL_IMAGE_PATH, (Rectangle)FIREBALL_DEFAULT_FRAME, 10, &game->fireballs.collisions);
+    game->spells.deathCooldown = 0.0f;
+    initCollisionMap(FIREBALL_IMAGE_PATH, (Rectangle)FIREBALL_DEFAULT_FRAME, 10, &game->spells.collisions.fireball);
+    initCollisionMap(ICEBALL_IMAGE_PATH, (Rectangle)ICEBALL_DEFAULT_FRAME, 10, &game->spells.collisions.iceball);
+    initCollisionMap(STARBALL_IMAGE_PATH, (Rectangle)STARBALL_DEFAULT_FRAME, 10, &game->spells.collisions.starball);
 }
 
 void createFireball(Position *position, Velocity *velocity, EcsEntityHandle caster, float damage, Game *game) {
@@ -190,7 +194,7 @@ void castPlayerSpells(Game *game, float dt) {
 
             // TODO: add cooldown after iceball destroyed
             float angle = iceballHandle != INVALID_HANDLE ? getOrbitMovement(iceballHandle)->angle + PI : 0.0f;
-            createIceball(game->player_handle, weaponSlot->damage, angle, game);
+            createIceball(game->player.handle, weaponSlot->damage, angle, game);
 
             continue;
         }
@@ -200,7 +204,7 @@ void castPlayerSpells(Game *game, float dt) {
                 if (ecsGetComponentCount(COMPONENT_ID(Enemy)) == 0) {
                     continue;
                 }
-                createStarball(weaponPosition, game->player_handle, weaponSlot->damage, game);
+                createStarball(weaponPosition, game->player.handle, weaponSlot->damage, game);
 
                 weaponSlot->cooldown = PLAYER_STARBALL_COOLDOWN;
             }
@@ -222,8 +226,7 @@ void systemCollideSpells(Game *game) {
     EcsEntityHandle fireballHandle;
     EcsEntityHandle enemyHandle;
     while ((fireballHandle = ecsGetNextEntity(&fireballIterator)) != INVALID_HANDLE) {
-        EntityState *fireballState =
-            (EntityState *)ecsGetEntityComponent(game->components[CMP_ENTITY_STATE], fireballHandle);
+        EntityState *fireballState = getEntityState(fireballHandle);
         if (fireballState->id != ENTITY_STATE_IDLE) {
             continue;
         }
@@ -240,7 +243,7 @@ void systemCollideSpells(Game *game) {
             Animation *playerAnim = getAnimation(game->player.handle);
             Position *playerPos = getPosition(game->player.handle);
             if(checkCollision(
-                &game->fireballs.collisions, fireballFrameIndex, fireballPosition->x, fireballPosition->y,
+                &game->spells.collisions.fireball, fireballFrameIndex, fireballPosition->x, fireballPosition->y,
                 &game->player.collisions, playerAnim->currentFrame, playerPos->x, playerPos->y
             )) {
                 eventCreate(fireballHandle, EVENT_FIREBALL_HIT, game);
@@ -267,7 +270,7 @@ void systemCollideSpells(Game *game) {
             }
 
             if (checkCollision(
-                &game->fireballs.collisions, fireballFrameIndex, fireballPosition->x, fireballPosition->y,
+                &game->spells.collisions.fireball, fireballFrameIndex, fireballPosition->x, fireballPosition->y,
                 &game->enemies.collisions, enemyFrameIndex, enemyPosition->x, enemyPosition->y
             )) {
                 eventCreate(fireballHandle, EVENT_FIREBALL_HIT, game);

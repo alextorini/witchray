@@ -1,46 +1,43 @@
-#include "ext/raylib.h"
-#include "smetanka_engine.h"
-#include "witch_game.h"
 #include "witch_resources.h"
 
-void resourcesInit(Game *game) {
-    game->resources.fonts[FONT_MAIN] = smeloadFont("fonts/monocraft.otf");
-    game->resources.sprites[SPRITESHEET_PLAYER] = smeLoadPixelTexture(PLAYER_IMAGE_PATH);
-    game->resources.sprites[SPRITESHEET_ENEMY] = smeLoadPixelTexture(ENEMY_IMAGE_PATH);
-    game->resources.sprites[SPRITESHEET_FIREBALL] = smeLoadPixelTexture(FIREBALL_IMAGE_PATH);
-    game->resources.sprites[SPRITESHEET_ICEBALL] = smeLoadPixelTexture(ICEBALL_IMAGE_PATH);
-    game->resources.sprites[SPRITESHEET_STARBALL] = smeLoadPixelTexture("images/starball.png");
-    game->resources.sprites[SPRITESHEET_EXP_CRYSTAL] = smeLoadPixelTexture(EXP_CRYSTAL_PATH );
-    game->resources.sprites[SPRITESHEET_HEALTH_CRYSTAL] = smeLoadPixelTexture("images/health_crystal.png");
-    game->resources.sprites[BACKGROUND_URBAN] = smeLoadPixelTexture("images/background_urban.png");
-    game->resources.sprites[BACKGROUND_CLOUDS] = smeLoadPixelTexture("images/background_clouds.png");
+void resourcesInit(ResourceRegistry *resourceRegistry) {
+    resourceRegistry->fonts[FONT_MAIN] = smeloadFont("fonts/monocraft.otf");
+    resourceRegistry->sprites[SPRITESHEET_PLAYER] = smeLoadPixelTexture(PLAYER_IMAGE_PATH);
+    resourceRegistry->sprites[SPRITESHEET_ENEMY] = smeLoadPixelTexture(ENEMY_IMAGE_PATH);
+    resourceRegistry->sprites[SPRITESHEET_FIREBALL] = smeLoadPixelTexture(FIREBALL_IMAGE_PATH);
+    resourceRegistry->sprites[SPRITESHEET_ICEBALL] = smeLoadPixelTexture(ICEBALL_IMAGE_PATH);
+    resourceRegistry->sprites[SPRITESHEET_STARBALL] = smeLoadPixelTexture(STARBALL_IMAGE_PATH);
+    resourceRegistry->sprites[SPRITESHEET_EXP_CRYSTAL] = smeLoadPixelTexture(EXP_CRYSTAL_PATH );
+    resourceRegistry->sprites[SPRITESHEET_HEALTH_CRYSTAL] = smeLoadPixelTexture("images/health_crystal.png");
+    resourceRegistry->sprites[BACKGROUND_URBAN] = smeLoadPixelTexture("images/background_urban.png");
+    resourceRegistry->sprites[BACKGROUND_CLOUDS] = smeLoadPixelTexture("images/background_clouds.png");
 
-    game->resources.sounds[SOUND_SHOOT] = smeLoadSound("sounds/shoot.wav");
-    SetSoundVolume(game->resources.sounds[SOUND_SHOOT], 0.3f);
-    game->resources.sounds[SOUND_EXPLOSION] = smeLoadSound("sounds/explosion.wav");
-    SetSoundVolume(game->resources.sounds[SOUND_EXPLOSION], 0.3f);
-    game->resources.sounds[SOUND_PLAYER_DEATH] = smeLoadSound("sounds/player_death.wav");
-    SetSoundVolume(game->resources.sounds[SOUND_PLAYER_DEATH], 0.5f);
+    resourceRegistry->sounds[SOUND_SHOOT] = smeLoadSound("sounds/shoot.wav");
+    SetSoundVolume(resourceRegistry->sounds[SOUND_SHOOT], 0.3f);
+    resourceRegistry->sounds[SOUND_EXPLOSION] = smeLoadSound("sounds/explosion.wav");
+    SetSoundVolume(resourceRegistry->sounds[SOUND_EXPLOSION], 0.3f);
+    resourceRegistry->sounds[SOUND_PLAYER_DEATH] = smeLoadSound("sounds/player_death.wav");
+    SetSoundVolume(resourceRegistry->sounds[SOUND_PLAYER_DEATH], 0.5f);
 
-    game->resources.sounds[SOUND_PICKUP_EXP] = smeLoadSound("sounds/pickup_exp.wav");
-    SetSoundVolume(game->resources.sounds[SOUND_PICKUP_EXP], 0.2f);
-    game->resources.sounds[SOUND_PICKUP_HP] = smeLoadSound("sounds/pickup_health.wav");
-    SetSoundVolume(game->resources.sounds[SOUND_PICKUP_HP], 0.5f);
+    resourceRegistry->sounds[SOUND_PICKUP_EXP] = smeLoadSound("sounds/pickup_exp.wav");
+    SetSoundVolume(resourceRegistry->sounds[SOUND_PICKUP_EXP], 0.2f);
+    resourceRegistry->sounds[SOUND_PICKUP_HP] = smeLoadSound("sounds/pickup_health.wav");
+    SetSoundVolume(resourceRegistry->sounds[SOUND_PICKUP_HP], 0.5f);
 
-    game->resources.sounds[SOUND_PAUSE] = smeLoadSound("sounds/pause.wav");
-    SetSoundVolume(game->resources.sounds[SOUND_PAUSE], 0.5f);
+    resourceRegistry->sounds[SOUND_PAUSE] = smeLoadSound("sounds/pause.wav");
+    SetSoundVolume(resourceRegistry->sounds[SOUND_PAUSE], 0.5f);
 
-    game->resources.music[MUSIC_MAIN] = smeLoadMusicStream("music/music2.wav");
-    game->resources.music[MUSIC_MAIN].looping = true;
+    resourceRegistry->music[MUSIC_MAIN] = smeLoadMusicStream("music/music2.wav");
+    resourceRegistry->music[MUSIC_MAIN].looping = true;
 
     #if defined(PLATFORM_WEB)
-    game->resources.shaders.damageFlash.shader = smeLoadShader("shaders/web/damage_flash.glsl");
+    resourceMap->shaders.damageFlash.shader = smeLoadShader("shaders/web/damage_flash.glsl");
     #else
-    game->resources.shaders.damageFlash.shader = smeLoadShader("shaders/damage_flash.glsl");
+    resourceRegistry->shaders.damageFlash.shader = smeLoadShader("shaders/damage_flash.glsl");
     #endif
 
-    game->resources.shaders.damageFlash.colorLoc  =
-        GetShaderLocation(game->resources.shaders.damageFlash.shader, "flashColor");
-    game->resources.shaders.damageFlash.strengthLoc =
-        GetShaderLocation(game->resources.shaders.damageFlash.shader, "flashStrength");
+    resourceRegistry->shaders.damageFlash.colorLoc  =
+        GetShaderLocation(resourceRegistry->shaders.damageFlash.shader, "flashColor");
+    resourceRegistry->shaders.damageFlash.strengthLoc =
+        GetShaderLocation(resourceRegistry->shaders.damageFlash.shader, "flashStrength");
 }

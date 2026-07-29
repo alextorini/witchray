@@ -98,7 +98,7 @@ static EcsEntityHandle createEnemy(Position *pos, Game *game) {
     return handle;
 }
 
-void systemSpawnEnemies(Game *game, float dt) {
+void systemEnemiesSpawn(Game *game, float dt) {
     if (!game->spawnEnemies) {
         return;
     }
@@ -121,7 +121,7 @@ void systemSpawnEnemies(Game *game, float dt) {
         return;
     }
 
-    if (ecsGetComponentCount(game->components[CMP_ENEMY]) >= MAX_ENEMIES_COUNT) {
+    if (ecsGetComponentCount(COMPONENT_ID(Enemy)) >= MAX_ENEMIES_COUNT) {
         return;
     }
 
@@ -134,7 +134,7 @@ void systemSpawnEnemies(Game *game, float dt) {
     spawnCooldown = game->enemySpawnCooldown;
 }
 
-void systemCleanEnemies() {
+void systemEnemiesClean() {
     EcsComponentId componentIdList[] = {COMPONENT_ID(Enemy), COMPONENT_ID(Position)};
     EcsEntityIterator iterator = ecsGetEntityIterator(componentIdList, 2);
     EcsEntityHandle entityHandle;
@@ -148,7 +148,7 @@ void systemCleanEnemies() {
     ecsFlushDestroyQueue();
 }
 
-void systemCollideEnemies(Game *game) {
+void systemEnemiesCollide(Game *game) {
     EcsEntityHandle playerHandle = game->player.handle;
 
     EcsComponentId componentIdList[] = {COMPONENT_ID(Enemy), COMPONENT_ID(Position), COMPONENT_ID(Render)};

@@ -6,7 +6,6 @@
 
 #define MAX_TEXT_LENGTH 128
 #define START_SCREEN_TEXT_COLOR WHITE
-#define START_SCREEN_TEXT_FONT game->resources.fonts[FONT_MAIN]
 #define START_SCREEN_TEXT_FONT_SIZE 31
 #define START_SCREEN_TEXT_FONT_SPACING 1
 #define START_SCREEN_TEXT "Press Space/Enter To Start"
@@ -20,7 +19,7 @@ void startScreenInit(Game *game) {
     TextRender start_label_text_render = {
         .offset = {0, 0},
         .color = START_SCREEN_TEXT_COLOR,
-        .font = START_SCREEN_TEXT_FONT,
+        .font = game->resources.fonts[FONT_MAIN],
         .fontSize = START_SCREEN_TEXT_FONT_SIZE,
         .spacing = START_SCREEN_TEXT_FONT_SPACING,
         .text = START_SCREEN_TEXT
@@ -32,6 +31,10 @@ void startScreenInit(Game *game) {
     game->state = STATE_START_SCREEN;
     game->requestedState = game->state;
     game->skyColor = SKY_COLOR_1;
+
+    if (!IsMusicStreamPlaying(game->resources.music[MUSIC_MAIN])) {
+        smePlayMusicStream(game->resources.music[MUSIC_MAIN]);
+    }
 }
 
 static void startScreenInputProcess(InputState *input, Game *game) {

@@ -34,8 +34,7 @@ void win(Game *game) {
 
     Animation *anim = getAnimation(game->player.handle);
 
-    anim->currentClip = ANIMATION_WIN;
-    anim->currentFrame = 6;
+    switchAnimation(anim, ANIMATION_WIN);
 
     EcsEntityHandle labelHandle = ecsCreateEntity();
 
@@ -56,6 +55,6 @@ void win(Game *game) {
     EntityState labelState = {.id = ENTITY_STATE_DYING, .cooldown = 10.0f};
     addComponent(labelHandle, &labelState);
 
-    saveGame(game);
+    saveHighscore(game->highscore);
     //stateRequestChange(game, STATE_START_SCREEN);
 }

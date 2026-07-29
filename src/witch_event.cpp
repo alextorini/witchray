@@ -52,7 +52,7 @@ void eventProcess(Game *game) {
                 }
 
                 // This variable is used for different purposes in different entity states
-                // In idle state, it is used to show damage flash effect on the entity
+                // In idle state, it's used to show a damage flash effect on the entity
                 entityState->cooldown = 0.15f;
 
                 break;

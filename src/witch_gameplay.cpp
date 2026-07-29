@@ -22,7 +22,6 @@
 void gameplayInit(Game *game) {
     initGameBackground(game);
     game->player.handle = initPlayer(game);
-    game->player_handle = game->player.handle;
     initEnemyFactory(game);
     game->timer = 0.0f;
     game->enemiesKilled = 0;
@@ -30,9 +29,9 @@ void gameplayInit(Game *game) {
     game->skyColor = SKY_COLOR_1;
     game->win = 0;
     game->spawnEnemies = 1;
+    game->pause = 0;
 
     game->pickups.speed = PICKAPABLE_SPEED;
-
 
     EcsEntityHandle introLabelHandle = ecsCreateEntity();
 
@@ -71,11 +70,11 @@ void gameplayUpdate(InputState *input, Game *game, float dt) {
         stateRequestChange(game, STATE_START_SCREEN);
     }
 
-    systemSpawnEnemies(game, dt);
+    systemEnemiesSpawn(game, dt);
 
     systemEnemiesFire(game, dt);
 
-    systemCleanEnemies();
+    systemEnemiesClean();
 
     castPlayerSpells(game, dt);
 
@@ -89,7 +88,7 @@ void gameplayUpdate(InputState *input, Game *game, float dt) {
 
     systemMoveParallax();
 
-    systemCollideEnemies(game);
+    systemEnemiesCollide(game);
 
     systemCollideSpells(game);
 

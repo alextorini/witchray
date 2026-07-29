@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include "smetanka_ecs.h"
 #include "witch_collisions.h"
+#include "witch_resources.h"
 
 #define GAME_VERSION 0
 
@@ -64,12 +65,16 @@ constexpr int VIRTUAL_WIDTH = 640;
 typedef struct {
     FrameCollisionMap collisions;
     float deathCooldown;
-} Enemies;
+} EnemyRegistry;
 
 typedef struct {
-    FrameCollisionMap collisions;
+    struct {
+        FrameCollisionMap fireball;
+        FrameCollisionMap iceball;
+        FrameCollisionMap starball;
+    } collisions;
     float deathCooldown;
-} Fireballs;
+} SpellRegistry;
 
 typedef struct {
     EcsEntityHandle handle;
@@ -80,80 +85,27 @@ typedef struct {
     float deathCooldown;
 } Player;
 
-typedef enum {
-    SOUND_SHOOT,
-    SOUND_EXPLOSION,
-    SOUND_PICKUP_EXP,
-    SOUND_PICKUP_HP,
-    SOUND_PLAYER_DEATH,
-    SOUND_PAUSE,
-    SOUND_COUNT
-} SoundIndex;
-
-typedef enum {
-    MUSIC_MAIN,
-    MUSIC_COUNT
-} MusicIndex;
-
-typedef enum {
-    SPRITESHEET_PLAYER,
-    SPRITESHEET_ENEMY,
-    BACKGROUND_URBAN,
-    BACKGROUND_CLOUDS,
-    SPRITESHEET_FIREBALL,
-    SPRITESHEET_ICEBALL,
-    SPRITESHEET_STARBALL,
-    SPRITESHEET_EXP_CRYSTAL,
-    SPRITESHEET_HEALTH_CRYSTAL,
-    SPRITE_COUNT
-} SpriteIndex;
-
-typedef enum {
-    FONT_MAIN,
-    FONT_COUNT
-} FontIndex;
-
-typedef struct {
-    struct {
-        Shader shader;
-        int colorLoc;
-        int strengthLoc;
-    } damageFlash;
-} ShadersMap;
-
-
-typedef struct {
-    Font fonts[FONT_COUNT];
-    Texture sprites[SPRITE_COUNT];
-    Sound sounds[SOUND_COUNT];
-    Music music[MUSIC_COUNT];
-    ShadersMap shaders;
-    int flashColorLoc;
-    int flashStrengthLoc;
-} ResourceMap;
 
 typedef struct {
     float speed;
     FrameCollisionMap collisions;
-} PickapableMap;
+} PickapableRegistry;
 
 typedef struct {
-    EcsEntityHandle player_handle;
     Player player;
-    Enemies enemies;
-    Fireballs fireballs;
-    PickapableMap pickups;
+    EnemyRegistry enemies;
+    SpellRegistry spells;
+    PickapableRegistry pickups;
     EcsEntityHandle backgrounds[2][2];
-    ResourceMap resources;
-    EcsComponentId *components;
-    int state;
-    int requestedState;
-    float timer;
-    float enemySpawnCooldown;
+    ResourceRegistry resources;
     Color skyColor;
     uint64_t enemiesKilled;
     uint64_t score;
     uint64_t highscore;
+    int state;
+    int requestedState;
+    float timer;
+    float enemySpawnCooldown;
     float winCooldown;
     uint8_t win;
     uint8_t spawnEnemies;

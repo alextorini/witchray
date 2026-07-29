@@ -8,7 +8,7 @@ void systemMoveParallax();
 
 void systemAnimateEntities(float dt);
 
-void systemRenderEntities(ResourceMap *resources);
+void systemRenderEntities(ResourceRegistry *resources);
 
 void systemRenderText();
 

@@ -11,18 +11,14 @@ void stateRequestChange(Game *game, int state) {
             }
 
             game->requestedState = state;
-
-            break;
-        }
+        } break;
         case STATE_GAMEPLAY: {
             if (state != STATE_START_SCREEN) {
                 ABORT();
             }
 
             game->requestedState = state;
-
-            break;
-        }
+        } break;
     }
 }
 
@@ -42,23 +38,18 @@ void stateUpdate(Game *game) {
             gameplayInit(game);
 
             game->state = game->requestedState;
-
-            break;
-        }
+        } break;
         case STATE_GAMEPLAY: {
             if (game->requestedState != STATE_START_SCREEN) {
                 ABORT();
             }
-
 
             gameplayDestroy(game);
 
             startScreenInit(game);
 
             game->state = game->requestedState;
-
-            break;
-        }
+        } break;
     }
 
 }

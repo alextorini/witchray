@@ -103,18 +103,6 @@ void systemEnemiesSpawn(Game *game, float dt) {
         return;
     }
 
-    if (game->timer < 3.0f) {
-        return;
-    }
-
-    if (game->timer > 90.0f) {
-        game->enemySpawnCooldown = SPAWN_COOLDOWN * 0.70f;
-    } else if (game->timer > 60.0f) {
-        game->enemySpawnCooldown = SPAWN_COOLDOWN * 0.80f;
-    } else if (game->timer > 30.0f) {
-        game->enemySpawnCooldown = SPAWN_COOLDOWN * 0.90f;
-    }
-
     if (spawnCooldown >= 0) {
         spawnCooldown -= dt;
 

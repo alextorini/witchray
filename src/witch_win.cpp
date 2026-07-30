@@ -14,6 +14,7 @@
 void win(Game *game) {
     game->win = 1;
     game->spawnEnemies = 0;
+    game->castSpells = 0;
 
     smeStopMusicStream(game->resources.music[MUSIC_MAIN]);
 

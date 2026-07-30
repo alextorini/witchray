@@ -154,7 +154,7 @@ void systemHomingVelocityUpdate() {
 }
 
 void castPlayerSpells(Game *game, float dt) {
-    if (game->timer < 5.0f || game->win) {
+    if (!game->castSpells) {
         return;
     }
 

@@ -61,7 +61,7 @@ static void renderDebug(Game *game) {
 void render(Game *game, RenderTexture *screen) {
     smeBeginTextureMode(*screen);
 
-    clearBackground(game->skyColor);
+    clearBackground(kColors[game->skyColor]);
 
     systemRenderEntities(&game->resources);
     systemRenderText();

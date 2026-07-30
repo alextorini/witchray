@@ -4,6 +4,7 @@
 #include "witch_animation.h"
 #include "witch_components.h"
 #include "witch_game.h"
+#include "witch_win.h"
 
 void eventCreate(EcsEntityHandle entityHandle, EventType eventType, Game *game) {
     EcsEntityHandle eventHandle = ecsCreateEntity();
@@ -123,9 +124,10 @@ void eventProcess(Game *game) {
                     Animation *animation = getAnimation(event->entityHandle);
                     switchAnimation(animation, ANIMATION_DYING);
                 }
-
-                break;
-            }
+            } break;
+            case EVENT_WIN: {
+                win(game);
+            } break;
         }
 
         ecsAddToDestroyQueue(eventHandle);

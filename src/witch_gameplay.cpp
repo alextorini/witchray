@@ -8,7 +8,7 @@
 #include "witch_background.h"
 #include "witch_pickupable.h"
 #include "witch_player.h"
-#include "witch_state.h"
+#include "witch_time.h"
 #include "witch_systems.h"
 #include "witch_system_movement.h"
 #include "witch_win.h"
@@ -21,14 +21,19 @@
 
 void gameplayInit(Game *game) {
     initGameBackground(game);
+
     game->player.handle = initPlayer(game);
+
     initEnemyFactory(game);
-    game->timer = 0.0f;
+
+    timeInit(game);
+
     game->enemiesKilled = 0;
     game->enemySpawnCooldown = SPAWN_COOLDOWN;
     game->skyColor = SKY_COLOR_1;
     game->win = 0;
-    game->spawnEnemies = 1;
+    game->spawnEnemies = 0;
+    game->castSpells = 0;
     game->pause = 0;
 
     game->pickups.speed = PICKAPABLE_SPEED;
@@ -62,14 +67,6 @@ void gameplayUpdate(InputState *input, Game *game, float dt) {
         return;
     }
 
-    if (game->timer >= 180.0f && !game->win) {
-        win(game);
-    }
-
-    if (game->timer >= 200.0f && game->win) {
-        stateRequestChange(game, STATE_START_SCREEN);
-    }
-
     systemEnemiesSpawn(game, dt);
 
     systemEnemiesFire(game, dt);
@@ -98,11 +95,7 @@ void gameplayUpdate(InputState *input, Game *game, float dt) {
 
     systemProcessEntityStates(game);
 
-    if (game->timer > 30.0f) {
-        game->skyColor = SKY_COLOR_2;
-    }
-
-    game->timer += dt;
+    timeUpdate(game, dt);
 
     game->score = game->enemiesKilled * 10;
 

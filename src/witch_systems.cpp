@@ -65,8 +65,6 @@ void systemAnimateEntities(float dt) {
         AnimationClip *currentClip = &animation->set->clips[animation->currentClip];
         animation->timer += dt;
 
-        if (currentClip->frameTime <= 0.00001f) return;
-
         while (animation->timer >= currentClip->frameTime) {
             animation->currentFrame++;
             if (animation->currentFrame > currentClip->endFrame) {

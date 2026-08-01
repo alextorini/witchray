@@ -67,7 +67,7 @@ void gameplayUpdate(InputState *input, Game *game, float dt) {
         return;
     }
 
-    systemEnemiesSpawn(game, dt);
+    enemiesSpawn(game, dt);
 
     systemEnemiesFire(game, dt);
 
@@ -91,7 +91,7 @@ void gameplayUpdate(InputState *input, Game *game, float dt) {
 
     systemPickupablePickup(game);
 
-    systemCleanFireballs();
+    systemSpellsClean();
 
     systemProcessEntityStates(game);
 

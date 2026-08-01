@@ -14,4 +14,4 @@ void systemHomingVelocityUpdate();
 
 void systemCollideSpells(Game *game);
 
-void systemCleanFireballs();
+void systemSpellsClean();

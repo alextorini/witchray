@@ -98,7 +98,7 @@ static EcsEntityHandle createEnemy(Position *pos, Game *game) {
     return handle;
 }
 
-void systemEnemiesSpawn(Game *game, float dt) {
+void enemiesSpawn(Game *game, float dt) {
     if (!game->spawnEnemies) {
         return;
     }

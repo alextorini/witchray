@@ -31,7 +31,6 @@ static void renderUI(Game *game) {
         9, 1, DARKGREEN, "Level %d", game->player.level
     );
 
-
     smeDrawTextF(
         game->resources.fonts[FONT_MAIN],
         CLITERAL(Vector2){300, 3},

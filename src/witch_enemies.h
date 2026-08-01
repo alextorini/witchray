@@ -4,7 +4,7 @@
 
 void initEnemyFactory(Game *game);
 
-void systemEnemiesSpawn(Game *game, float dt);
+void enemiesSpawn(Game *game, float dt);
 
 void systemEnemiesClean();
 

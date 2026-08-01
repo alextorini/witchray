@@ -117,7 +117,8 @@ typedef struct {
 typedef struct {
     Texture *spritesheet;
     Rectangle frame;
-    // int priority;
+    uint16_t layer;
+    uint32_t priority;
 } Render;
 
 typedef struct {

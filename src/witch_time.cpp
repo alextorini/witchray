@@ -15,12 +15,13 @@ typedef enum {
 } TimeEventIndex;
 
 static float timePoints[TIME_COUNT];
-static int8_t currentTimePoint = 0;
+static int8_t currentTimePoint;
 
 static void timeEventCreate(TimeEventIndex event, Game *game);
 
 void timeInit(Game *game) {
     game->timer = 0.0f;
+    currentTimePoint = 0;
 
     timePoints[TIME_ENEMY_SPAWN] = 3.0f;
     timePoints[TIME_SPELL_CAST] = 5.0f;

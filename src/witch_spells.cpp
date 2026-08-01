@@ -282,7 +282,7 @@ void systemCollideSpells(Game *game) {
     }
 }
 
-void systemCleanFireballs() {
+void systemSpellsClean() {
     EcsComponentId componentIdList[] = {COMPONENT_ID(Spell), COMPONENT_ID(Position)};
     EcsEntityIterator iterator = ecsGetEntityIterator(componentIdList, 2);
     EcsEntityHandle entityHandle;
